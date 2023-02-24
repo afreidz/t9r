@@ -1,0 +1,18 @@
+{
+  "bindings": [
+    {
+      "name": "req",
+      "direction": "in",
+      "type": "httpTrigger",
+      "authLevel": "anonymous",
+      "methods": ["get", "post"],
+      "route": "trpc/{x:regex(^[^\\/]+$)}"
+    },
+    {
+      "name": "res",
+      "type": "http",
+      "direction": "out"
+    }
+  ],
+  "scriptFile": "../dist/function.cjs"
+}

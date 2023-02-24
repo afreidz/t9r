@@ -1,0 +1,17 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "es2022",
+    "baseUrl": "./",
+    "types": ["svelte"],
+    "esModuleInterop": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/app.ts"],
+  "exclude": ["node_modules/**", "dist/**"]
+}

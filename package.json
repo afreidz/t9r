@@ -1,0 +1,14 @@
+{
+  "name": "t9r",
+  "type": "module",
+  "scripts": {
+    "dev": "conc \"npm run dev -w backend\" \"npm run dev -w frontend\" \"swa start\""
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

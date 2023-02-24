@@ -1,0 +1,15 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "t9r": {
+      "port": 2023,
+      "outputLocation": ".",
+      "apiLocation": "backend/dist",
+      "appLocation": "frontend/dist",
+      "apiDevserverUrl": "http://localhost:20232",
+      "appDevserverUrl": "http://localhost:20231",
+      "apiBuildCommand": "npm run build -w backend",
+      "appBuildCommand": "npm run build -w frontend"
+    }
+  }
+}

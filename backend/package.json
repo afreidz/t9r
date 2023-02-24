@@ -1,0 +1,19 @@
+{
+  "name": "trpc-backend",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild --bundle function/index.ts --outfile=dist/function.cjs --platform=node --target=node16",
+    "watch": "npm run build -- --watch",
+    "dev": "conc \"npm run watch\" \"func start --port 20232\""
+  },
+  "devDependencies": {
+    "@azure/functions": "^3.0.0",
+    "@trpc/server": "^10.12.0",
+    "@types/node": "16.x",
+    "azure-functions-core-tools": "^4.x",
+    "concurrently": "^7.6.0",
+    "esbuild": "0.17.10",
+    "temporal-polyfill": "^0.1.1",
+    "typescript": "^4.0.0"
+  }
+}
