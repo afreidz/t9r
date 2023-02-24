@@ -5,10 +5,14 @@
 
   onMount(async () => {
     resp = await trpc.ping.query();
+    const projects = await trpc.projects.list.query();
+    console.log(projects);
   });
 </script>
 
 <main class="flex flex-col items-center justify-center flex-1">
   <h1>Hello World</h1>
-  <small>{resp}</small>
+  <small>
+    {#if resp}{resp}{:else}loading...{/if}
+  </small>
 </main>
