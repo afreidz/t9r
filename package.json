@@ -2,6 +2,7 @@
   "name": "t9r",
   "type": "module",
   "scripts": {
+    "build": "npm run build --workspaces",
     "dev": "conc \"npm run dev -w backend\" \"npm run dev -w frontend\" \"swa start\""
   },
   "workspaces": [
