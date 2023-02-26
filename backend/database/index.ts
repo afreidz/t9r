@@ -1,4 +1,4 @@
-import { Db, MongoClient } from "mongodb";
+import { Db, MongoClient, MongoServerError } from "mongodb";
 let cache: Db;
 
 export default async function getDBClient(): Promise<Db> {
@@ -12,3 +12,5 @@ export default async function getDBClient(): Promise<Db> {
 
   return cache;
 }
+
+export const DBError = MongoServerError;

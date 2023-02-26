@@ -1,6 +1,7 @@
 <script lang="ts">
   import trpc from "./lib/trpc";
   import { onMount } from "svelte";
+  import NewProject from "./views/project/New.svelte";
   let resp: string;
 
   onMount(async () => {
@@ -15,4 +16,5 @@
   <small>
     {#if resp}{resp}{:else}loading...{/if}
   </small>
+  <NewProject />
 </main>

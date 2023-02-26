@@ -20,7 +20,7 @@ export function funcTriggerToHTTPRequest(req: AzureHttpRequest): HTTPRequest {
     method: req.method || "get",
     query: query,
     headers: req.headers,
-    body: req.bufferBody,
+    body: req.body,
   };
 }
 
@@ -36,6 +36,19 @@ export function urlToPath(url: string): string {
   } else {
     return trpcPath;
   }
+}
+
+export function tRPCOutputToAzureFuncOutput(
+  response: HTTPResponse
+): Record<string, any> {
+  return {
+    body: response.body ?? undefined,
+    status: response.status,
+    headers: {
+      "Content-Type": "application/json",
+      ...(response.headers ?? {}),
+    },
+  };
 }
 
 export type CreateAzureFuncContextOptions = {
@@ -59,16 +72,3 @@ export type AzureFunctionOptions<TRouter extends AnyRouter> = {
   responseMeta?: ResponseMetaFn<TRouter>;
   createContext?: AzureFuncCreateContextFn<TRouter>;
 };
-
-export function tRPCOutputToAzureFuncOutput(
-  response: HTTPResponse
-): Record<string, any> {
-  return {
-    body: response.body ?? undefined,
-    status: response.status,
-    headers: {
-      "Content-Type": "application/json",
-      ...(response.headers ?? {}),
-    },
-  };
-}
