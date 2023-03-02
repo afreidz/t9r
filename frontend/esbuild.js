@@ -2,6 +2,7 @@ import http from "node:http";
 import * as esbuild from "esbuild";
 import svelte from "esbuild-svelte";
 import postcss from "esbuild-postcss";
+import alias from "esbuild-plugin-alias";
 import preprocess from "svelte-preprocess";
 
 const config = {
@@ -14,7 +15,13 @@ const config = {
   splitting: true,
   write: true,
   format: `esm`,
-  plugins: [postcss(), svelte({ preprocess: preprocess() })],
+  plugins: [
+    postcss(),
+    svelte({ preprocess: preprocess() }),
+    alias({
+      "@/*": "./src/*",
+    }),
+  ],
 };
 
 if (!process.argv.includes(`--watch`)) {

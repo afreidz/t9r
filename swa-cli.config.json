@@ -4,6 +4,7 @@
     "t9r": {
       "port": 2023,
       "outputLocation": ".",
+      "swaConfigLocation": "./",
       "apiLocation": "backend/dist",
       "appLocation": "frontend/dist",
       "apiDevserverUrl": "http://localhost:20232",

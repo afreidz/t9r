@@ -1,6 +1,7 @@
 <script lang="ts">
-  import trpc from "../../lib/trpc";
-  import type { Project } from "../../../../backend/schema/project";
+  import trpc from "@/lib/trpc";
+  import Header from "@/components/core/Header.svelte";
+  import type { Project } from "@/backend/schema/project";
 
   let name: Project["name"];
   let color: Project["color"];
@@ -14,8 +15,8 @@
   }
 </script>
 
+<Header main="New Project" />
 <form on:submit|preventDefault={submit}>
-  <h2>New Project</h2>
   <div class="p-6">
     <label>
       <span>Name</span>

@@ -7,15 +7,20 @@
   },
   "type": "module",
   "devDependencies": {
+    "@iconify/svelte": "^3.1.0",
+    "@tailwindcss/line-clamp": "^0.4.2",
+    "@tailwindcss/typography": "^0.5.9",
     "@trpc/client": "^10.12.0",
     "@tsconfig/svelte": "^3.0.0",
     "autoprefixer": "^10.4.13",
     "esbuild": "^0.17.10",
+    "esbuild-plugin-alias": "^0.2.1",
     "esbuild-postcss": "^0.0.4",
     "esbuild-svelte": "^0.7.3",
     "postcss": "^8.4.21",
     "svelte": "^3.55.1",
     "svelte-preprocess": "^5.0.1",
+    "svelte-spa-router": "^3.3.0",
     "tailwindcss": "^3.2.7",
     "typescript": "^4.9.5"
   }

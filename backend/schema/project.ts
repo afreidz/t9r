@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 const ProjectSchema = z.object({
+  _id: z.string().optional(),
+  owner: z.string().optional(),
   name: z.string().min(2).max(30),
   budget: z.number().min(1).optional(),
   archived: z.boolean().optional().default(false),

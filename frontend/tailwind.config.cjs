@@ -1,8 +1,27 @@
 /** @type {import('tailwindcss').Config} */
+const theme = require("tailwindcss/defaultTheme");
+
 module.exports = {
-  content: ["./src/**/*.{html,js,ts,svelte,json}"],
+  darkMode: "class",
+  content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        text: {
+          light: "#D5DBE7",
+        },
+        neutral: {
+          900: "#1E2227",
+          800: "#23272E",
+        },
+      },
+      fontFamily: {
+        sans: ["Menlo", ...theme.fontFamily.sans],
+      },
+    },
   },
-  plugins: [],
+  plugins: [
+    require("@tailwindcss/line-clamp"),
+    require("@tailwindcss/typography"),
+  ],
 };
