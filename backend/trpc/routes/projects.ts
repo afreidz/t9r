@@ -17,7 +17,7 @@ const projectsRouter = router({
     const db = await getDBClient();
     const collection = db.collection("projects");
 
-    const result = await collection.find({ owner: userId }).toArray();
+    const result = await collection.find<Project>({ owner: userId }).toArray();
 
     if (result instanceof DBError) {
       throw new TRPCError({
@@ -26,7 +26,7 @@ const projectsRouter = router({
         cause: result,
       });
     } else {
-      return result as Project[];
+      return result;
     }
   }),
   delete: protectedProcedure

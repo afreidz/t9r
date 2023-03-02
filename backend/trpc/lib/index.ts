@@ -1,5 +1,4 @@
-import { ZodError } from "zod";
-import { createContext } from "./context";
+import type { createContext } from "./context";
 import { initTRPC, TRPCError } from "@trpc/server";
 
 const t = initTRPC.context<typeof createContext>().create();

@@ -11,6 +11,7 @@ module.exports = {
           light: "#D5DBE7",
         },
         neutral: {
+          light: "#D5DBE7",
           900: "#1E2227",
           800: "#23272E",
         },

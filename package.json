@@ -3,13 +3,15 @@
   "type": "module",
   "scripts": {
     "build": "npm run build --workspaces",
-    "dev": "conc \"npm run dev -w backend\" \"npm run dev -w frontend\" \"swa start\""
+    "dev": "conc \"npm run dev -w backend\" \"npm run dev -w frontend\" \"swa start\"",
+    "prepare": "husky install"
   },
   "workspaces": [
     "frontend",
     "backend"
   ],
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "husky": "^8.0.3"
   }
 }

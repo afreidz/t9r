@@ -9,7 +9,7 @@ let cache: Db;
 export default async function getDBClient(): Promise<Db> {
   if (cache) return cache;
 
-  const url = process.env.AZURE_COSMOS_CONNECTION_STRING;
+  const url = process.env.AZURE_COSMOS_CONNECTION_STRING ?? "";
 
   const client = new MongoClient(url);
   await client.connect();

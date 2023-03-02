@@ -3,6 +3,7 @@
   import projects from "@/lib/projects";
   import { link } from "svelte-spa-router";
   import { slide } from "svelte/transition";
+  import { location } from "svelte-spa-router";
   import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
@@ -10,11 +11,15 @@
   let showProjects = true;
 </script>
 
-<nav class="flex flex-1 flex-col px-3 text-xl">
-  <ul class="flex-1 flex flex-col gap-3 items-stretch">
+<nav class="flex flex-1 flex-col px-3 text-lg">
+  <ul class="flex flex-1 flex-col items-stretch gap-3">
     <li>
-      <a href="/" use:link on:click={() => dispatch("navigate", "/")}>
-        <div class="flex gap-2 items-center flex-wrap">
+      <a
+        href="/timers"
+        on:click={() => dispatch("navigate", "/")}
+        use:link={{ disabled: $location === "/timers" }}
+      >
+        <div class="flex flex-wrap items-center gap-2">
           <Icon icon="material-symbols:timer-outline" class="flex-none" />
           <span class="flex-1">Timers</span>
         </div>
@@ -24,31 +29,33 @@
       <button
         type="button"
         on:click={() => (showProjects = !showProjects)}
-        class="w-full flex gap-2 items-center"
+        class="flex w-full items-center gap-2"
       >
         <Icon icon="mdi:briefcase-outline" class="flex-none" />
         <span class="flex-1 text-left">Projects</span>
         <Icon
           icon="ph:caret-down-bold"
-          class={`flex-none transition-transform ease-in-out hidden md:block ${
+          class={`flex-none transition-transform ease-in-out ${
             showProjects ? "rotate-180" : ""
           }`}
         />
       </button>
       {#if showProjects}
-        <ul in:slide out:slide class="flex-1 flex-col gap-3 ml-7 my-2">
+        <ul in:slide out:slide class="my-2 ml-7 flex flex-1 flex-col gap-2">
           {#each $projects.filter((p) => !p.archived) as project}
             <li>
-              <div class="flex gap-2 items-center flex-wrap">
+              <div class="flex flex-wrap items-center gap-2">
                 <a
                   href={`/projects/${project._id}`}
-                  use:link
+                  use:link={{
+                    disabled: $location === `/projects/${project._id}`,
+                  }}
                   on:click={() =>
                     dispatch("navigate", `/projects/${project._id}`)}
                 >
-                  <span class="flex-1 flex items-center gap-2">
+                  <span class="flex flex-1 items-center gap-2">
                     <figure
-                      class="rounded w-4 h-4"
+                      class="h-4 w-4 rounded"
                       style={`background-color: ${project.color}`}
                     >
                       <figcaption class="sr-only">
@@ -64,10 +71,10 @@
           <li>
             <a
               href="/projects/new"
-              use:link
+              use:link={{ disabled: $location === `/projects/new` }}
               on:click={() => dispatch("navigate", `/projects/new`)}
             >
-              <div class="flex gap-2 items-center flex-wrap">
+              <div class="flex flex-wrap items-center gap-2">
                 <Icon
                   icon="material-symbols:add-circle-outline"
                   class="flex-none"
@@ -82,10 +89,10 @@
     <li>
       <a
         href="/settings"
-        use:link
+        use:link={{ disabled: $location === `/settings` }}
         on:click={() => dispatch("navigate", `/settings`)}
       >
-        <div class="flex gap-2 items-center flex-wrap">
+        <div class="flex flex-wrap items-center gap-2">
           <Icon icon="ph:gear-six" class="flex-none" />
           <span class="flex-1">Settings</span>
         </div>
@@ -93,7 +100,7 @@
     </li>
     <li>
       <a href="/logout">
-        <div class="flex gap-2 items-center flex-wrap">
+        <div class="flex flex-wrap items-center gap-2">
           <Icon icon="ri:logout-box-line" class="flex-none" />
           <span class="flex-1">Log Out</span>
         </div>

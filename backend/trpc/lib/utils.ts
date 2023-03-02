@@ -6,7 +6,10 @@ import type {
 } from "@trpc/server/dist/http/internals/types";
 import type { AnyRouter, inferRouterContext } from "@trpc/server";
 import type { OnErrorFunction } from "@trpc/server/dist/internals/types";
-import { HttpRequest as AzureHttpRequest, Context } from "@azure/functions";
+import type {
+  HttpRequest as AzureHttpRequest,
+  Context,
+} from "@azure/functions";
 
 export function funcTriggerToHTTPRequest(req: AzureHttpRequest): HTTPRequest {
   const query = new URLSearchParams();

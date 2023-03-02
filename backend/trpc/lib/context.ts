@@ -1,7 +1,8 @@
-import { CreateAzureFuncContextOptions } from "./utils";
+import type { CreateAzureFuncContextOptions } from "./utils";
 
 type User = {
   userId: string;
+  userDetails: unknown;
 };
 
 export function createContext(opts: CreateAzureFuncContextOptions) {

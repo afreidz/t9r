@@ -10,17 +10,17 @@
 </script>
 
 <label
-  class="flex-1 max-w-[200px] min-w-max flex items-center gap-4 rounded-full p-2 bg-white shadow-xl"
+  class="flex min-w-max max-w-[200px] flex-1 items-center gap-4 rounded-full bg-white p-2 shadow-xl"
 >
   {#if $mostRecentProject}
     <figure
-      class="rounded-full h-10 w-10 flex items-center justify-center text-xs flex-none"
+      class="flex h-10 w-10 flex-none items-center justify-center rounded-full text-xs"
       style={`background-color: ${$mostRecentProject.color}`}
     >
       {$mostRecentProject.name.substring(0, 1)}
     </figure>
-    <div class="flex flex-col flex-1">
-      <span class="text-black/50 text-xs">Select Project</span>
+    <div class="flex flex-1 flex-col">
+      <span class="text-xs text-black/50">Select Project</span>
       <select
         class="appearance-none text-black"
         bind:value
@@ -34,7 +34,7 @@
       </select>
     </div>
     <button
-      class="bg-blue-600 rounded-full flex items-center justify-center h-10 w-10"
+      class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600"
     >
       <Icon icon="material-symbols:play-arrow-rounded" />
     </button>

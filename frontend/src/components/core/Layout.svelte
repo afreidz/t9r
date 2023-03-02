@@ -14,22 +14,22 @@
 </script>
 
 <div
-  class="fixed top-0 bottom-0 left-0 right-0 min-w-[320px] grid text-text-light grid-rows-[6rem_auto_6rem] grid-cols-[0px_auto] md:grid-cols-[320px_auto] bg-neutral-900"
+  class="fixed top-0 bottom-0 left-0 right-0 grid min-w-[320px] grid-cols-[0px_auto] grid-rows-[6rem_auto_6rem] bg-neutral-900 text-text-light md:grid-cols-[320px_auto]"
 >
   <header
-    class="p-3 md:p-6 row-start-1 col-start-1 col-span-2 md:col-span-1 flex items-center justify-between"
+    class="col-span-2 col-start-1 row-start-1 flex items-center justify-between p-3 md:col-span-1 md:p-6"
   >
     <Logo />
     <MenuTrigger
       enabled={menuOpen}
       on:click={() => (menuOpen = !menuOpen)}
-      class="w-8 h-8 md:hidden"
+      class="h-8 w-8 md:hidden"
     />
   </header>
   <aside
-    class={`pl-3 md:pl-6 row-start-2 col-start-1 flex flex-1 flex-col transition-transform -translate-x-full md:translate-x-0 ease-in-out w-full max-w-xs fixed left-0 bottom-0 top-0 md:static ${
+    class={`fixed left-0 bottom-0 top-0 col-start-1 row-start-2 flex w-full max-w-xs flex-1 -translate-x-full flex-col pl-3 transition-transform ease-in-out md:static md:translate-x-0 md:pl-6 ${
       menuOpen
-        ? "pt-24 md:pt-0 pl-2 md:pl-0 border-r border-black/30 md:border-none translate-x-0 bg-neutral-900/50 backdrop-blur-md md:bg-transparent"
+        ? "translate-x-0 border-r border-black/30 bg-neutral-900/50 pt-24 pl-2 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
         : ""
     }`}
   >
@@ -38,14 +38,14 @@
   {#key $location}
     <main
       in:fly={{ x: 500, opacity: 0 }}
-      class="m-3 md:m-6 mt-0 flex row-span-3 col-start-2 flex-col rounded-xl bg-neutral-800 p-6 overflow-auto"
+      class="col-start-2 row-span-3 m-3 mt-0 flex flex-col overflow-auto rounded-xl bg-neutral-800 p-6 md:m-6"
     >
       <slot />
     </main>
   {/key}
   {#if $location.startsWith("/timers")}
     <div
-      class="flex items-center justify-center fixed bottom-6 left-0 right-0 md:static"
+      class="fixed bottom-6 left-0 right-0 flex items-center justify-center md:static"
     >
       <NewTimer />
     </div>
