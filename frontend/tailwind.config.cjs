@@ -17,7 +17,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["Menlo", ...theme.fontFamily.sans],
+        mono: ["Space Mono", "Menlo", ...theme.fontFamily.mono],
       },
     },
   },
