@@ -17,9 +17,13 @@ const config = {
   format: `esm`,
   plugins: [
     postcss(),
-    svelte({ preprocess: preprocess() }),
+    svelte({
+      preprocess: preprocess(),
+      compilerOptions: { css: "injected" },
+    }),
     alias({
       "@/*": "./src/*",
+      "@/foundation": "./src/components/foundation/*",
     }),
   ],
 };

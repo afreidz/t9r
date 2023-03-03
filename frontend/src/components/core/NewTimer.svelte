@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import Button from "@/foundation/Button.svelte";
   import projects, { mostRecentProject } from "@/lib/projects";
   let value: string;
 
@@ -10,19 +11,13 @@
 </script>
 
 <label
-  class="flex min-w-max max-w-[200px] flex-1 items-center gap-4 rounded-full bg-white p-2 shadow-xl"
+  class="flex min-w-max max-w-[280px] flex-1 items-center gap-4 rounded-full bg-white p-2 pl-6 shadow-xl ring-blue-500 focus-within:ring"
 >
   {#if $mostRecentProject}
-    <figure
-      class="flex h-10 w-10 flex-none items-center justify-center rounded-full text-xs"
-      style={`background-color: ${$mostRecentProject.color}`}
-    >
-      {$mostRecentProject.name.substring(0, 1)}
-    </figure>
     <div class="flex flex-1 flex-col">
       <span class="text-xs text-black/50">Select Project</span>
       <select
-        class="appearance-none text-black"
+        class="appearance-none !bg-transparent text-black outline-none"
         bind:value
         on:change={handleChange}
       >
@@ -33,10 +28,11 @@
         {/each}
       </select>
     </div>
-    <button
-      class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600"
+    <Button
+      class="flex h-10 w-10 items-center justify-center !rounded-full text-white !ring-offset-white"
+      style={`background-color: ${$mostRecentProject.color}`}
     >
-      <Icon icon="material-symbols:play-arrow-rounded" />
-    </button>
+      <Icon icon="ic:baseline-plus" />
+    </Button>
   {/if}
 </label>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { getToday, isToday } from "@/lib/dates";
+  import Button from "@/foundation/Button.svelte";
 
   let date: Temporal.PlainDate = getToday();
   let picker: HTMLInputElement;
@@ -33,24 +34,24 @@
 
 <div class="flex flex-none justify-between border-b border-neutral-900 px-3">
   <div>
-    <button
+    <Button
       class={buttonClasses}
       disabled={isToday(date)}
       on:click={() => (date = getToday())}
     >
       <Icon icon="ic:round-arrow-circle-down" />
-    </button>
+    </Button>
   </div>
   <div class="flex gap-2">
-    <button class={buttonClasses} on:click={prevDate}>
+    <Button class={buttonClasses} on:click={prevDate}>
       <Icon icon="ooui:previous-ltr" />
-    </button>
-    <button class={buttonClasses} on:click={nextDate} disabled={isToday(date)}>
+    </Button>
+    <Button class={buttonClasses} on:click={nextDate} disabled={isToday(date)}>
       <Icon icon="ooui:previous-rtl" />
-    </button>
+    </Button>
   </div>
   <div>
-    <button class={buttonClasses} on:click={showPicker}>
+    <Button class={buttonClasses} on:click={showPicker}>
       <Icon icon="material-symbols:calendar-month-outline-sharp" />
       <input
         type="date"
@@ -58,6 +59,6 @@
         on:change={(e) => updateDate(e.currentTarget.value)}
         class="invisible h-px w-px"
       />
-    </button>
+    </Button>
   </div>
 </div>

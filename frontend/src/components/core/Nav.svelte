@@ -1,12 +1,9 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import projects from "@/lib/projects";
-  import { link } from "svelte-spa-router";
   import { slide } from "svelte/transition";
-  import { location } from "svelte-spa-router";
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
+  import Link from "@/foundation/Link.svelte";
+  import Button from "@/foundation/Button.svelte";
 
   let showProjects = true;
 </script>
@@ -14,19 +11,15 @@
 <nav class="flex flex-1 flex-col px-3 text-lg">
   <ul class="flex flex-1 flex-col items-stretch gap-3">
     <li>
-      <a
-        href="/timers"
-        on:click={() => dispatch("navigate", "/")}
-        use:link={{ disabled: $location === "/timers" }}
-      >
+      <Link to="/timers" on:navigate>
         <div class="flex flex-wrap items-center gap-2">
           <Icon icon="material-symbols:timer-outline" class="flex-none" />
           <span class="flex-1">Timers</span>
         </div>
-      </a>
+      </Link>
     </li>
     <li>
-      <button
+      <Button
         type="button"
         on:click={() => (showProjects = !showProjects)}
         class="flex w-full items-center gap-2"
@@ -39,20 +32,13 @@
             showProjects ? "rotate-180" : ""
           }`}
         />
-      </button>
+      </Button>
       {#if showProjects}
         <ul in:slide out:slide class="my-2 ml-7 flex flex-1 flex-col gap-2">
           {#each $projects.filter((p) => !p.archived) as project}
             <li>
               <div class="flex flex-wrap items-center gap-2">
-                <a
-                  href={`/projects/${project._id}`}
-                  use:link={{
-                    disabled: $location === `/projects/${project._id}`,
-                  }}
-                  on:click={() =>
-                    dispatch("navigate", `/projects/${project._id}`)}
-                >
+                <Link to={`/projects/${project._id}`} on:navigate>
                   <span class="flex flex-1 items-center gap-2">
                     <figure
                       class="h-4 w-4 rounded"
@@ -64,16 +50,12 @@
                     </figure>
                     <span>{project.name}</span>
                   </span>
-                </a>
+                </Link>
               </div>
             </li>
           {/each}
           <li>
-            <a
-              href="/projects/new"
-              use:link={{ disabled: $location === `/projects/new` }}
-              on:click={() => dispatch("navigate", `/projects/new`)}
-            >
+            <Link to="/projects/new" on:navigate>
               <div class="flex flex-wrap items-center gap-2">
                 <Icon
                   icon="material-symbols:add-circle-outline"
@@ -81,30 +63,26 @@
                 />
                 <span class="flex-1"> Add project </span>
               </div>
-            </a>
+            </Link>
           </li>
         </ul>
       {/if}
     </li>
     <li>
-      <a
-        href="/settings"
-        use:link={{ disabled: $location === `/settings` }}
-        on:click={() => dispatch("navigate", `/settings`)}
-      >
+      <Link to="/settings" on:navigate>
         <div class="flex flex-wrap items-center gap-2">
           <Icon icon="ph:gear-six" class="flex-none" />
           <span class="flex-1">Settings</span>
         </div>
-      </a>
+      </Link>
     </li>
     <li>
-      <a href="/logout">
+      <Link to="/logout">
         <div class="flex flex-wrap items-center gap-2">
           <Icon icon="ri:logout-box-line" class="flex-none" />
           <span class="flex-1">Log Out</span>
         </div>
-      </a>
+      </Link>
     </li>
   </ul>
 </nav>

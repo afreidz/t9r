@@ -30,7 +30,7 @@ const projectsRouter = router({
     }
   }),
   delete: protectedProcedure
-    .input(z.string())
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const { userId } = ctx.user;
       const db = await getDBClient();
@@ -38,7 +38,7 @@ const projectsRouter = router({
 
       const result = await collection.deleteOne({
         owner: userId,
-        _id: new ObjectId(input),
+        _id: new ObjectId(input.id),
       });
 
       if (result instanceof DBError) {

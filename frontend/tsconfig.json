@@ -13,7 +13,8 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@/backend/*": ["../backend/*"]
+      "@/backend/*": ["../backend/*"],
+      "@/foundation/*": ["./src/components/foundation/*"]
     }
   },
   "exclude": ["node_modules/**", "dist/**"]
