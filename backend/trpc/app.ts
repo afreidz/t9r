@@ -1,10 +1,10 @@
-import pingRouter from "./routes/ping";
-import { mergeRouters, router } from "./lib";
+import { router } from "./lib";
+import timersRouter from "./routes/timers";
 import projectsRouter from "./routes/projects";
 
-const endpoints = router({
+export const appRouter = router({
   projects: projectsRouter,
+  timers: timersRouter,
 });
 
-export const appRouter = mergeRouters(pingRouter, endpoints);
 export type AppRouter = typeof appRouter;

@@ -1,8 +1,7 @@
 export const locale = "en-us";
-export const cal = "gregory";
 
 export function getToday() {
-  return Temporal.Now.plainDate(cal);
+  return Temporal.Now.plainDateISO();
 }
 
 export function getMonth(d: Temporal.PlainDate) {

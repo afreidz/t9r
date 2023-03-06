@@ -1,5 +1,7 @@
 <script lang="ts">
+  import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
+  import { updateTimers } from "@/lib/timers";
   import Button from "@/foundation/Button.svelte";
   import projects, { mostRecentProject } from "@/lib/projects";
   let value: string;
@@ -7,6 +9,16 @@
   function handleChange() {
     const match = $projects.find((p) => p._id === value);
     if (match) $mostRecentProject = match;
+  }
+
+  async function newTimer() {
+    if (!$mostRecentProject._id) return;
+    await trpc.timers.create.mutate({
+      project: $mostRecentProject._id,
+      date: Temporal.Now.plainDateISO().toString(),
+      start: Temporal.Now.plainTimeISO().toString(),
+    });
+    await updateTimers();
   }
 </script>
 
@@ -29,6 +41,7 @@
       </select>
     </div>
     <Button
+      on:click={newTimer}
       class="flex h-10 w-10 items-center justify-center !rounded-full text-white !ring-offset-white"
       style={`background-color: ${$mostRecentProject.color}`}
     >

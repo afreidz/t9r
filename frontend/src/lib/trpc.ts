@@ -1,4 +1,4 @@
-import type { AppRouter } from "../../../backend/trpc/app";
+import type { AppRouter } from "@/backend/trpc/app";
 import { createTRPCProxyClient, httpLink } from "@trpc/client";
 
 const trpc = createTRPCProxyClient<AppRouter>({
