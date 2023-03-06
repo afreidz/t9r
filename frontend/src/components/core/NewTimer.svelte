@@ -15,7 +15,7 @@
 >
   {#if $mostRecentProject}
     <div class="flex flex-1 flex-col">
-      <span class="text-xs text-black/50">Select Project</span>
+      <span class="font-mono text-xs text-black/50">Select Project</span>
       <select
         class="appearance-none !bg-transparent text-black outline-none"
         bind:value

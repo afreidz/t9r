@@ -4,7 +4,7 @@
   "scripts": {
     "build": "esbuild --bundle function/index.ts --outfile=dist/function.cjs --platform=node --target=node16",
     "watch": "npm run build -- --watch",
-    "dev": "conc \"npm run watch\" \"func start --port 20232\"",
+    "dev": "func start --port 20232",
     "check": "prettier ./ --check && tsc --noEmit ./function/index.ts"
   },
   "devDependencies": {

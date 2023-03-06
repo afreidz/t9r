@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "build": "npm run build --workspaces",
-    "dev": "conc \"npm run dev -w backend\" \"npm run dev -w frontend\" \"swa start\"",
+    "swa": "swa start",
+    "dev": "conc -c \"blue,yellow,green,magenta\" -n \"bew,bes,fes,swa\", \"npm run watch -w backend\" \"npm run dev -w backend\" \"npm run dev -w frontend\" \"npm run swa\"",
     "prepare": "husky install"
   },
   "workspaces": [

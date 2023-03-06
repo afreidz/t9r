@@ -20,7 +20,9 @@
     class="fixed top-0 bottom-0 left-0 right-0 grid min-w-[320px] grid-cols-[0px_auto] grid-rows-[6rem_auto_6rem] bg-neutral-900 text-text-light md:grid-cols-[320px_auto]"
   >
     <header
-      class="col-span-2 col-start-1 row-start-1 flex items-center justify-between p-3 md:col-span-1 md:p-6"
+      class={`relative col-span-2 col-start-1 row-start-1 mr-6 flex items-center justify-between md:col-span-1  ${
+        menuOpen ? "z-50" : ""
+      }`}
     >
       <Logo />
       <MenuTrigger
@@ -30,9 +32,9 @@
       />
     </header>
     <aside
-      class={`fixed left-0 bottom-0 top-0 col-start-1 row-start-2 flex w-full max-w-xs flex-1 -translate-x-full flex-col pl-3 transition-transform ease-in-out md:static md:translate-x-0 md:pl-6 ${
+      class={`fixed left-0 bottom-0 top-0 right-0 z-40 col-start-1 row-start-2 flex w-full flex-1 -translate-x-full flex-col pl-3 transition-transform ease-in-out md:static md:max-w-xs md:translate-x-0 md:pl-6 ${
         menuOpen
-          ? "translate-x-0 border-r border-black/30 bg-neutral-900/50 pt-24 pl-2 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
+          ? "translate-x-0 bg-neutral-900/60 pl-6 pt-24 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
           : ""
       }`}
     >

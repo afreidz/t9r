@@ -18,7 +18,11 @@ const config = {
   plugins: [
     postcss(),
     svelte({
-      preprocess: preprocess(),
+      preprocess: preprocess({
+        postcss: {
+          configFilePath: "./postcss.config.cjs",
+        },
+      }),
       compilerOptions: { css: "injected" },
     }),
     alias({
@@ -58,5 +62,7 @@ if (!process.argv.includes(`--watch`)) {
 
       req.pipe(proxy, { end: true });
     })
-    .listen(20231);
+    .listen(20231, () => {
+      console.log("Listening on", 20231);
+    });
 }

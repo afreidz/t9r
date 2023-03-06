@@ -3,29 +3,32 @@
   import projects from "@/lib/projects";
   import { slide } from "svelte/transition";
   import Link from "@/foundation/Link.svelte";
+  import { location } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
 
   let showProjects = true;
 </script>
 
-<nav class="flex flex-1 flex-col px-3 text-lg">
-  <ul class="flex flex-1 flex-col items-stretch gap-3">
-    <li>
+<nav class="flex flex-1 flex-col pl-4 pr-3 text-lg">
+  <ul class="flex flex-col items-stretch border-l-2 border-neutral-light/50">
+    <li
+      class="relative py-2 px-4"
+      class:active={$location.startsWith("/timers")}
+    >
       <Link to="/timers" on:navigate>
-        <div class="flex flex-wrap items-center gap-2">
-          <Icon icon="material-symbols:timer-outline" class="flex-none" />
-          <span class="flex-1">Timers</span>
-        </div>
+        <span class="flex-1 text-xl font-bold">Timers</span>
       </Link>
     </li>
-    <li>
+    <li
+      class="active relative py-2 px-4"
+      class:active={$location.startsWith("/projects")}
+    >
       <Button
         type="button"
         on:click={() => (showProjects = !showProjects)}
         class="flex w-full items-center gap-2"
       >
-        <Icon icon="mdi:briefcase-outline" class="flex-none" />
-        <span class="flex-1 text-left">Projects</span>
+        <span class="flex-1 text-left text-xl font-bold">Projects</span>
         <Icon
           icon="ph:caret-down-bold"
           class={`flex-none transition-transform ease-in-out ${
@@ -34,7 +37,11 @@
         />
       </Button>
       {#if showProjects}
-        <ul in:slide out:slide class="my-2 ml-7 flex flex-1 flex-col gap-2">
+        <ul
+          in:slide
+          out:slide
+          class="my-2 ml-4 flex w-full flex-1 flex-col gap-2 text-base"
+        >
           {#each $projects.filter((p) => !p.archived) as project}
             <li>
               <div class="flex flex-wrap items-center gap-2">
@@ -48,7 +55,9 @@
                         Color assigned to project
                       </figcaption>
                     </figure>
-                    <span>{project.name}</span>
+                    <span class="font-mono font-light text-text-light/50"
+                      >{project.name}</span
+                    >
                   </span>
                 </Link>
               </div>
@@ -68,21 +77,24 @@
         </ul>
       {/if}
     </li>
-    <li>
+    <li
+      class="active relative py-2 px-4"
+      class:active={$location.startsWith("/settings")}
+    >
       <Link to="/settings" on:navigate>
-        <div class="flex flex-wrap items-center gap-2">
-          <Icon icon="ph:gear-six" class="flex-none" />
-          <span class="flex-1">Settings</span>
-        </div>
+        <span class="flex-1 text-xl font-bold">Settings</span>
       </Link>
     </li>
-    <li>
-      <Link to="/logout">
-        <div class="flex flex-wrap items-center gap-2">
-          <Icon icon="ri:logout-box-line" class="flex-none" />
-          <span class="flex-1">Log Out</span>
-        </div>
-      </Link>
+    <li class="relative py-2 px-4">
+      <a href="/logout">
+        <span class="flex-1 text-xl font-bold">Log Out</span>
+      </a>
     </li>
   </ul>
 </nav>
+
+<style lang="postcss">
+  .active::before {
+    @apply absolute -left-px top-[18px] h-2 w-2 flex-none -translate-x-1/2 rounded-full bg-neutral-light content-[""];
+  }
+</style>

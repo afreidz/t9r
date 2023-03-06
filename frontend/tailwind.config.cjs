@@ -17,6 +17,8 @@ module.exports = {
         },
       },
       fontFamily: {
+        sans: ["Inter", ...theme.fontFamily.sans],
+        pseudoMono: ["Space Grotesk", ...theme.fontFamily.mono],
         mono: ["Space Mono", "Menlo", ...theme.fontFamily.mono],
       },
     },
