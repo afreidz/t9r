@@ -94,7 +94,16 @@ const projectsRouter = router({
       }
     }),
   update: protectedProcedure
-    .input(z.object({ id: z.string(), details: ProjectSchema }))
+    .input(
+      z.object({
+        id: z.string(),
+        details: z.object({
+          name: z.string().optional(),
+          color: z.string().optional(),
+          archived: z.boolean().optional(),
+        }),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       const { userId } = ctx.user;
       const db = await getDBClient();

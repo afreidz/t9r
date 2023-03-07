@@ -41,6 +41,17 @@
     await fetchProjects();
   }
 
+  async function archive() {
+    if (!project || !project._id) return;
+    await trpc.projects.update.mutate({
+      id: project._id,
+      details: {
+        archived: !project.archived,
+      },
+    });
+    await fetchProjects();
+  }
+
   async function handleDelete() {
     if (!project || !project._id) return;
     const result = await trpc.projects.delete.mutate({ id: project._id });
@@ -84,7 +95,7 @@
   {/if}
   <div slot="cta">
     {#if dirty}
-      <div in:fade out:fade>
+      <div in:fade>
         <DualAction label="Update Project?">
           <Button
             on:click={reset}
@@ -100,6 +111,32 @@
             class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
           >
             <Icon icon="material-symbols:fitbit-check-small-sharp" />
+          </Button>
+        </DualAction>
+      </div>
+    {:else}
+      <div in:fade>
+        <DualAction label="Project Visibility">
+          <Button
+            title="Delete project"
+            on:click={handleDelete}
+            slot="secondary"
+            class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+          >
+            <Icon icon="material-symbols:skull-outline-sharp" />
+          </Button>
+          <span slot="content">{project?.name}</span>
+          <Button
+            title="Archive project"
+            on:click={archive}
+            slot="primary"
+            class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
+          >
+            {#if project?.archived}
+              <Icon icon="mdi:eye-outline" />
+            {:else}
+              <Icon icon="mdi:eye-off-outline" />
+            {/if}
           </Button>
         </DualAction>
       </div>
