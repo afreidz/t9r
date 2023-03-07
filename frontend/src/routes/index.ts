@@ -7,7 +7,7 @@ import ProjectDetails from "@/routes/project/Details.svelte";
 export default {
   "/": Main,
   "/timers": Timers,
-  "/projects/new": NewProject,
-  "/projects/:id": ProjectDetails,
+  "/project/new": NewProject,
+  "/project/:id": ProjectDetails,
   "*": NotFound,
 };

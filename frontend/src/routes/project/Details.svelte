@@ -1,6 +1,7 @@
 <script lang="ts">
   import trpc from "@/lib/trpc";
   import { push, replace } from "svelte-spa-router";
+  import Layout from "@/components/core/Layout.svelte";
   import Header from "@/components/core/Header.svelte";
   import type { Project } from "@/backend/schema/project";
   import projects, { fetchProjects } from "@/lib/projects";
@@ -25,10 +26,13 @@
   }
 </script>
 
-{#if project}
-  <Header main={project.name} />
-  <Button
-    on:click={handleDelete}
-    class="m-6 rounded-md bg-red-500 px-10 py-6 text-2xl">Delete Project</Button
-  >
-{/if}
+<Layout>
+  {#if project}
+    <Header main={project.name} />
+    <Button
+      on:click={handleDelete}
+      class="m-6 rounded-md bg-red-500 px-10 py-6 text-2xl"
+      >Delete Project</Button
+    >
+  {/if}
+</Layout>

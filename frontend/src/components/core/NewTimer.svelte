@@ -1,10 +1,12 @@
 <script lang="ts">
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
-  import { updateTimers } from "@/lib/timers";
+  import { createEventDispatcher } from "svelte";
   import Button from "@/foundation/Button.svelte";
   import projects, { mostRecentProject } from "@/lib/projects";
   let value: string;
+
+  const dispatch = createEventDispatcher();
 
   function handleChange() {
     const match = $projects.find((p) => p._id === value);
@@ -18,7 +20,7 @@
       date: Temporal.Now.plainDateISO().toString(),
       start: Temporal.Now.plainTimeISO().toString(),
     });
-    await updateTimers();
+    dispatch("timer-update");
   }
 </script>
 

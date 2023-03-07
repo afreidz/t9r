@@ -13,7 +13,7 @@
   <ul class="flex flex-col items-stretch border-l-2 border-neutral-light/50">
     <li
       class="relative py-2 px-4"
-      class:active={$location.startsWith("/timers")}
+      class:active={$location.startsWith("/timer")}
     >
       <Link to="/timers" on:navigate>
         <span class="flex-1 text-xl font-bold">Timers</span>
@@ -21,7 +21,7 @@
     </li>
     <li
       class="active relative py-2 px-4"
-      class:active={$location.startsWith("/projects")}
+      class:active={$location.startsWith("/project")}
     >
       <Button
         type="button"
@@ -45,7 +45,7 @@
           {#each $projects.filter((p) => !p.archived) as project}
             <li>
               <div class="flex flex-wrap items-center gap-2">
-                <Link to={`/projects/${project._id}`} on:navigate>
+                <Link to={`/project/${project._id}`} on:navigate>
                   <span class="flex flex-1 items-center gap-2">
                     <figure
                       class="h-4 w-4 rounded"
@@ -64,7 +64,7 @@
             </li>
           {/each}
           <li>
-            <Link to="/projects/new" on:navigate>
+            <Link to="/project/new" on:navigate>
               <div class="flex flex-wrap items-center gap-2">
                 <Icon
                   icon="material-symbols:add-circle-outline"

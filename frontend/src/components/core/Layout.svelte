@@ -2,7 +2,6 @@
   import Logo from "./Logo.svelte";
   import Icon from "@iconify/svelte";
   import { fly } from "svelte/transition";
-  import NewTimer from "./NewTimer.svelte";
   import { location } from "svelte-spa-router";
   import Nav from "@/components/core/Nav.svelte";
   import { fetchProjects } from "@/lib/projects";
@@ -48,12 +47,10 @@
         <slot />
       </main>
     {/key}
-    {#if $location.startsWith("/timers")}
-      <div
-        class="fixed bottom-6 left-0 right-0 flex items-center justify-center md:static"
-      >
-        <NewTimer />
-      </div>
-    {/if}
+    <div
+      class="fixed bottom-6 left-0 right-0 flex items-center justify-center md:static"
+    >
+      <slot name="cta" />
+    </div>
   </div>
 {/await}
