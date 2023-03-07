@@ -33,7 +33,7 @@
     <aside
       class={`fixed left-0 bottom-0 top-0 right-0 z-40 col-start-1 row-start-2 flex w-full flex-1 -translate-x-full flex-col pl-3 transition-transform ease-in-out md:static md:max-w-xs md:translate-x-0 md:pl-6 ${
         menuOpen
-          ? "translate-x-0 bg-neutral-900/60 pl-6 pt-24 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
+          ? "translate-x-0 bg-neutral-900/80 pl-6 pt-24 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
           : ""
       }`}
     >

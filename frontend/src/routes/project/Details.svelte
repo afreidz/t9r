@@ -74,11 +74,11 @@
         class="my-1 flex flex-1 flex-col justify-between rounded-md bg-neutral-900 p-4"
       >
         More details here...
-        <Field as="footer" label="Danger Zone" class="border-red-500/50">
+        <!-- <Field as="footer" label="Danger Zone" class="border-red-500/50">
           <Button on:click={handleDelete} class="rounded-md bg-red-500 p-4 px-7"
             >Delete Project</Button
           >
-        </Field>
+        </Field> -->
       </section>
     </Container>
   {/if}
