@@ -1,9 +1,10 @@
 <script lang="ts">
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
-  import { colors } from "@/lib/theme";
   import { push } from "svelte-spa-router";
+  import Colors from "@/core/Colors.svelte";
   import { fetchProjects } from "@/lib/projects";
+  import DualAction from "@/core/DualAction.svelte";
   import Header from "@/components/core/Header.svelte";
   import Layout from "@/components/core/Layout.svelte";
   import type { Project } from "@/backend/schema/project";
@@ -31,10 +32,8 @@
     class="my-6 flex flex-1 items-center justify-center"
     on:submit|preventDefault={submit}
   >
-    <div
-      class="min-w-xs flex max-w-lg flex-1 items-center gap-4 rounded-full bg-white p-2 shadow-xl ring-blue-500 focus-within:ring"
-    >
-      <label class="flex-none">
+    <DualAction as="p" label="Project Name">
+      <label class="flex-none" slot="secondary">
         <span class="sr-only">Color</span>
         <div
           class="relative h-10 w-10 overflow-hidden rounded-full ring-blue-500 ring-offset-2 ring-offset-white focus-within:ring"
@@ -50,28 +49,23 @@
             class="absolute top-0 bottom-0 left-0 right-0 h-full w-full p-[10px] text-white"
           />
         </div>
-        <datalist id="colors">
-          {#each colors as color}
-            <option value={color} />
-          {/each}
-        </datalist>
+        <Colors id="colors" />
       </label>
-      <label class="flex flex-1 flex-col">
-        <span class="text-xs text-black/50">Project Name</span>
-        <input
-          min={2}
-          required
-          max={99}
-          class="text-black outline-none"
-          bind:value={name}
-        />
-      </label>
+      <input
+        min={2}
+        required
+        max={99}
+        class="text-black outline-none"
+        slot="content"
+        bind:value={name}
+      />
       <Button
+        slot="primary"
         class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
       >
         <Icon icon="ic:baseline-plus" />
       </Button>
-    </div>
+    </DualAction>
   </form>
 </Layout>
 
