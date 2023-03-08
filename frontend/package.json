@@ -1,7 +1,7 @@
 {
   "name": "t9r-frontend",
   "scripts": {
-    "dev": "node ./esbuild.js --watch",
+    "watch": "node ./esbuild.js --watch",
     "build": "node ./esbuild.js",
     "check": "prettier --check ./ && svelte-check"
   },

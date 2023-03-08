@@ -2,9 +2,10 @@
   "name": "t9r",
   "type": "module",
   "scripts": {
-    "build": "npm run build --workspaces",
     "swa": "swa start",
-    "dev": "conc -c \"blue,yellow,green,magenta\" -n \"bew,bes,fes,swa\", \"npm run watch -w backend\" \"npm run dev -w backend\" \"npm run dev -w frontend\" \"npm run swa\"",
+    "build": "turbo run build",
+    "check": "turbo run check",
+    "dev": "turbo run dev swa",
     "prepare": "husky install"
   },
   "workspaces": [
@@ -12,7 +13,7 @@
     "backend"
   ],
   "devDependencies": {
-    "concurrently": "^7.6.0",
-    "husky": "^8.0.3"
+    "husky": "^8.0.3",
+    "turbo": "^1.8.3"
   }
 }
