@@ -14,5 +14,5 @@
       "direction": "out"
     }
   ],
-  "scriptFile": "./function.cjs"
+  "scriptFile": "../dist/function.cjs"
 }
