@@ -3,9 +3,9 @@
   "type": "module",
   "scripts": {
     "swa": "swa start",
-    "build": "turbo run build",
-    "check": "turbo run check",
-    "dev": "turbo run dev swa",
+    "build": "turbo run build --color",
+    "check": "turbo run check --color",
+    "dev": "turbo run dev swa --color",
     "prepare": "husky install"
   },
   "workspaces": [

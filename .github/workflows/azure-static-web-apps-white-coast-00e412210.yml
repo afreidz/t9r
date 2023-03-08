@@ -19,13 +19,13 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
-      - name: Install modules
+      - name: Install Dependencies
         run: npm ci
-      - name: Diagnostics Check
+      - name: Check Source Code
         run: npm run check
-      - name: Build App/Api
+      - name: Build
         run: npm run build
-      - name: Deploy App/Api
+      - name: Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WHITE_COAST_00E412210 }}
@@ -34,7 +34,7 @@ jobs:
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: frontend/dist
-          api_location: backend/dist
+          api_location: backend/function
           skip_app_build: true
           skip_api_build: true
           output_location: ""
