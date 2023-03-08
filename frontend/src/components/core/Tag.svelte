@@ -1,5 +1,10 @@
 <script lang="ts">
-  export let color: string | undefined = "inherit";
+  type $$Props = {
+    color?: string;
+  };
+
+  let { color = "inherit" }: $$Props = $$props;
+  export { color };
 </script>
 
 <strong

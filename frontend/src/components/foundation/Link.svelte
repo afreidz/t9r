@@ -3,14 +3,13 @@
   import { link, location } from "svelte-spa-router";
   import type { HTMLAnchorAttributes } from "svelte/elements";
 
-  let to: string;
-
   type $$Props = HTMLAnchorAttributes & {
-    to: string;
+    to?: string;
   };
 
   const dispatch = createEventDispatcher();
 
+  let { to = "/" }: $$Props = $$props;
   export { to };
 </script>
 

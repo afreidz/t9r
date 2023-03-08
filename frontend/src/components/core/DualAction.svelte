@@ -1,6 +1,11 @@
 <script lang="ts">
-  export let label: string;
-  export let as: keyof HTMLElementTagNameMap = "label";
+  type $$Props = {
+    label?: string;
+    as?: keyof HTMLElementTagNameMap;
+  };
+
+  let { label, as = "label" }: $$Props = $$props;
+  export { label, as };
 </script>
 
 <svelte:element
@@ -10,7 +15,7 @@
 >
   <slot name="secondary" />
   <div class="flex flex-1 flex-col text-black">
-    <span class="font-mono text-xs text-black/50">{label}</span>
+    {#if label}<span class="font-mono text-xs text-black/50">{label}</span>{/if}
     <slot name="content" />
   </div>
   <slot name="primary" />

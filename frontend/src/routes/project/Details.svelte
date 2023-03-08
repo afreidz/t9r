@@ -12,11 +12,17 @@
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
   import projects, { fetchProjects } from "@/lib/projects";
+  import Dialog from "@/components/core/Dialog.svelte";
 
-  let newValues: Project | undefined;
-  let project: Project | undefined;
-  export let params = { id: null };
+  type $$Props = {
+    params?: { id?: string };
+  };
+
   let dirty = false;
+  let confirmDelete = false;
+  let project: Project | undefined;
+  let newValues: Project | undefined;
+  let { params = { id: undefined } }: $$Props = $$props;
 
   $: if (project && !newValues) newValues = { ...project };
   $: project = $projects.find((p: Project) => p._id === params.id);
@@ -56,6 +62,8 @@
     if (!project || !project._id) return;
     const result = await trpc.projects.delete.mutate({ id: project._id });
 
+    console.log(result);
+
     if (result.acknowledged) {
       await fetchProjects();
       return push("/timers");
@@ -65,6 +73,8 @@
   $: if (!!params.id && !project && $projects.length) {
     replace("/404");
   }
+
+  export { params };
 </script>
 
 <Layout>
@@ -78,6 +88,13 @@
         <Field label="Project Color">
           <input type="color" bind:value={newValues.color} list="colors" />
           <Colors id="colors" />
+        </Field>
+        <Field label="Project Status">
+          <strong class="flex flex-1 items-center justify-between gap-4"
+            >{#if project.archived}Archived <Icon
+                icon="mdi:eye-off-outline"
+              />{:else}Active <Icon icon="mdi:eye-outline" />{/if}</strong
+          >
         </Field>
       </section>
       <section
@@ -119,7 +136,7 @@
         <DualAction label="Project Visibility">
           <Button
             title="Delete project"
-            on:click={handleDelete}
+            on:click={() => (confirmDelete = true)}
             slot="secondary"
             class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
           >
@@ -143,3 +160,32 @@
     {/if}
   </div>
 </Layout>
+
+<Dialog
+  open={confirmDelete}
+  title="Delete {project?.name}"
+  sub="You are about to..."
+>
+  <Button slot="close" value="cancel" on:click={() => (confirmDelete = false)}>
+    <Icon icon="material-symbols:close" class="h-7 w-7" />
+  </Button>
+  <section class="flex flex-1 flex-col items-center justify-center py-4">
+    <DualAction>
+      <Button
+        slot="secondary"
+        on:click={() => (confirmDelete = false)}
+        class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+      >
+        <Icon icon="teenyicons:x-small-outline" />
+      </Button>
+      <span slot="content">Are you sure?</span>
+      <Button
+        on:click={handleDelete}
+        slot="primary"
+        class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+      >
+        <Icon icon="material-symbols:fitbit-check-small-sharp" />
+      </Button>
+    </DualAction>
+  </section>
+</Dialog>

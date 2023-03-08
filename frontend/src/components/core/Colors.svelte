@@ -1,6 +1,12 @@
 <script lang="ts">
   import { colors } from "@/lib/theme";
-  export let id = "colors";
+
+  type $$Props = {
+    id?: string;
+  };
+
+  let { id = "colors" }: $$Props = $$props;
+  export { id };
 </script>
 
 <datalist {id}>

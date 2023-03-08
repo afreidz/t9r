@@ -1,5 +1,10 @@
 <script lang="ts">
-  let enabled = false;
+  type $$Props = {
+    enabled?: boolean;
+    class?: string;
+  };
+
+  let { enabled = false }: $$Props = $$props;
   export { enabled };
 </script>
 

@@ -1,11 +1,14 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import projects from "@/lib/projects";
+  import Dialog from "@/core/Dialog.svelte";
   import { slide } from "svelte/transition";
   import Link from "@/foundation/Link.svelte";
   import { location } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
+  import NewProject from "@/core/NewProject.svelte";
 
+  let newProject = false;
   let showProjects = true;
 </script>
 
@@ -64,7 +67,7 @@
             </li>
           {/each}
           <li>
-            <Link to="/project/new" on:navigate>
+            <Button on:click={() => (newProject = true)}>
               <div class="flex flex-wrap items-center gap-2">
                 <Icon
                   icon="material-symbols:add-circle-outline"
@@ -72,7 +75,7 @@
                 />
                 <span class="flex-1"> Add project </span>
               </div>
-            </Link>
+            </Button>
           </li>
         </ul>
       {/if}
@@ -92,6 +95,15 @@
     </li>
   </ul>
 </nav>
+
+{#if newProject}
+  <Dialog open={true} sub="You are about to..." title="Add a new project">
+    <Button slot="close" value="cancel" on:click={() => (newProject = false)}>
+      <Icon icon="material-symbols:close" class="h-7 w-7" />
+    </Button>
+    <NewProject on:created={() => (newProject = false)} />
+  </Dialog>
+{/if}
 
 <style lang="postcss">
   .active::before {

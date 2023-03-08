@@ -3,7 +3,11 @@
   import { getToday, isToday } from "@/lib/dates";
   import Button from "@/foundation/Button.svelte";
 
-  let date: Temporal.PlainDate = getToday();
+  type $$Props = {
+    date?: Temporal.PlainDate;
+  };
+
+  let { date = getToday() }: $$Props = $$props;
   let picker: HTMLInputElement;
   let buttonClasses =
     "my-2 w-8 h-8 rounded bg-neutral-light/5 flex items-center justify-center disabled:opacity-30";

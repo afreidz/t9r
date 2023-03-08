@@ -2,8 +2,13 @@
   import Link from "../foundation/Link.svelte";
   import type { Project } from "@/backend/schema/project";
 
-  export let id: string | undefined;
-  export let project: Project | undefined;
+  type $$Props = {
+    id?: string;
+    project?: Project;
+  };
+
+  let { id, project }: $$Props = $$props;
+  export { id, project };
 </script>
 
 <Link
