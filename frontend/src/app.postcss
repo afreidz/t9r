@@ -5,7 +5,7 @@
 html,
 body {
   min-height: 100%;
-  @apply font-sans tracking-wide;
+  @apply bg-neutral-900 font-sans tracking-wide;
 }
 
 body {
@@ -25,4 +25,8 @@ input[type="color"]::-webkit-color-swatch-wrapper {
 }
 input[type="color"]::-webkit-color-swatch {
   @apply border-none;
+}
+
+button {
+  @apply inline-block rounded-md text-left outline-none ring-blue-500 focus:ring;
 }

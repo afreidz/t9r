@@ -2,10 +2,9 @@
   import Logo from "./Logo.svelte";
   import Icon from "@iconify/svelte";
   import { fly } from "svelte/transition";
-  import { location } from "svelte-spa-router";
-  import Nav from "@/components/core/Nav.svelte";
   import { fetchProjects } from "@/lib/projects";
   import MenuTrigger from "./MenuTrigger.svelte";
+  import Nav from "@/components/core/nav/Nav.svelte";
 
   let menuOpen = false;
 </script>

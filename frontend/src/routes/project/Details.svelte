@@ -152,7 +152,7 @@
   <div slot="cta">
     {#if dirty}
       <div in:fade>
-        <DualAction label="Update Project?">
+        <DualAction as="div" label="Update Project?">
           <Button
             on:click={reset}
             slot="secondary"
