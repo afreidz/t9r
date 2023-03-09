@@ -9,10 +9,10 @@
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import { push, replace } from "svelte-spa-router";
+  import Dialog from "@/components/core/Dialog.svelte";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
   import projects, { fetchProjects } from "@/lib/projects";
-  import Dialog from "@/components/core/Dialog.svelte";
 
   type $$Props = {
     params?: { id?: string };
@@ -70,10 +70,6 @@
     }
   }
 
-  $: if (!!params.id && !project && $projects.length) {
-    replace("/404");
-  }
-
   export { params };
 </script>
 
@@ -86,7 +82,14 @@
           <input bind:value={newValues.name} />
         </Field>
         <Field label="Project Color">
-          <input type="color" bind:value={newValues.color} list="colors" />
+          <div class="w-full overflow-hidden rounded-md">
+            <input
+              type="color"
+              class="h-full w-full"
+              bind:value={newValues.color}
+              list="colors"
+            />
+          </div>
           <Colors id="colors" />
         </Field>
         <Field label="Project Status">
@@ -102,6 +105,42 @@
         class="my-1 flex flex-1 flex-col justify-between rounded-md bg-neutral-900 p-4"
       >
         More details here...
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
+        <p>foo</p>
         <!-- <Field as="footer" label="Danger Zone" class="border-red-500/50">
           <Button on:click={handleDelete} class="rounded-md bg-red-500 p-4 px-7"
             >Delete Project</Button
@@ -133,7 +172,7 @@
       </div>
     {:else}
       <div in:fade>
-        <DualAction label="Project Visibility">
+        <DualAction as="div" label="Change Project Status">
           <Button
             title="Delete project"
             on:click={() => (confirmDelete = true)}
@@ -150,9 +189,9 @@
             class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
           >
             {#if project?.archived}
-              <Icon icon="mdi:eye-outline" />
-            {:else}
               <Icon icon="mdi:eye-off-outline" />
+            {:else}
+              <Icon icon="mdi:eye-outline" />
             {/if}
           </Button>
         </DualAction>
@@ -161,31 +200,33 @@
   </div>
 </Layout>
 
-<Dialog
-  open={confirmDelete}
-  title="Delete {project?.name}"
-  sub="You are about to..."
->
-  <Button slot="close" value="cancel" on:click={() => (confirmDelete = false)}>
-    <Icon icon="material-symbols:close" class="h-7 w-7" />
-  </Button>
-  <section class="flex flex-1 flex-col items-center justify-center py-4">
-    <DualAction>
-      <Button
-        slot="secondary"
-        on:click={() => (confirmDelete = false)}
-        class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
-      >
-        <Icon icon="teenyicons:x-small-outline" />
-      </Button>
-      <span slot="content">Are you sure?</span>
-      <Button
-        on:click={handleDelete}
-        slot="primary"
-        class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
-      >
-        <Icon icon="material-symbols:fitbit-check-small-sharp" />
-      </Button>
-    </DualAction>
-  </section>
-</Dialog>
+{#if confirmDelete}
+  <Dialog open={true} title="Delete {project?.name}" sub="You are about to...">
+    <Button
+      slot="close"
+      value="cancel"
+      on:click={() => (confirmDelete = false)}
+    >
+      <Icon icon="material-symbols:close" class="h-7 w-7" />
+    </Button>
+    <section class="flex flex-1 flex-col items-center justify-center py-4">
+      <DualAction>
+        <Button
+          slot="secondary"
+          on:click={() => (confirmDelete = false)}
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <span slot="content">Are you sure?</span>
+        <Button
+          on:click={handleDelete}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    </section>
+  </Dialog>
+{/if}

@@ -4,11 +4,11 @@
   "pipeline": {
     "dev": {
       "cache": false,
-      "persistent": true,
-      "dependsOn": ["watch"]
+      "persistent": true
     },
     "watch": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     }
   }
 }

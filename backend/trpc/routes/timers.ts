@@ -26,6 +26,22 @@ const timersRouter = router({
 
       return collection.find<Timer>({ owner: userId, date }).toArray();
     }),
+  getByMonth: protectedProcedure
+    .input(PlainDate)
+    .query(async ({ input, ctx }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("timers");
+      const date = Temporal.PlainDate.from(input);
+
+      const year = date.year;
+      const month = `${date.month}`.padStart(2, "0");
+      const $regex = new RegExp(`^${year}-${month}-\\d{2}`);
+
+      return collection
+        .find<Timer>({ owner: userId, date: { $regex } })
+        .toArray();
+    }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const { userId } = ctx.user;
     const db = await getDBClient();

@@ -13,5 +13,5 @@ export function getWeekDay(d: Temporal.PlainDate) {
 }
 
 export function isToday(d: Temporal.PlainDate) {
-  return d.toString() === getToday().toString();
+  return d.equals(getToday());
 }

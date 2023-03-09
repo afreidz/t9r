@@ -2,7 +2,7 @@
   "name": "t9r-backend",
   "type": "module",
   "scripts": {
-    "build": "esbuild --bundle function/index.ts --outfile=dist/function.cjs --platform=node --target=node16",
+    "build": "node ./esbuild.js",
     "watch": "npm run build -- --watch",
     "dev": "func start --port 20232",
     "check": "prettier ./ --check && tsc --noEmit ./function/index.ts"

@@ -16,7 +16,7 @@
   </div>
 {:then _}
   <div
-    class="fixed top-0 bottom-0 left-0 right-0 grid min-w-[320px] grid-cols-[0px_auto] grid-rows-[6rem_auto_6rem] bg-neutral-900 text-text-light md:grid-cols-[320px_auto]"
+    class="fixed inset-0 grid min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_6rem] bg-neutral-900 pb-24 text-text-light md:grid-cols-[320px_auto] md:grid-rows-[6rem_auto_6rem] md:pb-0"
   >
     <header
       class={`relative col-span-2 col-start-1 row-start-1 mr-6 flex items-center justify-between md:col-span-1  ${
@@ -33,20 +33,18 @@
     <aside
       class={`fixed left-0 bottom-0 top-0 right-0 z-40 col-start-1 row-start-2 flex w-full flex-1 -translate-x-full flex-col pl-3 transition-transform ease-in-out md:static md:max-w-xs md:translate-x-0 md:pl-6 ${
         menuOpen
-          ? "translate-x-0 bg-neutral-900/80 pl-6 pt-24 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
+          ? "translate-x-0 bg-neutral-900/80 pt-20 pl-6 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
           : ""
       }`}
     >
       <Nav on:navigate={() => (menuOpen = false)} />
     </aside>
-    {#key $location}
-      <main
-        in:fly={{ x: 500, opacity: 0 }}
-        class="col-start-2 row-span-3 m-3 mt-0 flex flex-col overflow-auto rounded-xl bg-neutral-800 p-6 md:m-6"
-      >
-        <slot />
-      </main>
-    {/key}
+    <main
+      in:fly={{ x: 500, opacity: 0 }}
+      class="col-start-2 row-span-3 m-2 mt-0 flex flex-col overflow-auto rounded-xl bg-neutral-800 p-3 !pt-0 md:m-6 md:p-6"
+    >
+      <slot />
+    </main>
     <div
       class="fixed bottom-6 left-0 right-0 flex items-center justify-center md:static"
     >

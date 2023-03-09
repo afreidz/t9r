@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import projects from "@/lib/projects";
+  import { getToday } from "@/lib/dates";
   import Dialog from "@/core/Dialog.svelte";
   import { slide } from "svelte/transition";
   import Link from "@/foundation/Link.svelte";
@@ -16,11 +17,39 @@
   <ul class="flex flex-col items-stretch border-l-2 border-neutral-light/50">
     <li
       class="relative py-2 px-4"
-      class:active={$location.startsWith("/timer")}
+      class:active={$location.startsWith("/timers")}
     >
-      <Link to="/timers" on:navigate>
-        <span class="flex-1 text-xl font-bold">Timers</span>
-      </Link>
+      <span class="flex-1 text-xl font-bold">Timers</span>
+      <ul
+        class="my-2 ml-4 flex w-full flex-1 flex-col gap-2 font-mono text-base font-light text-text-light/50"
+      >
+        <li>
+          <div class="flex flex-wrap items-center gap-2">
+            <Link to={`/timers/daily/${getToday().toString()}`} on:navigate>
+              <span class="flex flex-1 items-center gap-2">
+                <Icon
+                  icon="mdi:calendar-today-outline"
+                  class="text-neutral-light"
+                />
+                <span class="flex flex-1 items-center gap-2">Daily</span>
+              </span>
+            </Link>
+          </div>
+        </li>
+        <li>
+          <div class="flex flex-wrap items-center gap-2">
+            <Link to={`/timers/monthly/${getToday().toString()}`} on:navigate>
+              <span class="flex flex-1 items-center gap-2">
+                <Icon
+                  icon="mdi:calendar-month-outline"
+                  class="text-neutral-light"
+                />
+                <span class="flex flex-1 items-center gap-2">Monthly</span>
+              </span>
+            </Link>
+          </div>
+        </li>
+      </ul>
     </li>
     <li
       class="active relative py-2 px-4"
