@@ -15,7 +15,7 @@
   </div>
 {:then _}
   <div
-    class="fixed inset-0 grid min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_6rem] bg-neutral-900 pb-24 text-text-light md:grid-cols-[320px_auto] md:grid-rows-[6rem_auto_6rem] md:pb-0"
+    class="fixed inset-0 grid min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_6rem] bg-neutral-900 pb-14 text-text-light md:grid-cols-[320px_auto] md:grid-rows-[6rem_auto_6rem] md:pb-0"
   >
     <header
       class={`relative col-span-2 col-start-1 row-start-1 mr-6 flex items-center justify-between md:col-span-1  ${
@@ -45,7 +45,7 @@
       <slot />
     </main>
     <div
-      class="fixed bottom-6 left-0 right-0 flex items-center justify-center md:static"
+      class="fixed bottom-2 left-0 right-0 flex items-center justify-center md:static md:bottom-6"
     >
       <slot name="cta" />
     </div>

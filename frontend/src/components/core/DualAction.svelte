@@ -11,7 +11,7 @@
 <svelte:element
   this={as}
   class="flex w-full flex-1 items-center gap-4 rounded-full
-  bg-white p-2 shadow-xl ring-blue-500 focus-within:ring"
+  bg-white p-1 shadow-xl ring-blue-500 focus-within:ring md:p-2"
 >
   <div class="flex-none">
     <slot name="secondary" />

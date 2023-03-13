@@ -27,7 +27,10 @@
   let { params = { id: undefined } }: $$Props = $$props;
 
   $: if (project && !newValues) newValues = { ...project };
-  $: project = $projects.find((p: Project) => p._id === params.id);
+  $: if (params.id) {
+    newValues = undefined;
+    project = $projects.find((p: Project) => p._id === params.id);
+  }
   $: dirty =
     project?.name !== newValues?.name || project?.color !== newValues?.color;
 

@@ -1,19 +1,17 @@
 <script lang="ts">
+  import SubNav from "./Sub.svelte";
   import Icon from "@iconify/svelte";
   import projects from "@/lib/projects";
+  import SubItem from "./SubItem.svelte";
   import { getToday } from "@/lib/dates";
   import MainItem from "./MainItem.svelte";
   import Dialog from "@/core/Dialog.svelte";
-  import Link from "@/foundation/Link.svelte";
   import { location } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
   import NewProject from "@/core/NewProject.svelte";
-  import SubNav from "./Sub.svelte";
-  import SubItem from "./SubItem.svelte";
+  import { showArchived, showProjects } from "@/lib/ui";
 
   let newProject = false;
-  let showProjects = true;
-  let showArchived = false;
 </script>
 
 <nav class="flex flex-1 flex-col pl-4 text-lg">
@@ -42,7 +40,7 @@
     <MainItem
       clickable
       active={$location.startsWith("/project")}
-      on:click={() => (showProjects = !showProjects)}
+      on:click={() => ($showProjects = !$showProjects)}
     >
       <span slot="main">Projects</span>
       <Icon
@@ -52,7 +50,7 @@
           showProjects ? "rotate-180" : ""
         }`}
       />
-      {#if showProjects}
+      {#if $showProjects}
         <SubNav>
           {#each $projects.filter((p) => !p.archived) as project}
             <SubItem to={`/project/${project._id}`} on:navigate>
@@ -69,7 +67,10 @@
             </SubItem>
           {/each}
           {#if $projects.some((p) => p.archived)}
-            <SubItem clickable on:click={() => (showArchived = !showArchived)}>
+            <SubItem
+              clickable
+              on:click={() => ($showArchived = !$showArchived)}
+            >
               <Icon slot="icon" icon="mdi:eye-off-outline" />
               <span class="flex-1">Archived Projects</span>
               <Icon
@@ -81,7 +82,7 @@
               />
             </SubItem>
           {/if}
-          {#if showArchived}
+          {#if $showArchived}
             <SubNav>
               {#each $projects.filter((p) => p.archived) as project}
                 <SubItem to={`/project/${project._id}`} on:navigate>
