@@ -100,6 +100,7 @@ const projectsRouter = router({
         details: z.object({
           name: z.string().optional(),
           color: z.string().optional(),
+          budget: z.number().optional(),
           archived: z.boolean().optional(),
         }),
       })

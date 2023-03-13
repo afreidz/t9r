@@ -15,24 +15,25 @@
   import projects, { fetchProjects } from "@/lib/projects";
   import Chart from "@/components/core/chart/Chart.svelte";
   import ChartItem from "@/components/core/chart/ChartItem.svelte";
-
-  type $$Props = {
-    params?: { id?: string };
-  };
+  import Switch from "@/components/foundation/Switch.svelte";
 
   let dirty = false;
   let confirmDelete = false;
   let project: Project | undefined;
   let newValues: Project | undefined;
-  let { params = { id: undefined } }: $$Props = $$props;
+  export let params: { id: string };
 
-  $: if (project && !newValues) newValues = { ...project };
-  $: if (params.id) {
-    newValues = undefined;
+  $: if (params.id && project?._id !== params.id) {
     project = $projects.find((p: Project) => p._id === params.id);
+    if (project) newValues = { ...project, budget: project.budget || 0 };
   }
+
   $: dirty =
-    project?.name !== newValues?.name || project?.color !== newValues?.color;
+    project?.name !== newValues?.name ||
+    project?.color !== newValues?.color ||
+    project?.budget
+      ? project?.budget !== newValues?.budget
+      : newValues?.budget !== 0;
 
   async function reset() {
     if (!project || !newValues) return;
@@ -47,9 +48,11 @@
       details: {
         name: newValues.name,
         color: newValues.color,
+        budget: newValues.budget,
       },
     });
     await fetchProjects();
+    project = $projects.find((p: Project) => p._id === params.id);
   }
 
   async function archive() {
@@ -67,15 +70,11 @@
     if (!project || !project._id) return;
     const result = await trpc.projects.delete.mutate({ id: project._id });
 
-    console.log(result);
-
     if (result.acknowledged) {
       await fetchProjects();
       return push("/timers");
     }
   }
-
-  export { params };
 </script>
 
 <Layout>
@@ -104,6 +103,21 @@
               />{:else}Active <Icon icon="mdi:eye-outline" />{/if}</strong
           >
         </Field>
+        <Field label="Project Budget">
+          <input
+            class="text-2xl"
+            type="number"
+            min={0}
+            bind:value={newValues.budget}
+          />
+        </Field>
+        <Field>
+          <Switch
+            class="justify-between"
+            name="show_in_reports"
+            label="Show in project reports?"
+          />
+        </Field>
       </section>
       <section
         slot="secondary"
@@ -116,11 +130,13 @@
               >worked</span
             ></strong
           >
-          <strong class="my-2 flex-none text-4xl"
-            >696 <span class="font-mono text-sm font-light opacity-50"
-              >budget</span
-            ></strong
-          >
+          {#if project.budget}
+            <strong class="my-2 flex-none text-4xl"
+              >{project.budget}
+              <span class="font-mono text-sm font-light opacity-50">budget</span
+              ></strong
+            >
+          {/if}
         </header>
         <Chart cols={60} rows={5} height={320} axis={10}>
           <ChartItem
