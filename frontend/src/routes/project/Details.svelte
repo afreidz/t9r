@@ -2,17 +2,19 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import { fade } from "svelte/transition";
+  import { push } from "svelte-spa-router";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
   import Colors from "@/core/Colors.svelte";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
-  import { push, replace } from "svelte-spa-router";
   import Dialog from "@/components/core/Dialog.svelte";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
   import projects, { fetchProjects } from "@/lib/projects";
+  import Chart from "@/components/core/chart/Chart.svelte";
+  import ChartItem from "@/components/core/chart/ChartItem.svelte";
 
   type $$Props = {
     params?: { id?: string };
@@ -102,50 +104,52 @@
       </section>
       <section
         slot="secondary"
-        class="my-1 flex flex-1 flex-col justify-between rounded-md bg-neutral-900 p-4"
+        class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
-        More details here...
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <p>foo</p>
-        <!-- <Field as="footer" label="Danger Zone" class="border-red-500/50">
-          <Button on:click={handleDelete} class="rounded-md bg-red-500 p-4 px-7"
-            >Delete Project</Button
+        <h3 class="font-mono text-sm opacity-50">Project Hours</h3>
+        <header class="my-1 flex justify-between">
+          <strong class="my-2 flex-none text-4xl"
+            >456 <span class="font-mono text-sm font-light opacity-50"
+              >worked</span
+            ></strong
           >
-        </Field> -->
+          <strong class="my-2 flex-none text-4xl"
+            >696 <span class="font-mono text-sm font-light opacity-50"
+              >budget</span
+            ></strong
+          >
+        </header>
+        <Chart cols={60} rows={5} height={320} axis={10}>
+          <ChartItem
+            max={40}
+            index={0}
+            value={32}
+            label="3/13"
+            color={project.color}
+          />
+          <ChartItem index={1} value={22} label="3/6" color={project.color} />
+          <ChartItem
+            max={20}
+            index={2}
+            value={30}
+            label="2/27"
+            color={project.color}
+          />
+          <ChartItem
+            max={40}
+            index={3}
+            value={40}
+            label="2/20"
+            color={project.color}
+          />
+          <ChartItem
+            max={48}
+            index={4}
+            value={48}
+            label="2/13"
+            color={project.color}
+          />
+        </Chart>
       </section>
     </Container>
   {/if}

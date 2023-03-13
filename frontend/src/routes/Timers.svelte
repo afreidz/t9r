@@ -3,7 +3,6 @@
   import Icon from "@iconify/svelte";
   import projects from "@/lib/projects";
   import { location } from "svelte-spa-router";
-  import type { SvelteComponent } from "svelte";
   import Tag from "@/components/core/Tag.svelte";
   import type { Timer } from "@/backend/schema/timer";
   import Layout from "@/components/core/Layout.svelte";

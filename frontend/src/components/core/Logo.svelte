@@ -30,7 +30,7 @@
   <figure>
     <Icon
       icon="heroicons:bolt-20-solid"
-      class="backgr h-10 w-10 rounded-full bg-gradient-to-br from-violet-600 to-cyan-600 p-2 text-yellow-400"
+      class="backgr h-10 w-10 rounded-full bg-gradient-to-br from-violet-600 to-cyan-600 p-2 text-white"
     />
     <figcaption class="sr-only">t9r</figcaption>
   </figure>

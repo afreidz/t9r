@@ -21,6 +21,9 @@ module.exports = {
         pseudoMono: ["Space Grotesk", ...theme.fontFamily.mono],
         mono: ["Space Mono", "Menlo", ...theme.fontFamily.mono],
       },
+      gridTemplateColumns: {
+        60: "repeat(40, minmax(0,1fr))",
+      },
     },
   },
   plugins: [
