@@ -77,7 +77,7 @@
                 slot="right"
                 icon="ph:caret-down-bold"
                 class={`transition-transform ease-in-out ${
-                  showArchived ? "rotate-180" : ""
+                  $showArchived ? "rotate-180" : ""
                 }`}
               />
             </SubItem>

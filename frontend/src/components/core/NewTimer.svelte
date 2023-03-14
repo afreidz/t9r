@@ -18,6 +18,7 @@
     if (!$mostRecentProject._id) return;
     await trpc.timers.create.mutate({
       project: $mostRecentProject._id,
+      title: $mostRecentProject.defaultTitle,
       date: Temporal.Now.plainDateISO().toString(),
       start: Temporal.Now.plainTimeISO().toString(),
     });

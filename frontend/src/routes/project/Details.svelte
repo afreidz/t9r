@@ -1,4 +1,5 @@
 <script lang="ts">
+  import same from "@/lib/same";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import { fade } from "svelte/transition";
@@ -12,10 +13,10 @@
   import Dialog from "@/components/core/Dialog.svelte";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
-  import projects, { fetchProjects } from "@/lib/projects";
   import Chart from "@/components/core/chart/Chart.svelte";
-  import ChartItem from "@/components/core/chart/ChartItem.svelte";
+  import projects, { fetchProjects } from "@/lib/projects";
   import Switch from "@/components/foundation/Switch.svelte";
+  import ChartItem from "@/components/core/chart/ChartItem.svelte";
 
   let dirty = false;
   let confirmDelete = false;
@@ -28,12 +29,7 @@
     if (project) newValues = { ...project, budget: project.budget || 0 };
   }
 
-  $: dirty =
-    project?.name !== newValues?.name ||
-    project?.color !== newValues?.color ||
-    project?.budget
-      ? project?.budget !== newValues?.budget
-      : newValues?.budget !== 0;
+  $: if (newValues && project) dirty = !same<Project>(newValues, project);
 
   async function reset() {
     if (!project || !newValues) return;
@@ -43,12 +39,12 @@
   async function update() {
     if (!project || !project._id || !newValues?.name || !newValues?.color)
       return;
+
     await trpc.projects.update.mutate({
       id: project._id,
       details: {
-        name: newValues.name,
-        color: newValues.color,
-        budget: newValues.budget,
+        ...newValues,
+        _id: undefined,
       },
     });
     await fetchProjects();
@@ -96,12 +92,8 @@
           </div>
           <Colors id="colors" />
         </Field>
-        <Field label="Project Status">
-          <strong class="flex flex-1 items-center justify-between gap-4"
-            >{#if project.archived}Archived <Icon
-                icon="mdi:eye-off-outline"
-              />{:else}Active <Icon icon="mdi:eye-outline" />{/if}</strong
-          >
+        <Field label="Default Timer Title">
+          <input min={0} max={30} bind:value={newValues.defaultTitle} />
         </Field>
         <Field label="Project Budget">
           <input
@@ -110,6 +102,13 @@
             min={0}
             bind:value={newValues.budget}
           />
+        </Field>
+        <Field label="Project Status">
+          <strong class="flex flex-1 items-center justify-between gap-4"
+            >{#if project.archived}Archived <Icon
+                icon="mdi:eye-off-outline"
+              />{:else}Active <Icon icon="mdi:eye-outline" />{/if}</strong
+          >
         </Field>
         <Field>
           <Switch

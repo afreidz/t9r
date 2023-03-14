@@ -104,12 +104,13 @@ const timersRouter = router({
       const db = await getDBClient();
       const collection = db.collection("timers");
 
-      const { date, start, end, project } = input;
+      const { date, start, end, project, title } = input;
       const dateISO = Temporal.PlainDate.from(date).toString();
 
       const result = await collection.insertOne({
         end,
         start,
+        title,
         project,
         owner: userId,
         date: dateISO,
@@ -126,7 +127,7 @@ const timersRouter = router({
       }
     }),
   update: protectedProcedure
-    .input(z.object({ id: z.string(), details: TimerSchema }))
+    .input(z.object({ id: z.string(), details: TimerSchema.partial() }))
     .mutation(async ({ input, ctx }) => {
       const { userId } = ctx.user;
       const db = await getDBClient();

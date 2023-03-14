@@ -69,15 +69,21 @@
 
   {#each timers as timer}
     <TimerComponent
+      let:size
       id={timer._id}
+      title={timer.title}
       project={$projects.find((p) => p._id === timer.project)}
     >
-      {#if !timer.end}
-        <Tag>running</Tag>
+      {#if size?.width && size.width < 400}
+        <Tag round>2</Tag>
+      {:else}
+        {#if !timer.end}
+          <Tag>running</Tag>
+        {/if}
+        <Tag>
+          {timer.start}
+        </Tag>
       {/if}
-      <Tag>
-        {timer.start}
-      </Tag>
     </TimerComponent>
   {/each}
 

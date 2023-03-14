@@ -97,12 +97,7 @@ const projectsRouter = router({
     .input(
       z.object({
         id: z.string(),
-        details: z.object({
-          name: z.string().optional(),
-          color: z.string().optional(),
-          budget: z.number().optional(),
-          archived: z.boolean().optional(),
-        }),
+        details: ProjectSchema.partial(),
       })
     )
     .mutation(async ({ input, ctx }) => {

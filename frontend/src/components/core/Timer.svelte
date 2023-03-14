@@ -1,31 +1,45 @@
 <script lang="ts">
   import Link from "../foundation/Link.svelte";
+  import type { Writable } from "svelte/store";
   import type { Project } from "@/backend/schema/project";
+  import observeResize, { type ResizeObserverValue } from "@/lib/resize";
 
-  type $$Props = {
-    id?: string;
-    project?: Project;
-  };
+  export let project: Project | undefined = undefined;
+  export let title: string | undefined = undefined;
+  export let id: string | undefined = undefined;
 
-  let { id, project }: $$Props = $$props;
-  export { id, project };
+  let size: Writable<ResizeObserverValue>;
+  let timer: HTMLAnchorElement;
+  let grad: string;
+
+  $: if (project)
+    grad = `linear-gradient(to right, ${project.color}80, ${project.color})`;
+
+  $: if (timer) {
+    size = observeResize(timer);
+  }
 </script>
 
-<Link
-  to={`/timer/${id}`}
-  style={`background-color: ${project?.color}`}
-  class="mb-2 flex items-center gap-2 !rounded-full p-2 leading-8 text-white"
->
-  <abbr
-    title={project?.name}
-    style={`color: ${project?.color}`}
-    class="flex aspect-square w-8 flex-none items-center justify-center rounded-full bg-white no-underline"
+{#if project && id}
+  <Link
+    bind:elm={timer}
+    to={`/timer/${id}`}
+    style={`background: ${grad}`}
+    class="mb-2 flex items-center overflow-hidden !rounded-full leading-8 text-white"
   >
-    {(project?.name || "").charAt(0).toUpperCase()}
-  </abbr>
-  <div
-    class="flex flex-1 items-center justify-end overflow-auto whitespace-nowrap text-sm"
-  >
-    <slot />
-  </div>
-</Link>
+    <header
+      style={`background: ${grad}`}
+      class="flex flex-col justify-around rounded-full px-6 py-3"
+    >
+      <small class="font-mono leading-none opacity-50">{project.name}</small>
+      <strong class="font-normal leading-tight">{title || "Timer"}</strong>
+    </header>
+    <div
+      class="flex flex-1 items-center justify-end overflow-auto whitespace-nowrap pr-2 text-sm"
+    >
+      {#if size}
+        <slot size={$size} />
+      {/if}
+    </div>
+  </Link>
+{/if}

@@ -26,6 +26,7 @@ const TimerSchema = z
     _id: z.string().optional(),
     owner: z.string().optional(),
     project: z.string().optional(),
+    title: z.string().min(2).max(30).optional(),
   })
   .passthrough();
 

@@ -5,17 +5,19 @@
 
   type $$Props = HTMLAnchorAttributes & {
     to?: string;
+    elm?: HTMLAnchorElement;
   };
 
   const dispatch = createEventDispatcher();
 
-  let { to = "/" }: $$Props = $$props;
-  export { to };
+  export let to: string | undefined = undefined;
+  export let elm: HTMLAnchorElement | undefined = undefined;
 </script>
 
 <a
   {...$$props}
   href={to}
+  bind:this={elm}
   class:rounded-md={true}
   class:focus:ring={true}
   class:inline-block={true}
