@@ -162,7 +162,7 @@
               <option id={tag._id} value={tag.value} />
             {/each}
           </datalist>
-          <div class="flex flex-wrap border-t border-white/5 py-2">
+          <div class="flex flex-wrap border-t border-neutral-900/50 pb-1 pt-5">
             {#each newValues.tags as tag}
               {#if tags.find((t) => t._id === tag)}
                 <Tag closeable on:close={() => removeTag(tag)}>

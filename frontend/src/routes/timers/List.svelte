@@ -83,11 +83,13 @@
           {#if !timer.end}
             <Tag>running</Tag>
           {/if}
-          {#each timer.tags as tag}
-            {#if $tags.find((t) => t._id === tag)}
-              <Tag>{$tags.find((t) => t._id === tag)?.value}</Tag>
-            {/if}
-          {/each}
+          {#if timer.tags}
+            {#each timer.tags as tag}
+              {#if $tags.find((t) => t._id === tag)}
+                <Tag>{$tags.find((t) => t._id === tag)?.value}</Tag>
+              {/if}
+            {/each}
+          {/if}
         {/if}
       </TimerComponent>
     {/each}
