@@ -20,8 +20,15 @@
       project: $mostRecentProject._id,
       title: $mostRecentProject.defaultTitle,
       date: Temporal.Now.plainDateISO().toString(),
-      start: Temporal.Now.plainTimeISO().toString(),
+      start: Temporal.Now.plainTimeISO()
+        .round({
+          smallestUnit: "minute",
+          roundingIncrement: 15,
+          roundingMode: "floor",
+        })
+        .toString(),
     });
+
     dispatch("timer-update");
   }
 </script>

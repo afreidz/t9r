@@ -10,6 +10,7 @@
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
+  import Time from "@/foundation/Time.svelte";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -55,8 +56,6 @@
       details: {
         ...newValues,
         _id: undefined,
-        end: undefined,
-        start: undefined,
       },
     });
 
@@ -108,6 +107,26 @@
 
   function removeTag(id: string) {
     if (newValues) newValues.tags = newValues?.tags.filter((t) => t !== id);
+  }
+
+  async function stop() {
+    if (!timer || !timer._id) return;
+
+    await trpc.timers.update.mutate({
+      id: timer._id,
+      details: {
+        end: Temporal.Now.plainTimeISO()
+          .round({
+            smallestUnit: "minute",
+            roundingIncrement: 15,
+            roundingMode: "ceil",
+          })
+          .toString(),
+      },
+    });
+
+    timer = await trpc.timers.get.query(timer._id);
+    if (timer) newValues = { ...timer };
   }
 
   export let params: { id: string };
@@ -179,7 +198,23 @@
         slot="secondary"
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
-        Hello!
+        <div class="flex items-center justify-evenly gap-4">
+          <Field label="Start Time">
+            <Time bind:value={newValues.start} />
+          </Field>
+          <Icon icon="material-symbols:arrow-range" class="text-4xl" />
+          <Field label={newValues.end ? "End Time" : "Running..."}>
+            {#if !newValues.end}
+              <Button
+                on:click={stop}
+                class="h-9 bg-blue-500 px-8 text-center font-mono text-xl text-white"
+                >Stop</Button
+              >
+            {:else}
+              <Time bind:value={newValues.end} />
+            {/if}
+          </Field>
+        </div>
       </section>
     </Container>
   {/if}

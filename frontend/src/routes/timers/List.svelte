@@ -82,6 +82,13 @@
         {:else}
           {#if !timer.end}
             <Tag>running</Tag>
+          {:else}
+            <!-- svelte-ignore missing-declaration -->
+            <Tag
+              >{Temporal.PlainTime.from(timer.end).since(
+                Temporal.PlainTime.from(timer.start)
+              ).hours}hrs</Tag
+            >
           {/if}
           {#if timer.tags}
             {#each timer.tags as tag}
