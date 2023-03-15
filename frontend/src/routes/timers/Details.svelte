@@ -163,13 +163,15 @@
             {/each}
           </datalist>
           <div class="flex flex-wrap border-t border-neutral-900/50 pb-1 pt-5">
-            {#each newValues.tags as tag}
-              {#if tags.find((t) => t._id === tag)}
-                <Tag closeable on:close={() => removeTag(tag)}>
-                  {tags.find((t) => t._id === tag)?.value}
-                </Tag>
-              {/if}
-            {/each}
+            {#if newValues.tags}
+              {#each newValues.tags as tag}
+                {#if tags.find((t) => t._id === tag)}
+                  <Tag closeable on:close={() => removeTag(tag)}>
+                    {tags.find((t) => t._id === tag)?.value}
+                  </Tag>
+                {/if}
+              {/each}
+            {/if}
           </div>
         </Field>
       </section>
