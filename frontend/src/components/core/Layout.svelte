@@ -2,8 +2,8 @@
   import Logo from "./Logo.svelte";
   import Icon from "@iconify/svelte";
   import { fly } from "svelte/transition";
-  import { fetchProjects } from "@/lib/projects";
   import MenuTrigger from "./MenuTrigger.svelte";
+  import { fetchProjects } from "@/stores/projects";
   import Nav from "@/components/core/nav/Nav.svelte";
 
   let menuOpen = false;

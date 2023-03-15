@@ -4,7 +4,7 @@
   import { createEventDispatcher } from "svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
-  import projects, { mostRecentProject } from "@/lib/projects";
+  import projects, { mostRecentProject } from "@/stores/projects";
   let value: string;
 
   const dispatch = createEventDispatcher();

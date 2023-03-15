@@ -18,4 +18,7 @@
     <small class="my-1 font-mono opacity-50">{label || ""}</small>
     <slot />
   </span>
+  <span class="mt-8 flex flex-none items-start">
+    <slot name="icon" />
+  </span>
 </svelte:element>

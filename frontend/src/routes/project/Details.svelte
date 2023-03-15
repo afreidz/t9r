@@ -14,8 +14,8 @@
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
   import Chart from "@/components/core/chart/Chart.svelte";
-  import projects, { fetchProjects } from "@/lib/projects";
   import Switch from "@/components/foundation/Switch.svelte";
+  import projects, { fetchProjects } from "@/stores/projects";
   import ChartItem from "@/components/core/chart/ChartItem.svelte";
 
   let dirty = false;

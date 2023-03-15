@@ -1,15 +1,15 @@
 <script lang="ts">
   import SubNav from "./Sub.svelte";
   import Icon from "@iconify/svelte";
-  import projects from "@/lib/projects";
   import SubItem from "./SubItem.svelte";
   import { getToday } from "@/lib/dates";
+  import projects from "@/stores/projects";
   import MainItem from "./MainItem.svelte";
   import Dialog from "@/core/Dialog.svelte";
   import { location } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
   import NewProject from "@/core/NewProject.svelte";
-  import { showArchived, showProjects } from "@/lib/ui";
+  import { showArchived, showProjects } from "@/stores/ui";
 
   let newProject = false;
 </script>

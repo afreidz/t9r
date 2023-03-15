@@ -2,8 +2,8 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import Colors from "@/core/Colors.svelte";
-  import { fetchProjects } from "@/lib/projects";
   import { createEventDispatcher } from "svelte";
+  import { fetchProjects } from "@/stores/projects";
   import DualAction from "@/core/DualAction.svelte";
   import type { Project } from "@/backend/schema/project";
   import Button from "@/components/foundation/Button.svelte";

@@ -27,7 +27,9 @@ const config = {
     }),
     alias({
       "@/*": "./src/*",
-      "@/foundation": "./src/components/foundation/*",
+      "@/stores/*": "./src/lib/stores/*",
+      "@/core/*": "./src/components/core/*",
+      "@/foundation/*": "./src/components/foundation/*",
     }),
   ],
 };

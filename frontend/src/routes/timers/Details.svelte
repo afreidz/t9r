@@ -2,8 +2,10 @@
   import same from "@/lib/same";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
-  import projects from "@/lib/projects";
+  import Tag from "@/core/Tag.svelte";
+  import { getToday } from "@/lib/dates";
   import { pop } from "svelte-spa-router";
+  import projects from "@/stores/projects";
   import { fade } from "svelte/transition";
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
@@ -14,23 +16,28 @@
   import type { Timer } from "@/backend/schema/timer";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
+  import type { Tag as TagType } from "@/backend/schema/tag";
 
   let title: string;
-  let loader: Promise<void>;
+  let newTag: string;
+  let tags: TagType[] = [];
   let dirty: boolean = false;
+  let picker: HTMLInputElement;
   let timer: Timer | null = null;
+  let loader: () => Promise<void>;
   let project: Project | undefined;
   let confirmDelete: boolean = false;
   let newValues: Timer | undefined = undefined;
 
   $: if (params.id && timer?._id !== params.id) {
-    loader = trpc.timers.get.query(params.id).then((r) => {
-      timer = r;
+    loader = async () => {
+      tags = await trpc.tags.list.query();
+      timer = await trpc.timers.get.query(params.id);
+
       if (timer) newValues = { ...timer };
       if (timer) project = $projects.find((p) => p._id === timer?.project);
-      if (timer && project) title = `${project.name}/${timer.title || "timer"}`;
       return;
-    });
+    };
   }
 
   $: if (newValues && timer) dirty = !same<Timer>(newValues, timer);
@@ -66,10 +73,47 @@
     }
   }
 
+  function showPicker() {
+    if (picker) picker.showPicker();
+  }
+
+  async function addTag(e: { currentTarget: HTMLInputElement }) {
+    const val = e.currentTarget.value;
+    const datalist = e.currentTarget.list as HTMLDataListElement;
+    const option = [...datalist.options].find((o) => o.value === val);
+
+    let existing =
+      tags.find((t) => t._id === option?.id) ||
+      (await trpc.tags.get.query(val));
+
+    if (!existing && newValues) {
+      const result = await trpc.tags.create.mutate({ value: val });
+
+      if (result.acknowledged && result.insertedId) {
+        tags = await trpc.tags.list.query();
+        existing = await trpc.tags.get.query(result.insertedId);
+      }
+    }
+
+    newTag = "";
+
+    if (existing && existing._id && newValues) {
+      const newTags = newValues.tags
+        ? [...newValues.tags, existing._id]
+        : [existing._id];
+      newValues.tags = [...new Set(newTags)];
+      return;
+    }
+  }
+
+  function removeTag(id: string) {
+    if (newValues) newValues.tags = newValues?.tags.filter((t) => t !== id);
+  }
+
   export let params: { id: string };
 </script>
 
-<Layout {loader}>
+<Layout loader={loader()}>
   {#if newValues}
     <Header sub="Details For" main={title} class="mb-1" />
     <Container class="flex-1">
@@ -83,6 +127,50 @@
               <option value={project._id}>{project.name}</option>
             {/each}
           </select>
+        </Field>
+        <Field label="Date">
+          <button class="!ring-0 !ring-offset-0" on:click={showPicker}>
+            <input
+              type="date"
+              bind:this={picker}
+              max={getToday().toString()}
+              bind:value={newValues.date}
+            />
+          </button>
+          <Icon
+            slot="icon"
+            icon="mdi:calendar-today-outline"
+            class="text-neutral-light"
+          />
+        </Field>
+        <Field label="Tags">
+          <input
+            min={2}
+            max={30}
+            list="tags"
+            class="mb-2 appearance-none"
+            on:change={addTag}
+            bind:value={newTag}
+          />
+          <Icon
+            slot="icon"
+            icon="material-symbols:search"
+            class="text-neutral-light"
+          />
+          <datalist id="tags">
+            {#each tags as tag}
+              <option id={tag._id} value={tag.value} />
+            {/each}
+          </datalist>
+          <div class="flex flex-wrap border-t border-white/5 py-2">
+            {#each newValues.tags as tag}
+              {#if tags.find((t) => t._id === tag)}
+                <Tag closeable on:close={() => removeTag(tag)}>
+                  {tags.find((t) => t._id === tag)?.value}
+                </Tag>
+              {/if}
+            {/each}
+          </div>
         </Field>
       </section>
       <section
@@ -163,3 +251,10 @@
     </section>
   </Dialog>
 {/if}
+
+<style>
+  [list]::-webkit-calendar-picker-indicator,
+  [list]::-webkit-list-button {
+    opacity: 0;
+  }
+</style>
