@@ -78,7 +78,7 @@
         project={$projects.find((p) => p._id === timer.project)}
       >
         {#if size?.width && size.width < 400}
-          <Tag round>{timer.tags.length + (!timer.end ? 1 : 0)}</Tag>
+          <Tag round>{(timer.tags?.length ?? 0) + (!timer.end ? 1 : 0)}</Tag>
         {:else}
           {#if !timer.end}
             <Tag>running</Tag>
