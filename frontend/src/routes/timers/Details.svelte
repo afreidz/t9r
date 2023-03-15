@@ -198,11 +198,16 @@
         slot="secondary"
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
-        <div class="flex items-center justify-evenly gap-4">
+        <div
+          class="flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
+        >
           <Field label="Start Time">
             <Time bind:value={newValues.start} />
           </Field>
-          <Icon icon="material-symbols:arrow-range" class="text-4xl" />
+          <Icon
+            icon="material-symbols:arrow-range"
+            class="hidden text-4xl md:block"
+          />
           <Field label={newValues.end ? "End Time" : "Running..."}>
             {#if !newValues.end}
               <Button
