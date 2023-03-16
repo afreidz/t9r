@@ -1,6 +1,7 @@
 <script lang="ts">
   import SubNav from "./Sub.svelte";
   import Icon from "@iconify/svelte";
+  import { user } from "@/stores/user";
   import SubItem from "./SubItem.svelte";
   import { getToday } from "@/lib/dates";
   import projects from "@/stores/projects";
@@ -114,6 +115,11 @@
       <a href="/logout" slot="main">
         <span class="flex-1 text-xl font-bold">Log Out</span>
       </a>
+      {#if $user}
+        <SubNav>
+          <SubItem class="break-all">{$user.email}</SubItem>
+        </SubNav>
+      {/if}
     </MainItem>
   </ul>
 </nav>

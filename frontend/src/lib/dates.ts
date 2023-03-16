@@ -12,8 +12,9 @@ export function getWeekDay(d: Temporal.PlainDate) {
   return d.toLocaleString(locale, { weekday: "long" });
 }
 
-export function isToday(d: Temporal.PlainDate) {
-  return d.equals(getToday());
+export function isToday(d: Temporal.PlainDate | string) {
+  const pd = typeof d === "string" ? Temporal.PlainDate.from(d) : d;
+  return pd.equals(getToday());
 }
 
 export function getDurationHoursFromString(a: string, b: string) {

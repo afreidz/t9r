@@ -3,7 +3,7 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
-  import { getToday } from "@/lib/dates";
+  import { getToday, isToday } from "@/lib/dates";
   import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
   import { fade } from "svelte/transition";
@@ -131,6 +131,20 @@
     if (timer) newValues = { ...timer };
   }
 
+  async function restart() {
+    if (!timer || !timer._id) return;
+
+    await trpc.timers.update.mutate({
+      id: timer._id,
+      details: {
+        end: null,
+      },
+    });
+
+    timer = await trpc.timers.get.query(timer._id);
+    if (timer) newValues = { ...timer };
+  }
+
   export let params: { id: string };
 </script>
 
@@ -238,6 +252,15 @@
             {/if}
           </Field>
         </div>
+        {#if timer && timer.end && isToday(timer.date)}
+          <div class="flex justify-center">
+            <Button
+              on:click={restart}
+              class="h-9 max-w-min px-8 text-center text-xl text-white"
+              style={` background-color: ${project?.color} `}>Restart</Button
+            >
+          </div>
+        {/if}
       </section>
     </Container>
   {/if}

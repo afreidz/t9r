@@ -1,14 +1,21 @@
 <script lang="ts">
+  import type { HTMLAttributes } from "svelte/elements";
   import Link from "@/components/foundation/Link.svelte";
+
   export let to: string | undefined = undefined;
   export let clickable: boolean = false;
+
+  type $$Props = HTMLAttributes<HTMLLIElement> & {
+    to?: string;
+    clickable?: boolean;
+  };
 
   let tag = "div";
 
   $: if (clickable) tag = "button";
 </script>
 
-<li class="flex items-center">
+<li class={`flex items-center ${$$props.class || ""}`}>
   {#if to}
     <Link {to} class="flex flex-1 items-center gap-2" on:navigate>
       <div class="flex-none">
