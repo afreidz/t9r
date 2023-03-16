@@ -35,14 +35,18 @@
     to={`/timer/${id}`}
     disabled={disableNav}
     style={`background: ${grad}`}
-    class={`mb-2 flex items-center overflow-hidden !rounded-full leading-8 text-white ${$$props.class}`}
+    class={`mb-2 flex items-center overflow-hidden !rounded-full text-white ${$$props.class}`}
   >
     <header
       style={`background: ${grad}`}
-      class="flex flex-col justify-around rounded-full px-6 py-3"
+      class="flex flex-col justify-around rounded-full px-6 py-2 md:py-3"
     >
-      <small class="font-mono leading-none opacity-50">{project.name}</small>
-      <strong class="font-normal leading-tight">{title || "Timer"}</strong>
+      <small class="font-mono text-xs leading-none opacity-50 md:text-sm"
+        >{project.name}</small
+      >
+      <strong class="text-sm font-normal leading-tight md:text-base"
+        >{title || "Timer"}</strong
+      >
     </header>
     <div
       class="flex flex-1 items-center justify-end overflow-auto whitespace-nowrap pr-2 text-sm"
