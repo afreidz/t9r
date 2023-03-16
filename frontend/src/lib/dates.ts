@@ -15,3 +15,10 @@ export function getWeekDay(d: Temporal.PlainDate) {
 export function isToday(d: Temporal.PlainDate) {
   return d.equals(getToday());
 }
+
+export function getDurationHoursFromString(a: string, b: string) {
+  const start = Temporal.PlainTime.from(a);
+  const end = Temporal.PlainTime.from(b);
+
+  return end.since(start).total("hour");
+}

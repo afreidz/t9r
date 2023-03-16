@@ -1,4 +1,11 @@
 <script lang="ts">
+  import {
+    isToday,
+    getMonth,
+    getToday,
+    getWeekDay,
+    getDurationHoursFromString,
+  } from "@/lib/dates";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import projects from "@/stores/projects";
@@ -11,7 +18,6 @@
   import NewTimer from "@/components/core/NewTimer.svelte";
   import TimerComponent from "@/components/core/Timer.svelte";
   import DateActions from "@/components/core/DateActions.svelte";
-  import { getWeekDay, getMonth, isToday, getToday } from "@/lib/dates";
 
   export let params: { date: string };
 
@@ -83,12 +89,7 @@
           {#if !timer.end}
             <Tag>running</Tag>
           {:else}
-            <!-- svelte-ignore missing-declaration -->
-            <Tag
-              >{Temporal.PlainTime.from(timer.end).since(
-                Temporal.PlainTime.from(timer.start)
-              ).hours}hrs</Tag
-            >
+            <Tag>{getDurationHoursFromString(timer.start, timer.end)}hrs</Tag>
           {/if}
           {#if timer.tags}
             {#each timer.tags as tag}

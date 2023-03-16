@@ -5,11 +5,13 @@
 
   type $$Props = HTMLAnchorAttributes & {
     to?: string;
+    disabled?: boolean;
     elm?: HTMLAnchorElement;
   };
 
   const dispatch = createEventDispatcher();
 
+  export let disabled: boolean = false;
   export let to: string | undefined = undefined;
   export let elm: HTMLAnchorElement | undefined = undefined;
 </script>
@@ -26,7 +28,7 @@
   class:ring-offset-2={true}
   class:ring-offset-neutral-900={true}
   on:click={() => dispatch("navigate", to)}
-  use:link={{ disabled: $location === to }}
+  use:link={{ disabled: disabled || $location === to }}
 >
   <slot />
 </a>

@@ -5,7 +5,7 @@
   let mm: number;
 
   const inputClass =
-    "focus:ring-2 rounded-md ring-blue-500 flex font-mono max-w-[3rem] w-fit appearance-none items-center justify-center text-3xl";
+    "focus:ring-2 rounded-md ring-blue-500 flex font-mono max-w-[3rem] w-fit appearance-none items-center justify-center text-xl lg:text-3xl";
 
   $: if (value) {
     const plainTime = Temporal.PlainTime.from(value).round({

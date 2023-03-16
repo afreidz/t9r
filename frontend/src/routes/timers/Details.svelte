@@ -17,7 +17,9 @@
   import type { Timer } from "@/backend/schema/timer";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
+  import { getDurationHoursFromString } from "@/lib/dates";
   import type { Tag as TagType } from "@/backend/schema/tag";
+  import TimerComponent from "@/components/core/Timer.svelte";
 
   let title: string;
   let newTag: string;
@@ -134,7 +136,7 @@
 
 <Layout loader={loader()}>
   {#if newValues}
-    <Header sub="Details For" main={title} class="mb-1" />
+    <Header sub="Timer details For" main={newValues.title} class="mb-1" />
     <Container class="flex-1">
       <section slot="primary" class="xl:flex-1">
         <Field label="Title">
@@ -198,8 +200,24 @@
         slot="secondary"
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
+        <h3 class="mb-3 text-center text-xl font-bold md:text-left">Timing</h3>
+        <TimerComponent
+          disableNav
+          class="mt-3"
+          title={newValues.title}
+          project={$projects.find((p) => p._id === newValues?.project)}
+        >
+          {#if newValues.end}
+            <Tag
+              >{getDurationHoursFromString(
+                newValues.start,
+                newValues.end
+              )}hrs</Tag
+            >
+          {/if}
+        </TimerComponent>
         <div
-          class="flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
+          class="my-3 flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
         >
           <Field label="Start Time">
             <Time bind:value={newValues.start} />
@@ -212,8 +230,8 @@
             {#if !newValues.end}
               <Button
                 on:click={stop}
-                class="h-9 bg-blue-500 px-8 text-center font-mono text-xl text-white"
-                >Stop</Button
+                class="h-9 px-8 text-center font-mono text-xl text-white"
+                style={` background-color: ${project?.color} `}>Stop</Button
               >
             {:else}
               <Time bind:value={newValues.end} />

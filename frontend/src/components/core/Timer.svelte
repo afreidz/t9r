@@ -2,9 +2,18 @@
   import Link from "../foundation/Link.svelte";
   import type { Writable } from "svelte/store";
   import type { Project } from "@/backend/schema/project";
+  import type { HTMLAnchorAttributes } from "svelte/elements";
   import observeResize, { type ResizeObserverValue } from "@/lib/resize";
 
+  type $$Props = HTMLAnchorAttributes & {
+    disableNav?: boolean;
+    project?: Project;
+    title?: string;
+    id?: string;
+  };
+
   export let project: Project | undefined = undefined;
+  export let disableNav: boolean | undefined = false;
   export let title: string | undefined = undefined;
   export let id: string | undefined = undefined;
 
@@ -20,12 +29,13 @@
   }
 </script>
 
-{#if project && id}
+{#if project}
   <Link
     bind:elm={timer}
     to={`/timer/${id}`}
+    disabled={disableNav}
     style={`background: ${grad}`}
-    class="mb-2 flex items-center overflow-hidden !rounded-full leading-8 text-white"
+    class={`mb-2 flex items-center overflow-hidden !rounded-full leading-8 text-white ${$$props.class}`}
   >
     <header
       style={`background: ${grad}`}

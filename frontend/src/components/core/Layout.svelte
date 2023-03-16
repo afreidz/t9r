@@ -51,7 +51,7 @@
         <slot />
       </main>
       <div
-        class="fixed bottom-2 left-0 right-0 flex items-center justify-center md:static md:bottom-6"
+        class="absolute bottom-[calc(env(keyboard-inset-height,0)_+_0.5rem)] left-0 right-0 flex items-center justify-center md:static md:bottom-6"
       >
         <slot name="cta" />
       </div>
