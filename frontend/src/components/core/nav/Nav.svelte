@@ -70,10 +70,11 @@
           {#if $projects.some((p) => p.archived)}
             <SubItem
               clickable
+              class="mt-6"
               on:click={() => ($showArchived = !$showArchived)}
             >
               <Icon slot="icon" icon="mdi:eye-off-outline" />
-              <span class="flex-1">Archived Projects</span>
+              <span class="flex-1 text-neutral-light">Archived Projects</span>
               <Icon
                 slot="right"
                 icon="ph:caret-down-bold"
@@ -107,9 +108,6 @@
           </SubItem>
         </SubNav>
       {/if}
-    </MainItem>
-    <MainItem to="/settings" active={$location.startsWith("/settings")}>
-      <span slot="main">Settings</span>
     </MainItem>
     <MainItem>
       <a href="/logout" slot="main">

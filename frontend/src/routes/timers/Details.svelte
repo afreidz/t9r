@@ -3,15 +3,16 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
-  import { getToday, isToday } from "@/lib/dates";
   import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
   import { fade } from "svelte/transition";
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
+  import { selected } from "@/lib/stores/ui";
   import Time from "@/foundation/Time.svelte";
   import Field from "@/foundation/Field.svelte";
+  import { getToday, isToday } from "@/lib/dates";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
@@ -19,10 +20,11 @@
   import type { Project } from "@/backend/schema/project";
   import { getDurationHoursFromString } from "@/lib/dates";
   import type { Tag as TagType } from "@/backend/schema/tag";
+  import Switch from "@/components/foundation/Switch.svelte";
   import TimerComponent from "@/components/core/Timer.svelte";
 
-  let title: string;
   let newTag: string;
+  let multiple = false;
   let tags: TagType[] = [];
   let dirty: boolean = false;
   let picker: HTMLInputElement;
@@ -30,9 +32,14 @@
   let loader: () => Promise<void>;
   let project: Project | undefined;
   let confirmDelete: boolean = false;
-  let newValues: Timer | undefined = undefined;
+  let timers: Timer[] | undefined = undefined;
+  let newValues: Partial<Timer> | undefined = undefined;
+  let emptyTimer: Partial<Timer> = { project: undefined };
 
-  $: if (params.id && timer?._id !== params.id) {
+  export let params: { id: string };
+
+  if (params.id !== "selected") {
+    console.log("single");
     loader = async () => {
       tags = await trpc.tags.list.query();
       timer = await trpc.timers.get.query(params.id);
@@ -41,33 +48,75 @@
       if (timer) project = $projects.find((p) => p._id === timer?.project);
       return;
     };
+  } else {
+    console.log("multiple");
+    loader = async () => {
+      tags = await trpc.tags.list.query();
+      timers = await trpc.timers.bulkGet.query($selected);
+
+      if (timers) newValues = { ...emptyTimer };
+    };
   }
 
-  $: if (newValues && timer) dirty = !same<Timer>(newValues, timer);
+  $: multiple = params.id === "selected";
+
+  $: if (multiple && newValues && timers) {
+    dirty = !same<Partial<Timer>>(newValues, { ...emptyTimer });
+  } else if (!multiple && newValues && timer) {
+    dirty = !same<Partial<Timer>>(newValues, { ...timer });
+  }
+
+  $: console.log(
+    "Dirty",
+    newValues,
+    newValues &&
+      same<Partial<Timer>>(
+        newValues,
+        multiple ? { ...emptyTimer } : { ...timer }
+      )
+  );
 
   function reset() {
+    if (multiple === true && (!timers || !newValues)) return;
     if (!timer || !newValues) return;
-    newValues = { ...timer };
+    newValues = multiple ? { ...emptyTimer } : { ...timer };
   }
 
   async function update() {
+    if (multiple === true && (!timers || !newValues)) return;
     if (!timer || !timer._id) return;
 
-    await trpc.timers.update.mutate({
-      id: timer._id,
-      details: {
-        ...newValues,
-        _id: undefined,
-      },
-    });
+    if (multiple) {
+      await trpc.timers.bulkUpdate.mutate({
+        ids: $selected,
+        details: {
+          ...newValues,
+          _id: undefined,
+        },
+      });
 
-    timer = await trpc.timers.get.query(timer._id);
-    if (timer) newValues = { ...timer };
+      timers = await trpc.timers.bulkGet.query($selected);
+      if (timers.length > 0) newValues = { ...emptyTimer };
+    } else {
+      await trpc.timers.update.mutate({
+        id: timer._id,
+        details: {
+          ...newValues,
+          _id: undefined,
+        },
+      });
+      timer = await trpc.timers.get.query(timer._id);
+      if (timer) newValues = { ...timer };
+    }
   }
 
   async function handleDelete() {
+    if (multiple === true && (!timers || !newValues)) return;
     if (!timer || !timer._id) return;
-    const result = await trpc.timers.delete.mutate({ id: timer._id });
+
+    const result = multiple
+      ? await trpc.timers.bulkDelete.mutate($selected)
+      : await trpc.timers.delete.mutate({ id: timer._id });
 
     if (result.acknowledged) {
       return pop();
@@ -108,10 +157,11 @@
   }
 
   function removeTag(id: string) {
-    if (newValues) newValues.tags = newValues?.tags.filter((t) => t !== id);
+    if (newValues) newValues.tags = newValues?.tags?.filter((t) => t !== id);
   }
 
   async function stop() {
+    if (multiple) return;
     if (!timer || !timer._id) return;
 
     await trpc.timers.update.mutate({
@@ -132,6 +182,7 @@
   }
 
   async function restart() {
+    if (multiple) return;
     if (!timer || !timer._id) return;
 
     await trpc.timers.update.mutate({
@@ -144,8 +195,6 @@
     timer = await trpc.timers.get.query(timer._id);
     if (timer) newValues = { ...timer };
   }
-
-  export let params: { id: string };
 </script>
 
 <Layout loader={loader()}>
@@ -158,6 +207,7 @@
         </Field>
         <Field label="Project">
           <select bind:value={newValues.project}>
+            <option value={undefined}>Select one...</option>
             {#each $projects as project}
               <option value={project._id}>{project.name}</option>
             {/each}
@@ -209,62 +259,97 @@
             {/if}
           </div>
         </Field>
+        <Field>
+          <Switch
+            class="justify-between"
+            name="utilized"
+            color={project?.color}
+            label="Utilized?"
+            enabled={newValues.utilized}
+            on:change={(e) => {
+              if (newValues) newValues.utilized = e.detail;
+            }}
+          />
+        </Field>
       </section>
       <section
         slot="secondary"
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
-        <h3 class="mb-3 text-center text-xl font-bold md:text-left">Timing</h3>
-        <TimerComponent
-          disableNav
-          class="mt-3"
-          title={newValues.title}
-          project={$projects.find((p) => p._id === newValues?.project)}
-        >
-          {#if newValues.end}
-            <Tag
-              >{getDurationHoursFromString(
-                newValues.start,
-                newValues.end
-              )}hrs</Tag
+        {#if multiple && timers}
+          <h3 class="mb-3 text-center text-xl font-bold md:text-left">
+            Timers
+          </h3>
+          {#each timers as timer}
+            <TimerComponent
+              disableNav
+              class="mt-3"
+              title={timer.title}
+              project={$projects.find((p) => p._id === timer?.project)}
             >
-          {/if}
-        </TimerComponent>
-        <div
-          class="my-3 flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
-        >
-          <Field label="Start Time">
-            <Time bind:value={newValues.start} />
-          </Field>
-          <Icon
-            icon="material-symbols:arrow-range"
-            class="hidden text-4xl md:block"
-          />
-          <Field label={newValues.end ? "End Time" : "Running..."}>
-            {#if !newValues.end}
-              <Button
-                on:click={stop}
-                class="h-9 px-8 text-center font-mono text-xl text-white"
-                style={` background-color: ${project?.color} `}>Stop</Button
+              {#if timer.start && timer.end}
+                <Tag
+                  >{getDurationHoursFromString(timer.start, timer.end)}hrs</Tag
+                >
+              {/if}
+            </TimerComponent>
+          {/each}
+        {:else}
+          <h3 class="mb-3 text-center text-xl font-bold md:text-left">
+            Timing
+          </h3>
+          <TimerComponent
+            disableNav
+            class="mt-3"
+            title={newValues.title}
+            project={$projects.find((p) => p._id === newValues?.project)}
+          >
+            {#if newValues.start && newValues.end}
+              <Tag
+                >{getDurationHoursFromString(
+                  newValues.start,
+                  newValues.end
+                )}hrs</Tag
               >
-            {:else}
-              <Time bind:value={newValues.end} />
             {/if}
-          </Field>
-        </div>
-        {#if timer && timer.end && isToday(timer.date)}
-          <div class="flex justify-center">
-            <Button
-              on:click={restart}
-              class="h-9 max-w-min px-8 text-center text-xl text-white"
-              style={` background-color: ${project?.color} `}>Restart</Button
-            >
+          </TimerComponent>
+          <div
+            class="my-3 flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
+          >
+            <Field label="Start Time">
+              {#if newValues.start}
+                <Time bind:value={newValues.start} />
+              {/if}
+            </Field>
+            <Icon
+              icon="material-symbols:arrow-range"
+              class="hidden text-4xl md:block"
+            />
+            <Field label={newValues.end ? "End Time" : "Running..."}>
+              {#if !newValues.end && !multiple}
+                <Button
+                  on:click={stop}
+                  class="h-9 px-8 text-center font-mono text-xl text-white"
+                  style={` background-color: ${project?.color} `}>Stop</Button
+                >
+              {:else if newValues.end}
+                <Time bind:value={newValues.end} />
+              {/if}
+            </Field>
           </div>
+          {#if timer && timer.end && isToday(timer.date) && !multiple}
+            <div class="flex justify-center">
+              <Button
+                on:click={restart}
+                class="h-9 max-w-min px-8 text-center text-xl text-white"
+                style={` background-color: ${project?.color} `}>Restart</Button
+              >
+            </div>
+          {/if}
         {/if}
       </section>
     </Container>
   {/if}
-
   <div slot="cta">
     {#if dirty}
       <div in:fade>
@@ -272,15 +357,17 @@
           <Button
             on:click={reset}
             slot="secondary"
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
           >
             <Icon icon="teenyicons:x-small-outline" />
           </Button>
-          <span slot="content">{timer?.title || "Timer"}</span>
+          <span slot="content"
+            >{multiple ? "Multiple" : timer?.title || ""}</span
+          >
           <Button
             on:click={update}
             slot="primary"
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
           >
             <Icon icon="material-symbols:fitbit-check-small-sharp" />
           </Button>
@@ -293,11 +380,13 @@
             title="Delete project"
             on:click={() => (confirmDelete = true)}
             slot="secondary"
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
           >
             <Icon icon="material-symbols:skull-outline-sharp" />
           </Button>
-          <span slot="content">{timer?.title || "Timer"}</span>
+          <span slot="content"
+            >{multiple ? "Multiple" : timer?.title || ""}</span
+          >
         </DualAction>
       </div>
     {/if}
@@ -305,7 +394,11 @@
 </Layout>
 
 {#if confirmDelete}
-  <Dialog open={true} title="Delete {title}" sub="You are about to...">
+  <Dialog
+    open={true}
+    title="Delete {timer?.title || ''}"
+    sub="You are about to..."
+  >
     <Button
       slot="close"
       value="cancel"
@@ -318,7 +411,7 @@
         <Button
           slot="secondary"
           on:click={() => (confirmDelete = false)}
-          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
@@ -326,7 +419,7 @@
         <Button
           on:click={handleDelete}
           slot="primary"
-          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
         >
           <Icon icon="material-symbols:fitbit-check-small-sharp" />
         </Button>

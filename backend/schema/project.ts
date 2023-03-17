@@ -8,6 +8,8 @@ const ProjectSchema = z
     budget: z.number().min(1).optional(),
     archived: z.boolean().optional().default(false),
     defaultTitle: z.string().min(2).max(30).optional(),
+    hideInReport: z.boolean().optional().default(false),
+    defaultUtilized: z.boolean().optional().default(true),
     color: z.string().regex(/^#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})$/),
   })
   .passthrough();

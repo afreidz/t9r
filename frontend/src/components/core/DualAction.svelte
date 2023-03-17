@@ -10,7 +10,7 @@
 
 <svelte:element
   this={as}
-  class="flex w-full flex-1 items-center gap-4 rounded-full
+  class="flex w-full flex-1 items-center gap-4 rounded-2xl
   bg-white p-1 shadow-xl ring-blue-500 focus-within:ring md:p-2"
 >
   <div class="flex-none">

@@ -40,6 +40,14 @@
     timers = await query(viewDate.toString());
     await fetchTags();
   }
+
+  function getAllTags(t: Timer) {
+    const tags = [...(t.tags || [])];
+    if (!t.end) tags.push("running");
+    if (t.utilized) tags.push("utilized");
+    if (t.end) tags.push(`${getDurationHoursFromString(t.start, t.end)}hrs`);
+    return tags;
+  }
 </script>
 
 <Layout>
@@ -78,12 +86,12 @@
 
     {#each timers as timer}
       <TimerComponent
-        let:size
         id={timer._id}
         title={timer.title}
+        tags={getAllTags(timer)}
         project={$projects.find((p) => p._id === timer.project)}
-      >
-        {#if size?.width && size.width < 400}
+      />
+      <!-- {#if size?.width && size.width < 400}
           <Tag round>{(timer.tags?.length ?? 0) + (!timer.end ? 1 : 0)}</Tag>
         {:else}
           {#if !timer.end}
@@ -99,7 +107,7 @@
             {/each}
           {/if}
         {/if}
-      </TimerComponent>
+      </TimerComponent> -->
     {/each}
   {/await}
 

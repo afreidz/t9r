@@ -95,6 +95,30 @@
         <Field label="Default Timer Title">
           <input min={0} max={30} bind:value={newValues.defaultTitle} />
         </Field>
+        <Field>
+          <Switch
+            class="justify-between"
+            color={newValues.color}
+            name="default_utilized"
+            label="Timers default to utilized?"
+            enabled={newValues.defaultUtilized}
+            on:change={(e) => {
+              if (newValues) newValues.defaultUtilized = e.detail;
+            }}
+          />
+        </Field>
+        <Field>
+          <Switch
+            class="justify-between"
+            color={newValues.color}
+            name="show_in_reports"
+            label="Hide project from reports"
+            enabled={newValues.hideInReport}
+            on:change={(e) => {
+              if (newValues) newValues.hideInReport = e.detail;
+            }}
+          />
+        </Field>
         <Field label="Project Budget">
           <input
             class="text-2xl"
@@ -110,33 +134,39 @@
               />{:else}Active <Icon icon="mdi:eye-outline" />{/if}</strong
           >
         </Field>
-        <Field>
-          <Switch
-            class="justify-between"
-            name="show_in_reports"
-            label="Show in project reports?"
-          />
-        </Field>
       </section>
       <section
         slot="secondary"
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
-        <h3 class="font-mono text-sm opacity-50">Project Hours</h3>
-        <header class="my-1 flex justify-between">
-          <strong class="my-2 flex-none text-4xl"
-            >456 <span class="font-mono text-sm font-light opacity-50"
-              >worked</span
-            ></strong
-          >
-          {#if project.budget}
+        {#if project.budget}
+          <h3 class="font-mono text-sm opacity-50">Project Lifetime</h3>
+          <header class="my-1 flex justify-between">
             <strong class="my-2 flex-none text-4xl"
-              >{project.budget}
-              <span class="font-mono text-sm font-light opacity-50">budget</span
+              >456 <span class="font-mono text-sm font-light opacity-50"
+                >worked</span
               ></strong
             >
-          {/if}
-        </header>
+            {#if project.budget}
+              <strong class="my-2 flex-none text-4xl"
+                >{project.budget}
+                <span class="font-mono text-sm font-light opacity-50"
+                  >budget</span
+                ></strong
+              >
+            {/if}
+          </header>
+          <div class="group my-2 mb-6 grid h-12 grid-cols-2">
+            <ChartItem
+              max={2}
+              index={0}
+              value={456}
+              color={project.color}
+              percent={(456 / project.budget) * 100}
+            />
+          </div>
+        {/if}
+        <h3 class="font-mono text-sm opacity-50">Recent Hours</h3>
         <Chart cols={60} rows={5} height={320} axis={10}>
           <ChartItem
             max={40}
@@ -178,7 +208,7 @@
           <Button
             on:click={reset}
             slot="secondary"
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
           >
             <Icon icon="teenyicons:x-small-outline" />
           </Button>
@@ -186,7 +216,7 @@
           <Button
             on:click={update}
             slot="primary"
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
           >
             <Icon icon="material-symbols:fitbit-check-small-sharp" />
           </Button>
@@ -199,7 +229,7 @@
             title="Delete project"
             on:click={() => (confirmDelete = true)}
             slot="secondary"
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
           >
             <Icon icon="material-symbols:skull-outline-sharp" />
           </Button>
@@ -208,7 +238,7 @@
             title="Archive project"
             on:click={archive}
             slot="primary"
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
           >
             {#if project?.archived}
               <Icon icon="mdi:eye-off-outline" />
@@ -236,7 +266,7 @@
         <Button
           slot="secondary"
           on:click={() => (confirmDelete = false)}
-          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
@@ -244,7 +274,7 @@
         <Button
           on:click={handleDelete}
           slot="primary"
-          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
         >
           <Icon icon="material-symbols:fitbit-check-small-sharp" />
         </Button>

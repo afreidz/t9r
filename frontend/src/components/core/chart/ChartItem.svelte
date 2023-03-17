@@ -4,25 +4,29 @@
   export let label: string = "";
   export let color: string = "#cccccc";
   export let max: number | undefined = undefined;
+  export let percent: number | undefined = undefined;
 
-  let percent: number | undefined;
   let bg: string = "#cccccc";
   let grad = "";
 
   $: bg = `${color}66`;
-  $: percent = max ? (value / max) * 100 : value;
+  $: if (!percent) percent = max ? (value / max) * 100 : value;
   $: grad = `linear-gradient(to right, ${color}80, ${color})`;
 </script>
 
-<small
-  style={`grid-row-start: ${index + 1}; grid-row-end: ${index + 2};`}
-  class="col-start-1 col-end-2 cursor-pointer self-center font-mono text-xs opacity-50"
-  >{label}</small
->
+{#if label}
+  <small
+    style={`grid-row-start: ${index + 1}; grid-row-end: ${index + 2};`}
+    class="col-start-1 col-end-2 cursor-pointer self-center font-mono text-xs opacity-50"
+    >{label}</small
+  >
+{/if}
 <div
-  style={`grid-column: 2 / ${max ? "span " + max : -1}; grid-row-start: ${
-    index + 1
-  }; grid-row-end: ${index + 2}; ${max ? "background-color: " + bg : ""};`}
+  style={`grid-column: ${label ? 2 : 1} / ${
+    max ? "span " + max : -1
+  }; grid-row-start: ${index + 1}; grid-row-end: ${index + 2}; ${
+    max ? "background-color: " + bg : ""
+  };`}
   class="my-2 flex flex-col justify-center overflow-hidden rounded-md"
 >
   <span
@@ -31,7 +35,7 @@
     >{value}</span
   >
 </div>
-{#if max}
+{#if label && max}
   <small
     style={`grid-row-start: ${index + 1}; grid-row-end: ${
       index + 2

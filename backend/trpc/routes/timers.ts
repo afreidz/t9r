@@ -16,6 +16,18 @@ const timersRouter = router({
       _id: new ObjectId(input),
     });
   }),
+  bulkGet: protectedProcedure
+    .input(z.array(z.string()))
+    .query(async ({ input, ctx }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("timers");
+      const ids = input.map((id) => new ObjectId(id));
+
+      return collection
+        .find<Timer>({ owner: userId, _id: { $in: ids } })
+        .toArray();
+    }),
   getByDate: protectedProcedure
     .input(PlainDate)
     .query(async ({ input, ctx }) => {
@@ -59,6 +71,28 @@ const timersRouter = router({
       return result;
     }
   }),
+  bulkDelete: protectedProcedure
+    .input(z.array(z.string()))
+    .mutation(async ({ input, ctx }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("timers");
+      const ids = input.map((id) => new ObjectId(id));
+
+      const result = await collection.deleteMany({
+        owner: userId,
+        _id: { $in: ids },
+      });
+      if (result instanceof DBError) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: result.message,
+          cause: result,
+        });
+      } else {
+        return result;
+      }
+    }),
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
@@ -104,7 +138,7 @@ const timersRouter = router({
       const db = await getDBClient();
       const collection = db.collection("timers");
 
-      const { date, start, end, project, title } = input;
+      const { date, start, end, project, title, utilized } = input;
       const dateISO = Temporal.PlainDate.from(date).toString();
 
       const result = await collection.insertOne({
@@ -112,6 +146,7 @@ const timersRouter = router({
         start,
         title,
         project,
+        utilized,
         owner: userId,
         date: dateISO,
       });
@@ -138,6 +173,36 @@ const timersRouter = router({
           _id: new ObjectId(input.id),
           owner: userId,
         },
+        {
+          $set: {
+            ...input.details,
+          },
+        }
+      );
+
+      if (result instanceof DBError) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: result.message,
+          cause: result,
+        });
+      } else {
+        return result;
+      }
+    }),
+
+  bulkUpdate: protectedProcedure
+    .input(
+      z.object({ ids: z.array(z.string()), details: TimerSchema.partial() })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("timers");
+      const ids = input.ids.map((id) => new ObjectId(id));
+
+      const result = await collection.updateMany(
+        { owner: userId, _id: { $in: ids } },
         {
           $set: {
             ...input.details,
