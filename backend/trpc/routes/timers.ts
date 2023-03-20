@@ -1,9 +1,13 @@
 import "temporal-polyfill/global";
+
 import { z } from "zod";
+import type { Sort } from "mongodb";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "../lib";
 import getDBClient, { DBError, ObjectId } from "../../database";
 import TimerSchema, { type Timer, PlainDate } from "../../schema/timer";
+
+const timerSort: Sort = { date: 1, start: 1 };
 
 const timersRouter = router({
   get: protectedProcedure.input(z.string()).query(async ({ input, ctx }) => {
@@ -26,6 +30,7 @@ const timersRouter = router({
 
       return collection
         .find<Timer>({ owner: userId, _id: { $in: ids } })
+        .sort(timerSort)
         .toArray();
     }),
   getByDate: protectedProcedure
@@ -36,7 +41,10 @@ const timersRouter = router({
       const collection = db.collection("timers");
       const date = Temporal.PlainDate.from(input).toString();
 
-      return collection.find<Timer>({ owner: userId, date }).toArray();
+      return collection
+        .find<Timer>({ owner: userId, date })
+        .sort(timerSort)
+        .toArray();
     }),
   getByMonth: protectedProcedure
     .input(PlainDate)
@@ -52,6 +60,7 @@ const timersRouter = router({
 
       return collection
         .find<Timer>({ owner: userId, date: { $regex } })
+        .sort(timerSort)
         .toArray();
     }),
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -59,7 +68,10 @@ const timersRouter = router({
     const db = await getDBClient();
     const collection = db.collection("timers");
 
-    const result = await collection.find<Timer>({ owner: userId }).toArray();
+    const result = await collection
+      .find<Timer>({ owner: userId })
+      .sort(timerSort)
+      .toArray();
 
     if (result instanceof DBError) {
       throw new TRPCError({

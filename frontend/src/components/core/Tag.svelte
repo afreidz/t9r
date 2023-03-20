@@ -10,7 +10,7 @@
 </script>
 
 <strong
-  class="m-1 flex h-8 max-w-fit items-center justify-center gap-1 rounded-xl bg-white/30 text-xs font-normal ring-blue-500 focus-within:ring-2 md:text-base"
+  class="m-1 inline-block max-w-fit rounded-xl bg-white/30 text-xs font-normal !leading-8 ring-blue-500 focus-within:ring-2 md:text-base"
   class:px-2={!round}
   style={`color: ${color}`}
   class:aspect-square={round}

@@ -23,3 +23,13 @@ export function getDurationHoursFromString(a: string, b: string) {
 
   return end.since(start).total("hour");
 }
+
+export function formatForMonth(s: string) {
+  const date = Temporal.PlainDate.from(s);
+
+  return date.toLocaleString("en", {
+    weekday: "short",
+    month: "2-digit",
+    day: "2-digit",
+  });
+}

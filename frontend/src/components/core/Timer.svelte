@@ -5,15 +5,6 @@
   import { push } from "svelte-spa-router";
   import { isSelecting, selected } from "@/lib/stores/ui";
   import type { Project } from "@/backend/schema/project";
-  import type { HTMLAnchorAttributes } from "svelte/elements";
-
-  type $$Props = HTMLAnchorAttributes & {
-    tags?: (string | undefined)[];
-    disableNav?: boolean;
-    project?: Project;
-    title?: string;
-    id?: string;
-  };
 
   export let project: Project | undefined = undefined;
   export let disableNav: boolean | undefined = false;
@@ -37,6 +28,7 @@
   }
 
   function holdHandler() {
+    if (disableNav) return;
     $isSelecting = true;
     return clickHandler();
   }
@@ -44,29 +36,34 @@
 
 {#if project}
   <a
-    class={`mb-2 flex items-center overflow-hidden !rounded-2xl text-white ${$$props.class}`}
-    on:press={holdHandler}
     href={`/#/timer/${id}`}
+    class={`relative mb-2 flex items-center overflow-auto !rounded-2xl text-white ${
+      $$restProps.class || ""
+    }`}
     style={`background: ${grad}`}
-    on:click|preventDefault={clickHandler}
-    class:focus-within:ring-0={$isSelecting}
-    class:!ring-2={id && $selected.includes(id)}
-    use:press={{ timeframe: 600, triggerBeforeFinished: true }}
   >
-    <header
-      style={`background: ${grad}`}
-      class="flex flex-col justify-around rounded-2xl px-6 py-2 md:py-3"
+    <button
+      class="sticky top-0 bottom-0 left-0 right-[200px] flex h-full flex-none flex-col justify-around rounded-2xl py-2 px-6 md:py-3"
+      on:press={holdHandler}
+      on:click|preventDefault={clickHandler}
+      style={`background: ${project.color}`}
+      use:press={{ timeframe: 600, triggerBeforeFinished: true }}
     >
-      <small class="font-mono text-xs leading-none opacity-50 md:text-sm"
+      <small
+        class="font-mono text-xs leading-none opacity-50 line-clamp-1 md:text-sm"
         >{project.name}</small
       >
-      <strong class="text-sm font-normal leading-tight md:text-base"
+      <strong
+        class="text-sm font-normal leading-tight line-clamp-1 md:text-base"
         >{title || "Timer"}</strong
       >
-    </header>
-    <div
-      class="flex flex-1 items-center justify-end overflow-auto whitespace-nowrap pr-2 text-sm"
-    >
+    </button>
+    <div class="flex-none">
+      {#if $$slots.left}
+        <slot name="left" />
+      {/if}
+    </div>
+    <div class="flex flex-1 justify-end whitespace-nowrap pr-2 text-sm">
       {#if tags && tags.length > 0}
         {#each tags as tag}
           {#if tag}

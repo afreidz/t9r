@@ -5,13 +5,14 @@
     getToday,
     getWeekDay,
     getDurationHoursFromString,
+    formatForMonth,
   } from "@/lib/dates";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import projects from "@/stores/projects";
   import { location } from "svelte-spa-router";
+  import { fetchTags } from "@/lib/stores/tags";
   import Tag from "@/components/core/Tag.svelte";
-  import tags, { fetchTags } from "@/lib/stores/tags";
   import type { Timer } from "@/backend/schema/timer";
   import Layout from "@/components/core/Layout.svelte";
   import Header from "@/components/core/Header.svelte";
@@ -22,6 +23,7 @@
   export let params: { date: string };
 
   let loader: Promise<unknown>;
+  let view: "daily" | "monthly" = "daily";
 
   let query:
     | typeof trpc.timers.getByDate.query
@@ -35,6 +37,7 @@
     ? trpc.timers.getByMonth.query
     : trpc.timers.getByDate.query;
   $: if (viewDate) loader = updateTimers();
+  $: view = $location.includes("/timers/monthly") ? "monthly" : "daily";
 
   async function updateTimers() {
     timers = await query(viewDate.toString());
@@ -54,7 +57,7 @@
   {#await loader then}
     <Header as="h2">
       <div slot="sub" class="flex flex-1 items-center gap-2">
-        {#if $location.startsWith("/timers/monthly")}
+        {#if view === "monthly"}
           <Icon icon="mdi:calendar-month-outline" class="text-neutral-light" />
         {:else if isToday(viewDate)}
           <Icon icon="ic:round-arrow-circle-down" class="text-neutral-light" />
@@ -62,13 +65,11 @@
           <Icon icon="mdi:calendar-today-outline" class="text-neutral-light" />
         {/if}
         <span>
-          Timers for {#if $location.startsWith("/timers/daily")}{getWeekDay(
-              viewDate
-            )}{/if}
+          Timers for {#if view === "daily"}{getWeekDay(viewDate)}{/if}
         </span>
       </div>
       <div slot="main">
-        {#if $location.startsWith("/timers/monthly")}
+        {#if view === "monthly"}
           {getMonth(viewDate)}
           {viewDate.year}
         {:else}
@@ -78,10 +79,8 @@
     </Header>
     <DateActions
       date={viewDate}
-      disableTimelineView={$location.startsWith("/timers/monthly")}
-      baseRoute={$location.startsWith("/timers/monthly")
-        ? "/timers/monthly"
-        : "/timers/daily"}
+      disableTimelineView={view === "monthly"}
+      baseRoute={view === "monthly" ? "/timers/monthly" : "/timers/daily"}
     />
 
     {#each timers as timer}
@@ -90,24 +89,9 @@
         title={timer.title}
         tags={getAllTags(timer)}
         project={$projects.find((p) => p._id === timer.project)}
-      />
-      <!-- {#if size?.width && size.width < 400}
-          <Tag round>{(timer.tags?.length ?? 0) + (!timer.end ? 1 : 0)}</Tag>
-        {:else}
-          {#if !timer.end}
-            <Tag>running</Tag>
-          {:else}
-            <Tag>{getDurationHoursFromString(timer.start, timer.end)}hrs</Tag>
-          {/if}
-          {#if timer.tags}
-            {#each timer.tags as tag}
-              {#if $tags.find((t) => t._id === tag)}
-                <Tag>{$tags.find((t) => t._id === tag)?.value}</Tag>
-              {/if}
-            {/each}
-          {/if}
-        {/if}
-      </TimerComponent> -->
+      >
+        <Tag slot="left">{formatForMonth(timer.date)}</Tag>
+      </TimerComponent>
     {/each}
   {/await}
 

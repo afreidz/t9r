@@ -9,7 +9,6 @@
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
-  import { selected } from "@/lib/stores/ui";
   import Time from "@/foundation/Time.svelte";
   import Field from "@/foundation/Field.svelte";
   import { getToday, isToday } from "@/lib/dates";
@@ -17,6 +16,7 @@
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
   import Container from "@/foundation/Container.svelte";
+  import { isSelecting, selected } from "@/lib/stores/ui";
   import type { Project } from "@/backend/schema/project";
   import { getDurationHoursFromString } from "@/lib/dates";
   import type { Tag as TagType } from "@/backend/schema/tag";
@@ -39,7 +39,6 @@
   export let params: { id: string };
 
   if (params.id !== "selected") {
-    console.log("single");
     loader = async () => {
       tags = await trpc.tags.list.query();
       timer = await trpc.timers.get.query(params.id);
@@ -49,7 +48,6 @@
       return;
     };
   } else {
-    console.log("multiple");
     loader = async () => {
       tags = await trpc.tags.list.query();
       timers = await trpc.timers.bulkGet.query($selected);
@@ -66,27 +64,12 @@
     dirty = !same<Partial<Timer>>(newValues, { ...timer });
   }
 
-  $: console.log(
-    "Dirty",
-    newValues,
-    newValues &&
-      same<Partial<Timer>>(
-        newValues,
-        multiple ? { ...emptyTimer } : { ...timer }
-      )
-  );
-
   function reset() {
-    if (multiple === true && (!timers || !newValues)) return;
-    if (!timer || !newValues) return;
     newValues = multiple ? { ...emptyTimer } : { ...timer };
   }
 
   async function update() {
-    if (multiple === true && (!timers || !newValues)) return;
-    if (!timer || !timer._id) return;
-
-    if (multiple) {
+    if (multiple && timers && newValues) {
       await trpc.timers.bulkUpdate.mutate({
         ids: $selected,
         details: {
@@ -97,7 +80,7 @@
 
       timers = await trpc.timers.bulkGet.query($selected);
       if (timers.length > 0) newValues = { ...emptyTimer };
-    } else {
+    } else if (!multiple && timer && timer._id) {
       await trpc.timers.update.mutate({
         id: timer._id,
         details: {
@@ -108,19 +91,19 @@
       timer = await trpc.timers.get.query(timer._id);
       if (timer) newValues = { ...timer };
     }
+
+    $selected = [];
+    $isSelecting = false;
+    return pop();
   }
 
   async function handleDelete() {
-    if (multiple === true && (!timers || !newValues)) return;
-    if (!timer || !timer._id) return;
-
-    const result = multiple
-      ? await trpc.timers.bulkDelete.mutate($selected)
-      : await trpc.timers.delete.mutate({ id: timer._id });
-
-    if (result.acknowledged) {
-      return pop();
+    if (multiple && $selected.length) {
+      await trpc.timers.bulkDelete.mutate($selected);
+    } else if (!multiple && timer && timer._id) {
+      await trpc.timers.delete.mutate({ id: timer._id });
     }
+    return pop();
   }
 
   function showPicker() {
@@ -311,6 +294,8 @@
                   newValues.end
                 )}hrs</Tag
               >
+            {:else}
+              <Tag>running</Tag>
             {/if}
           </TimerComponent>
           <div
