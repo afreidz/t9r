@@ -63,6 +63,39 @@ const timersRouter = router({
         .sort(timerSort)
         .toArray();
     }),
+  getByWeek: protectedProcedure
+    .input(PlainDate)
+    .query(async ({ input, ctx }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("timers");
+      const date = Temporal.PlainDate.from(input);
+
+      const Sunday = Temporal.PlainDate.from({
+        year: date.year,
+        month: date.month,
+        day: date.day - date.dayOfWeek,
+      });
+
+      const Saturday = Sunday.add({ days: 6 });
+
+      const year = date.year;
+      const month = `${date.month}`.padStart(2, "0");
+      const $regex = new RegExp(`^${year}-${month}-\\d{2}`);
+
+      const monthly = await collection
+        .find<Timer>({ owner: userId, date: { $regex } })
+        .sort(timerSort)
+        .toArray();
+
+      return monthly.filter((t) => {
+        const date = Temporal.PlainDate.from(t.date);
+        return (
+          Temporal.PlainDate.compare(date, Sunday) >= 0 &&
+          Temporal.PlainDate.compare(date, Saturday) <= 0
+        );
+      });
+    }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const { userId } = ctx.user;
     const db = await getDBClient();

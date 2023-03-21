@@ -26,7 +26,7 @@
 
   $: if (params.id && project?._id !== params.id) {
     project = $projects.find((p: Project) => p._id === params.id);
-    if (project) newValues = { ...project, budget: project.budget || 0 };
+    if (project) newValues = { ...project, budget: project.budget || null };
   }
 
   $: if (newValues && project) dirty = !same<Project>(newValues, project);
@@ -44,6 +44,7 @@
       id: project._id,
       details: {
         ...newValues,
+        budget: newValues.budget === 0 ? null : newValues.budget,
         _id: undefined,
       },
     });

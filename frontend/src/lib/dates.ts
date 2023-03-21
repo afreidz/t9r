@@ -33,3 +33,21 @@ export function formatForMonth(s: string) {
     day: "2-digit",
   });
 }
+
+export function formatForWeek(s: string) {
+  const date = Temporal.PlainDate.from(s);
+
+  return date.toLocaleString("en", {
+    weekday: "short",
+  });
+}
+
+export function formatTime(s: string) {
+  const date = Temporal.PlainTime.from(s);
+
+  const hh = date.hour === 12 || date.hour === 24 ? 12 : date.hour % 12;
+  const mm = date.minute.toLocaleString("en", { minimumIntegerDigits: 2 });
+  const ap = date.hour > 12 ? "PM" : "AM";
+
+  return `${hh}:${mm} ${ap}`;
+}

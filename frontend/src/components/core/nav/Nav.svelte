@@ -28,6 +28,14 @@
           />
           Daily
         </SubItem>
+        <SubItem to={`/timers/weekly/${getToday().toString()}`} on:navigate>
+          <Icon
+            slot="icon"
+            icon="mdi:calendar-minus-outline"
+            class="text-neutral-light"
+          />
+          Weekly
+        </SubItem>
         <SubItem to={`/timers/monthly/${getToday().toString()}`} on:navigate>
           <Icon
             slot="icon"
@@ -113,11 +121,6 @@
       <a href="/logout" slot="main">
         <span class="flex-1 text-xl font-bold">Log Out</span>
       </a>
-      {#if $user}
-        <SubNav>
-          <SubItem class="break-all">{$user.email}</SubItem>
-        </SubNav>
-      {/if}
     </MainItem>
   </ul>
 </nav>

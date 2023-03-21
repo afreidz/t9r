@@ -7,7 +7,8 @@
   export let date: Temporal.PlainDate;
   export let view: "list" | "timeline" = "list";
   export let disableTimelineView: boolean = false;
-  export let baseRoute: "/timers/daily" | "/timers/monthly" = "/timers/daily";
+  export let baseRoute: "/timers/daily" | "/timers/monthly" | "/timers/weekly" =
+    "/timers/daily";
 
   let picker: HTMLInputElement;
   let buttonClasses =
@@ -28,6 +29,8 @@
     const dest =
       baseRoute === "/timers/monthly"
         ? date.add({ months: 1 })
+        : baseRoute === "/timers/weekly"
+        ? date.add({ weeks: 1 })
         : date.add({ days: 1 });
 
     push(`${baseRoute}/${dest}`);
@@ -37,6 +40,8 @@
     const dest =
       baseRoute === "/timers/monthly"
         ? date.subtract({ months: 1 })
+        : baseRoute === "/timers/weekly"
+        ? date.subtract({ weeks: 1 })
         : date.subtract({ days: 1 });
 
     push(`${baseRoute}/${dest}`);

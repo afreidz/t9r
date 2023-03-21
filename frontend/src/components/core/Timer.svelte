@@ -37,13 +37,13 @@
 {#if project}
   <a
     href={`/#/timer/${id}`}
-    class={`relative mb-2 flex items-center overflow-auto !rounded-2xl text-white ${
+    class={`relative mb-2 flex items-center overflow-auto !rounded-2xl pr-2 text-white ${
       $$restProps.class || ""
     }`}
     style={`background: ${grad}`}
   >
     <button
-      class="sticky top-0 bottom-0 left-0 right-[200px] flex h-full flex-none flex-col justify-around rounded-2xl py-2 px-6 md:py-3"
+      class="sticky top-0 bottom-0 left-0 right-[200px] mr-2 flex h-full flex-none flex-col justify-around rounded-2xl py-2 px-6 md:py-3"
       on:press={holdHandler}
       on:click|preventDefault={clickHandler}
       style={`background: ${project.color}`}
@@ -63,7 +63,7 @@
         <slot name="left" />
       {/if}
     </div>
-    <div class="flex flex-1 justify-end whitespace-nowrap pr-2 text-sm">
+    <div class="flex flex-1 justify-center whitespace-nowrap text-sm">
       {#if tags && tags.length > 0}
         {#each tags as tag}
           {#if tag}
@@ -74,5 +74,21 @@
         <slot />
       {/if}
     </div>
+    <div class="flex-none">
+      {#if $$slots.right}
+        <slot name="right" />
+      {/if}
+    </div>
   </a>
 {/if}
+
+<style>
+  a::-webkit-scrollbar {
+    display: none;
+  }
+
+  a {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

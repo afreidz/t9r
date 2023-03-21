@@ -11,7 +11,7 @@
   import Header from "@/core/Header.svelte";
   import Time from "@/foundation/Time.svelte";
   import Field from "@/foundation/Field.svelte";
-  import { getToday, isToday } from "@/lib/dates";
+  import { formatForMonth, getToday, isToday } from "@/lib/dates";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
@@ -182,7 +182,11 @@
 
 <Layout loader={loader()}>
   {#if newValues}
-    <Header sub="Timer details For" main={newValues.title} class="mb-1" />
+    <Header
+      class="mb-1"
+      sub="Timer details For"
+      main={multiple ? $selected.length + " Timers" : newValues.title}
+    />
     <Container class="flex-1">
       <section slot="primary" class="xl:flex-1">
         <Field label="Title">
@@ -270,11 +274,19 @@
               title={timer.title}
               project={$projects.find((p) => p._id === timer?.project)}
             >
-              {#if timer.start && timer.end}
-                <Tag
-                  >{getDurationHoursFromString(timer.start, timer.end)}hrs</Tag
-                >
-              {/if}
+              <div slot="left">
+                <Tag>{formatForMonth(timer.date)}</Tag>
+              </div>
+              <div slot="right">
+                {#if timer.start && timer.end}
+                  <Tag
+                    >{getDurationHoursFromString(
+                      timer.start,
+                      timer.end
+                    )}hrs</Tag
+                  >
+                {/if}
+              </div>
             </TimerComponent>
           {/each}
         {:else}
@@ -287,16 +299,18 @@
             title={newValues.title}
             project={$projects.find((p) => p._id === newValues?.project)}
           >
-            {#if newValues.start && newValues.end}
-              <Tag
-                >{getDurationHoursFromString(
-                  newValues.start,
-                  newValues.end
-                )}hrs</Tag
-              >
-            {:else}
-              <Tag>running</Tag>
-            {/if}
+            <div slot="right">
+              {#if newValues.start && newValues.end}
+                <Tag
+                  >{getDurationHoursFromString(
+                    newValues.start,
+                    newValues.end
+                  )}hrs</Tag
+                >
+              {:else}
+                <Tag>running</Tag>
+              {/if}
+            </div>
           </TimerComponent>
           <div
             class="my-3 flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
@@ -347,7 +361,7 @@
             <Icon icon="teenyicons:x-small-outline" />
           </Button>
           <span slot="content"
-            >{multiple ? "Multiple" : timer?.title || ""}</span
+            >{multiple ? $selected.length + " Timers" : timer?.title}</span
           >
           <Button
             on:click={update}
@@ -360,7 +374,7 @@
       </div>
     {:else}
       <div in:fade>
-        <DualAction as="div" label="Delete Timer">
+        <DualAction as="div" label="Delete Timer(s)">
           <Button
             title="Delete project"
             on:click={() => (confirmDelete = true)}
@@ -370,7 +384,7 @@
             <Icon icon="material-symbols:skull-outline-sharp" />
           </Button>
           <span slot="content"
-            >{multiple ? "Multiple" : timer?.title || ""}</span
+            >{multiple ? $selected.length + " Timers" : timer?.title}</span
           >
         </DualAction>
       </div>
