@@ -187,6 +187,11 @@
   {/await}
 
   <div slot="cta">
-    <NewTimer on:timer-update={() => (loader = updateTimers())} />
+    {#if view === "all" || view === "day"}
+      <NewTimer
+        date={viewDate}
+        on:timer-update={() => (loader = updateTimers())}
+      />
+    {/if}
   </div>
 </Layout>

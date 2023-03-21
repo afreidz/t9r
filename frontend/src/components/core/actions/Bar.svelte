@@ -1,4 +1,6 @@
-<div class="flex flex-none justify-between border-b border-neutral-900 px-3">
+<div
+  class="mb-3 flex flex-none justify-between border-b border-neutral-900 px-3"
+>
   <div>
     <slot name="left" />
   </div>

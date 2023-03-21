@@ -2,8 +2,8 @@
   import same from "@/lib/same";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
+  import { pop } from "svelte-spa-router";
   import { fade } from "svelte/transition";
-  import { push } from "svelte-spa-router";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
   import Colors from "@/core/Colors.svelte";
@@ -49,7 +49,7 @@
       },
     });
     await fetchProjects();
-    project = $projects.find((p: Project) => p._id === params.id);
+    pop();
   }
 
   async function archive() {
@@ -69,8 +69,25 @@
 
     if (result.acknowledged) {
       await fetchProjects();
-      return push("/timers");
+      pop();
     }
+  }
+
+  const maxVals = [40, 50, 30];
+  const valVals = [22, 30, 10];
+  let chartVals: { max: number; val: number }[];
+  function random() {
+    return Math.floor(Math.random() * (maxVals.length - 0)) + 0;
+  }
+
+  $: if (params.id) {
+    chartVals = [
+      { max: maxVals[random()], val: valVals[random()] },
+      { max: maxVals[random()], val: valVals[random()] },
+      { max: maxVals[random()], val: valVals[random()] },
+      { max: maxVals[random()], val: valVals[random()] },
+      { max: maxVals[random()], val: valVals[random()] },
+    ];
   }
 </script>
 
@@ -174,31 +191,37 @@
         </h3>
         <Chart cols={60} rows={5} height={320} axis={10}>
           <ChartItem
-            max={40}
+            max={chartVals[0].max}
+            value={chartVals[0].val}
             index={0}
-            value={32}
             label="3/13"
             color={project.color}
           />
-          <ChartItem index={1} value={22} label="3/6" color={project.color} />
           <ChartItem
-            max={20}
+            max={chartVals[1].max}
+            value={chartVals[1].val}
+            index={1}
+            label="3/6"
+            color={project.color}
+          />
+          <ChartItem
+            max={chartVals[2].max}
+            value={chartVals[2].val}
             index={2}
-            value={30}
             label="2/27"
             color={project.color}
           />
           <ChartItem
-            max={40}
+            max={chartVals[3].max}
+            value={chartVals[3].val}
             index={3}
-            value={40}
             label="2/20"
             color={project.color}
           />
           <ChartItem
-            max={48}
+            max={chartVals[4].max}
+            value={chartVals[4].val}
             index={4}
-            value={48}
             label="2/13"
             color={project.color}
           />

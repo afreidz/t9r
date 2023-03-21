@@ -5,9 +5,10 @@
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import projects, { mostRecentProject } from "@/stores/projects";
-  let value: string;
 
-  const dispatch = createEventDispatcher();
+  let value: string;
+  let dispatch = createEventDispatcher();
+  export let date: Temporal.PlainDate = Temporal.Now.plainDateISO();
 
   function handleChange() {
     const match = $projects.find((p) => p._id === value);
@@ -20,7 +21,7 @@
       project: $mostRecentProject._id,
       title: $mostRecentProject.defaultTitle,
       utilized: $mostRecentProject.defaultUtilized === false ? false : true,
-      date: Temporal.Now.plainDateISO().toString(),
+      date: date.toString(),
       start: Temporal.Now.plainTimeISO()
         .round({
           smallestUnit: "minute",
