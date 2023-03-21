@@ -20,6 +20,26 @@ const timersRouter = router({
       _id: new ObjectId(input),
     });
   }),
+  getByPage: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(10),
+        offset: z.number().default(0),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("timers");
+
+      return collection
+        .find<Timer>(
+          { owner: userId },
+          { limit: input.limit, skip: input.offset }
+        )
+        .sort(timerSort)
+        .toArray();
+    }),
   bulkGet: protectedProcedure
     .input(z.array(z.string()))
     .query(async ({ input, ctx }) => {

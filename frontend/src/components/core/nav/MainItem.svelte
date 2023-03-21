@@ -10,9 +10,9 @@
   $: if (clickable) tag = "button";
 </script>
 
-<li class="relative flex flex-col py-2 pl-4" class:active>
+<li class="relative flex flex-col py-2 pl-4 text-2xl" class:active>
   {#if to}
-    <Link {to} on:navigate class="flex flex-1 items-center text-xl font-bold">
+    <Link {to} on:navigate class="flex flex-1 items-center font-bold">
       <div class="flex-1">
         <slot name="main" />
       </div>
@@ -26,7 +26,7 @@
       this={tag}
       on:click
       on:keypress
-      class="flex flex-1 items-center text-xl font-bold"
+      class="flex flex-1 items-center font-bold"
     >
       <div class="flex-1">
         <slot name="main" />

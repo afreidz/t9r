@@ -15,7 +15,9 @@
   class={`sticky top-0 z-[1] flex items-center border-b border-neutral-900 bg-neutral-800 py-3 md:py-6 ${rest.class}`}
 >
   <svelte:element this={as || "h2"} class="flex-1">
-    <small class="block font-mono text-sm text-text-light/50 md:text-base">
+    <small
+      class="block font-pseudoMono text-base font-light text-text-light/50 md:text-lg"
+    >
       {#if sub}
         {sub}
       {:else if $$slots.sub}

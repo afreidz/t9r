@@ -17,7 +17,9 @@
     <slot name="secondary" />
   </div>
   <div class="flex flex-1 flex-col text-black">
-    {#if label}<span class="font-mono text-xs text-black/50">{label}</span>{/if}
+    {#if label}<span class="font-pseudoMono text-xs font-light text-black/50"
+        >{label}</span
+      >{/if}
     <slot name="content" />
   </div>
   <div class="flex-none">

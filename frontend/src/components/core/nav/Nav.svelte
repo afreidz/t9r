@@ -1,7 +1,6 @@
 <script lang="ts">
   import SubNav from "./Sub.svelte";
   import Icon from "@iconify/svelte";
-  import { user } from "@/stores/user";
   import SubItem from "./SubItem.svelte";
   import { getToday } from "@/lib/dates";
   import projects from "@/stores/projects";
@@ -20,7 +19,7 @@
     <MainItem active={$location.startsWith("/timers")}>
       <span slot="main" class="flex-1">Timers</span>
       <SubNav>
-        <SubItem to={`/timers/daily/${getToday().toString()}`} on:navigate>
+        <SubItem to={`/timers/day/${getToday().toString()}`} on:navigate>
           <Icon
             slot="icon"
             icon="mdi:calendar-today-outline"
@@ -28,7 +27,7 @@
           />
           Daily
         </SubItem>
-        <SubItem to={`/timers/weekly/${getToday().toString()}`} on:navigate>
+        <SubItem to={`/timers/week/${getToday().toString()}`} on:navigate>
           <Icon
             slot="icon"
             icon="mdi:calendar-minus-outline"
@@ -36,13 +35,21 @@
           />
           Weekly
         </SubItem>
-        <SubItem to={`/timers/monthly/${getToday().toString()}`} on:navigate>
+        <SubItem to={`/timers/month/${getToday().toString()}`} on:navigate>
           <Icon
             slot="icon"
             icon="mdi:calendar-month-outline"
             class="text-neutral-light"
           />
           Monthly
+        </SubItem>
+        <SubItem to="/timers/all" on:navigate>
+          <Icon
+            slot="icon"
+            icon="mdi:hamburger-menu"
+            class="text-neutral-light"
+          />
+          All
         </SubItem>
       </SubNav>
     </MainItem>

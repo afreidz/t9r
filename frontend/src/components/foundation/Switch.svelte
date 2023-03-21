@@ -14,7 +14,9 @@
 </script>
 
 <label class={`flex items-center ${$$props.class || ""}`}>
-  <span class={`mr-2 font-mono text-sm opacity-50`}>{label}</span>
+  <span class={`mr-2 font-pseudoMono text-sm font-light opacity-50`}
+    >{label}</span
+  >
   <input
     {name}
     id={name}

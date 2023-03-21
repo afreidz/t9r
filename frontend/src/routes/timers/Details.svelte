@@ -112,12 +112,9 @@
 
   async function addTag(e: { currentTarget: HTMLInputElement }) {
     const val = e.currentTarget.value;
-    const datalist = e.currentTarget.list as HTMLDataListElement;
-    const option = [...datalist.options].find((o) => o.value === val);
 
     let existing =
-      tags.find((t) => t._id === option?.id) ||
-      (await trpc.tags.get.query(val));
+      tags.find((t) => t._id === val) || (await trpc.tags.get.query(val));
 
     if (!existing && newValues) {
       const result = await trpc.tags.create.mutate({ value: val });
@@ -221,6 +218,8 @@
             max={30}
             list="tags"
             class="mb-2 appearance-none"
+            type="search"
+            autocomplete="on"
             on:change={addTag}
             bind:value={newTag}
           />
@@ -231,7 +230,7 @@
           />
           <datalist id="tags">
             {#each tags as tag}
-              <option id={tag._id} value={tag.value} />
+              <option value={tag._id}>{tag.value}</option>
             {/each}
           </datalist>
           <div class="flex flex-wrap border-t border-neutral-900/50 pb-1 pt-5">
@@ -328,7 +327,7 @@
               {#if !newValues.end && !multiple}
                 <Button
                   on:click={stop}
-                  class="h-9 px-8 text-center font-mono text-xl text-white"
+                  class="h-9 px-8 text-center font-pseudoMono text-xl font-light text-white"
                   style={` background-color: ${project?.color} `}>Stop</Button
                 >
               {:else if newValues.end}

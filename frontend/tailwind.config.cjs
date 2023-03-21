@@ -16,6 +16,9 @@ module.exports = {
           800: "#23272E",
         },
       },
+      fontSize: {
+        base: "13px",
+      },
       fontFamily: {
         sans: ["Inter", ...theme.fontFamily.sans],
         pseudoMono: ["Space Grotesk", ...theme.fontFamily.mono],

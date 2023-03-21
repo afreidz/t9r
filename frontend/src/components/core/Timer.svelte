@@ -50,11 +50,10 @@
       use:press={{ timeframe: 600, triggerBeforeFinished: true }}
     >
       <small
-        class="font-mono text-xs leading-none opacity-50 line-clamp-1 md:text-sm"
+        class="font-pseudoMono text-sm font-light leading-none opacity-50 line-clamp-1 md:text-base"
         >{project.name}</small
       >
-      <strong
-        class="text-sm font-normal leading-tight line-clamp-1 md:text-base"
+      <strong class="text-lg font-normal leading-tight line-clamp-1 md:text-xl"
         >{title || "Timer"}</strong
       >
     </button>

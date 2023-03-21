@@ -22,7 +22,7 @@
         idx * axis + 2
       } / span ${axis}; grid-row: 1 / span ${rows + 1}`}
     >
-      <span class="px-2 font-mono opacity-50">
+      <span class="px-2 font-pseudoMono font-light opacity-50">
         {axis * (idx + 1)}
       </span>
     </strong>

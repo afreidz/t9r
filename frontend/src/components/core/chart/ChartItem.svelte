@@ -17,7 +17,7 @@
 {#if label}
   <small
     style={`grid-row-start: ${index + 1}; grid-row-end: ${index + 2};`}
-    class="col-start-1 col-end-2 cursor-pointer self-center font-mono text-xs opacity-50"
+    class="col-start-1 col-end-2 cursor-pointer self-center font-pseudoMono text-xs font-light opacity-50"
     >{label}</small
   >
 {/if}
@@ -31,7 +31,7 @@
 >
   <span
     style={`width: ${percent}%; background: ${grad};`}
-    class="flex flex-1 items-center justify-center rounded-md bg-gradient-to-r from-indigo-400/50 to-indigo-400 px-3 font-mono text-xs transition-colors group-hover:text-white/100 md:text-white/0"
+    class="flex flex-1 items-center justify-center rounded-md bg-gradient-to-r from-indigo-400/50 to-indigo-400 px-3 font-pseudoMono text-xs font-light transition-colors group-hover:text-white/100 md:text-white/0"
     >{value}</span
   >
 </div>
@@ -40,7 +40,7 @@
     style={`grid-row-start: ${index + 1}; grid-row-end: ${
       index + 2
     }; grid-column-start: ${max + 3}; grid-column-end: ${max + 5}`}
-    class="flex items-center justify-start px-2 font-mono text-xs transition-colors group-hover:text-white/100 md:text-white/0"
+    class="flex items-center justify-start px-2 font-pseudoMono text-xs font-light transition-colors group-hover:text-white/100 md:text-white/0"
   >
     {max}
     {#if percent && percent > 100}<i

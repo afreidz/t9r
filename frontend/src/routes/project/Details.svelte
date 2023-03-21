@@ -141,17 +141,19 @@
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
         {#if project.budget}
-          <h3 class="font-mono text-sm opacity-50">Project Lifetime</h3>
+          <h3 class="font-pseudoMono text-sm font-light opacity-50">
+            Project Lifetime
+          </h3>
           <header class="my-1 flex justify-between">
             <strong class="my-2 flex-none text-4xl"
-              >456 <span class="font-mono text-sm font-light opacity-50"
+              >456 <span class="font-pseudoMono text-sm font-light opacity-50"
                 >worked</span
               ></strong
             >
             {#if project.budget}
               <strong class="my-2 flex-none text-4xl"
                 >{project.budget}
-                <span class="font-mono text-sm font-light opacity-50"
+                <span class="font-pseudoMono text-sm font-light opacity-50"
                   >budget</span
                 ></strong
               >
@@ -167,7 +169,9 @@
             />
           </div>
         {/if}
-        <h3 class="font-mono text-sm opacity-50">Recent Hours</h3>
+        <h3 class="font-pseudoMono text-sm font-light opacity-50">
+          Recent Hours
+        </h3>
         <Chart cols={60} rows={5} height={320} axis={10}>
           <ChartItem
             max={40}
