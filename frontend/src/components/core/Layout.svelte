@@ -27,7 +27,7 @@
     </div>
   {:then}
     <div
-      class="fixed inset-0 grid min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_6rem] bg-neutral-900 pb-14 text-text-light md:grid-cols-[320px_auto] md:grid-rows-[6rem_auto_6rem] md:pb-0"
+      class="grid min-h-screen min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_6rem] bg-neutral-900 pb-14 text-text-light md:grid-cols-[320px_auto] md:grid-rows-[6rem_auto_6rem] md:pb-0"
     >
       <header
         class={`relative col-span-2 col-start-1 row-start-1 mr-6 flex items-center justify-between md:col-span-1  ${
@@ -57,7 +57,7 @@
         <slot />
       </main>
       <div
-        class="fixed bottom-[calc(env(keyboard-inset-height,0)_+_0.5rem)] left-0 right-0 flex items-center justify-center md:static md:bottom-6"
+        class="fixed bottom-[calc(env(keyboard-inset-height,0)_+_0.5rem)] left-0 right-0 z-40 flex items-center justify-center md:static md:bottom-6"
       >
         {#if $isSelecting}
           <DualAction>

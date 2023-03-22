@@ -9,49 +9,62 @@
   import { location } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
   import NewProject from "@/core/NewProject.svelte";
-  import { showArchived, showProjects } from "@/stores/ui";
+  import { showArchived, showProjects, showTimers } from "@/stores/ui";
 
   let newProject = false;
 </script>
 
 <nav class="flex flex-1 flex-col pl-4 text-lg">
   <ul class="flex flex-col items-stretch border-l-2 border-neutral-light/50">
-    <MainItem active={$location.startsWith("/timers")}>
+    <MainItem
+      clickable
+      active={$location.startsWith("/timers")}
+      on:click={() => ($showTimers = !$showTimers)}
+    >
       <span slot="main" class="flex-1">Timers</span>
-      <SubNav>
-        <SubItem to={`/timers/day/${getToday().toString()}`} on:navigate>
-          <Icon
-            slot="icon"
-            icon="mdi:calendar-today-outline"
-            class="text-neutral-light"
-          />
-          Daily
-        </SubItem>
-        <SubItem to={`/timers/week/${getToday().toString()}`} on:navigate>
-          <Icon
-            slot="icon"
-            icon="mdi:calendar-minus-outline"
-            class="text-neutral-light"
-          />
-          Weekly
-        </SubItem>
-        <SubItem to={`/timers/month/${getToday().toString()}`} on:navigate>
-          <Icon
-            slot="icon"
-            icon="mdi:calendar-month-outline"
-            class="text-neutral-light"
-          />
-          Monthly
-        </SubItem>
-        <SubItem to="/timers/all" on:navigate>
-          <Icon
-            slot="icon"
-            icon="mdi:hamburger-menu"
-            class="text-neutral-light"
-          />
-          All
-        </SubItem>
-      </SubNav>
+      <Icon
+        slot="right"
+        icon="ph:caret-down-bold"
+        class={`flex-none transition-transform ease-in-out ${
+          $showTimers ? "rotate-180" : ""
+        }`}
+      />
+      {#if $showTimers}
+        <SubNav>
+          <SubItem to={`/timers/day/${getToday().toString()}`} on:navigate>
+            <Icon
+              slot="icon"
+              icon="mdi:calendar-today-outline"
+              class="text-neutral-light"
+            />
+            Daily
+          </SubItem>
+          <SubItem to={`/timers/week/${getToday().toString()}`} on:navigate>
+            <Icon
+              slot="icon"
+              icon="mdi:calendar-minus-outline"
+              class="text-neutral-light"
+            />
+            Weekly
+          </SubItem>
+          <SubItem to={`/timers/month/${getToday().toString()}`} on:navigate>
+            <Icon
+              slot="icon"
+              icon="mdi:calendar-month-outline"
+              class="text-neutral-light"
+            />
+            Monthly
+          </SubItem>
+          <SubItem to="/timers/all" on:navigate>
+            <Icon
+              slot="icon"
+              icon="mdi:hamburger-menu"
+              class="text-neutral-light"
+            />
+            All
+          </SubItem>
+        </SubNav>
+      {/if}
     </MainItem>
     <MainItem
       clickable
@@ -63,7 +76,7 @@
         slot="right"
         icon="ph:caret-down-bold"
         class={`flex-none transition-transform ease-in-out ${
-          showProjects ? "rotate-180" : ""
+          $showProjects ? "rotate-180" : ""
         }`}
       />
       {#if $showProjects}
