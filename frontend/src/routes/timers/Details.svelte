@@ -413,7 +413,7 @@
       <Icon icon="material-symbols:close" class="h-7 w-7" />
     </Button>
     <section class="flex flex-1 flex-col items-center justify-center py-4">
-      <DualAction draggable={false}>
+      <DualAction>
         <Button
           slot="secondary"
           on:click={() => (confirmDelete = false)}

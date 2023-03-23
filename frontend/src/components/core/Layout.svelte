@@ -2,12 +2,13 @@
   import Logo from "./Logo.svelte";
   import Icon from "@iconify/svelte";
   import { fly } from "svelte/transition";
+  import Nav from "@/core/nav/Nav.svelte";
   import { push } from "svelte-spa-router";
+  import Moveable from "@/core/Moveable.svelte";
   import MenuTrigger from "./MenuTrigger.svelte";
   import Button from "@/foundation/Button.svelte";
   import { fetchProjects } from "@/stores/projects";
   import DualAction from "@/core/DualAction.svelte";
-  import Nav from "@/components/core/nav/Nav.svelte";
   import { isSelecting, selected } from "@/lib/stores/ui";
 
   $: if ($selected.length <= 0) $isSelecting = false;
@@ -57,36 +58,38 @@
         <slot />
       </main>
     </div>
-    <div
-      class="absolute bottom-[calc(env(keyboard-inset-height,0)_+_0.5rem)] left-0 right-0 z-30 flex items-center justify-center md:right-auto md:bottom-6 md:w-80"
+    <footer
+      class="absolute left-0 bottom-2 z-30 flex h-full max-h-14 w-full items-center justify-center md:mb-4 md:max-w-xs"
     >
-      {#if $isSelecting}
-        <DualAction>
-          <Button
-            slot="secondary"
-            on:click={() => {
-              $selected = [];
-              $isSelecting = false;
-            }}
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-          >
-            <Icon icon="teenyicons:x-small-outline" />
-          </Button>
-          <span slot="content">Edit {$selected.length} timers</span>
-          <Button
-            on:click={() => {
-              push("/timer/selected");
-              $isSelecting = false;
-            }}
-            slot="primary"
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-          >
-            <Icon icon="ri:pencil-line" />
-          </Button>
-        </DualAction>
-      {:else}
-        <slot name="cta" />
-      {/if}
-    </div>
+      <Moveable>
+        {#if $isSelecting}
+          <DualAction>
+            <Button
+              slot="secondary"
+              on:click={() => {
+                $selected = [];
+                $isSelecting = false;
+              }}
+              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+            >
+              <Icon icon="teenyicons:x-small-outline" />
+            </Button>
+            <span slot="content">Edit {$selected.length} timers</span>
+            <Button
+              on:click={() => {
+                push("/timer/selected");
+                $isSelecting = false;
+              }}
+              slot="primary"
+              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+            >
+              <Icon icon="ri:pencil-line" />
+            </Button>
+          </DualAction>
+        {:else}
+          <slot name="cta" />
+        {/if}
+      </Moveable>
+    </footer>
   {/await}
 {/await}
