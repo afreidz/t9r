@@ -252,7 +252,7 @@
       </div>
     {:else}
       <div in:fade>
-        <DualAction as="div" label="Change Project Status">
+        <DualAction as="div" label="Change Project Status" draggable={false}>
           <Button
             title="Delete project"
             on:click={() => (confirmDelete = true)}
