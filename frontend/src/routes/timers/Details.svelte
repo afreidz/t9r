@@ -385,6 +385,14 @@
           <span slot="content"
             >{multiple ? $selected.length + " Timers" : timer?.title}</span
           >
+          <Button
+            slot="primary"
+            title="Navigate back"
+            on:click={pop}
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+          >
+            <Icon icon="ic:outline-arrow-back" />
+          </Button>
         </DualAction>
       </div>
     {/if}
