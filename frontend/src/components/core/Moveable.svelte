@@ -2,8 +2,6 @@
   import Icon from "@iconify/svelte";
   import { press } from "svelte-gestures";
 
-  export let top: number = 0;
-  export let left: number = 0;
   export let enabled: boolean = true;
   export let as: keyof HTMLElementTagNameMap = "div";
 
