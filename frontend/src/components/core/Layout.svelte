@@ -27,7 +27,7 @@
     </div>
   {:then}
     <div
-      class="grid min-h-screen min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_6rem] bg-neutral-900 pb-14 text-text-light md:grid-cols-[320px_auto] md:grid-rows-[6rem_auto_6rem] md:pb-0"
+      class="grid h-screen min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_6rem] bg-neutral-900 pb-14 text-text-light md:grid-cols-[320px_auto] md:grid-rows-[6rem_auto] md:pb-0"
     >
       <header
         class={`relative col-span-2 col-start-1 row-start-1 mr-6 flex items-center justify-between md:col-span-1  ${
@@ -42,7 +42,7 @@
         />
       </header>
       <aside
-        class={`fixed left-0 bottom-0 top-0 right-0 z-40 col-start-1 row-start-2 flex w-full flex-1 -translate-x-full flex-col pl-3 transition-transform ease-in-out md:static md:max-w-xs md:translate-x-0 md:pl-6 ${
+        class={`fixed left-0 bottom-0 top-0 right-0 z-40 col-start-1 row-span-2 row-start-2 flex w-full flex-1 -translate-x-full flex-col overflow-auto pl-3 transition-transform ease-in-out md:static md:max-w-xs md:translate-x-0 md:pl-6 ${
           menuOpen
             ? "translate-x-0 bg-neutral-900/80 pt-20 pl-6 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
             : ""
@@ -56,37 +56,37 @@
       >
         <slot />
       </main>
-      <div
-        class="fixed bottom-[calc(env(keyboard-inset-height,0)_+_0.5rem)] left-0 right-0 z-40 flex items-center justify-center md:static md:bottom-6"
-      >
-        {#if $isSelecting}
-          <DualAction>
-            <Button
-              slot="secondary"
-              on:click={() => {
-                $selected = [];
-                $isSelecting = false;
-              }}
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-            >
-              <Icon icon="teenyicons:x-small-outline" />
-            </Button>
-            <span slot="content">Edit {$selected.length} timers</span>
-            <Button
-              on:click={() => {
-                push("/timer/selected");
-                $isSelecting = false;
-              }}
-              slot="primary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-            >
-              <Icon icon="ri:pencil-line" />
-            </Button>
-          </DualAction>
-        {:else}
-          <slot name="cta" />
-        {/if}
-      </div>
+    </div>
+    <div
+      class="fixed bottom-[calc(env(keyboard-inset-height,0)_+_0.5rem)] left-0 right-0 z-30 flex items-center justify-center md:right-auto md:bottom-6 md:w-80"
+    >
+      {#if $isSelecting}
+        <DualAction>
+          <Button
+            slot="secondary"
+            on:click={() => {
+              $selected = [];
+              $isSelecting = false;
+            }}
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+          >
+            <Icon icon="teenyicons:x-small-outline" />
+          </Button>
+          <span slot="content">Edit {$selected.length} timers</span>
+          <Button
+            on:click={() => {
+              push("/timer/selected");
+              $isSelecting = false;
+            }}
+            slot="primary"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+          >
+            <Icon icon="ri:pencil-line" />
+          </Button>
+        </DualAction>
+      {:else}
+        <slot name="cta" />
+      {/if}
     </div>
   {/await}
 {/await}

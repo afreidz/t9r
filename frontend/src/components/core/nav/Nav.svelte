@@ -14,7 +14,7 @@
   let newProject = false;
 </script>
 
-<nav class="flex flex-1 flex-col pl-4 text-lg">
+<nav class="flex flex-1 flex-col px-4 text-lg">
   <ul class="flex flex-col items-stretch border-l-2 border-neutral-light/50">
     <MainItem
       clickable
@@ -31,7 +31,11 @@
       />
       {#if $showTimers}
         <SubNav>
-          <SubItem to={`/timers/day/${getToday().toString()}`} on:navigate>
+          <SubItem
+            active={$location.startsWith("/timers/day")}
+            to={`/timers/day/${getToday().toString()}`}
+            on:navigate
+          >
             <Icon
               slot="icon"
               icon="mdi:calendar-today-outline"
@@ -39,7 +43,11 @@
             />
             Daily
           </SubItem>
-          <SubItem to={`/timers/week/${getToday().toString()}`} on:navigate>
+          <SubItem
+            active={$location.startsWith("/timers/week")}
+            to={`/timers/week/${getToday().toString()}`}
+            on:navigate
+          >
             <Icon
               slot="icon"
               icon="mdi:calendar-minus-outline"
@@ -47,7 +55,11 @@
             />
             Weekly
           </SubItem>
-          <SubItem to={`/timers/month/${getToday().toString()}`} on:navigate>
+          <SubItem
+            active={$location.startsWith("/timers/month")}
+            to={`/timers/month/${getToday().toString()}`}
+            on:navigate
+          >
             <Icon
               slot="icon"
               icon="mdi:calendar-month-outline"
@@ -55,7 +67,11 @@
             />
             Monthly
           </SubItem>
-          <SubItem to="/timers/all" on:navigate>
+          <SubItem
+            active={$location.startsWith("/timers/all")}
+            to="/timers/all"
+            on:navigate
+          >
             <Icon
               slot="icon"
               icon="mdi:hamburger-menu"
@@ -82,7 +98,11 @@
       {#if $showProjects}
         <SubNav>
           {#each $projects.filter((p) => !p.archived) as project}
-            <SubItem to={`/project/${project._id}`} on:navigate>
+            <SubItem
+              on:navigate
+              to={`/project/${project._id}`}
+              active={$location === `/project/${project._id}`}
+            >
               <figure
                 slot="icon"
                 class="h-4 w-4 rounded"
@@ -115,7 +135,11 @@
           {#if $showArchived}
             <SubNav>
               {#each $projects.filter((p) => p.archived) as project}
-                <SubItem to={`/project/${project._id}`} on:navigate>
+                <SubItem
+                  on:navigate
+                  to={`/project/${project._id}`}
+                  active={$location === `/project/${project._id}`}
+                >
                   <figure
                     slot="icon"
                     class="h-4 w-4 rounded"
@@ -138,9 +162,21 @@
       {/if}
     </MainItem>
     <MainItem>
-      <a href="/logout" slot="main">
-        <span class="flex-1 text-xl font-bold">Log Out</span>
-      </a>
+      <span slot="main">Forecasts</span>
+      <SubNav>
+        <SubItem
+          active={$location.startsWith("/forecasts/week")}
+          to="/forecasts/week"
+          on:navigate
+        >
+          <Icon
+            slot="icon"
+            class="p-[2px] text-neutral-light"
+            icon="teenyicons:cost-estimate-outline"
+          />
+          Weekly
+        </SubItem>
+      </SubNav>
     </MainItem>
   </ul>
 </nav>

@@ -37,7 +37,7 @@
 {#if project}
   <a
     href={`/#/timer/${id}`}
-    class={`relative mb-2 flex items-center overflow-auto !rounded-2xl pr-2 text-white ${
+    class={`relative mb-2 flex flex-none items-center overflow-auto !rounded-2xl pr-2 text-white ${
       $$restProps.class || ""
     }`}
     style={`background: ${grad}`}

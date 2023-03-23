@@ -1,21 +1,20 @@
 <script lang="ts">
-  import type { HTMLAttributes } from "svelte/elements";
   import Link from "@/components/foundation/Link.svelte";
 
   export let to: string | undefined = undefined;
   export let clickable: boolean = false;
-
-  type $$Props = HTMLAttributes<HTMLLIElement> & {
-    to?: string;
-    clickable?: boolean;
-  };
+  export let active: boolean = false;
 
   let tag = "div";
 
   $: if (clickable) tag = "button";
 </script>
 
-<li class={`flex items-center ${$$props.class || ""}`}>
+<li
+  class:active
+  class:text-text-light={active}
+  class={`flex items-center ${$$props.class || ""}`}
+>
   {#if to}
     <Link {to} class="flex flex-1 items-center gap-2" on:navigate>
       <div class="flex-none">
@@ -43,3 +42,9 @@
     </svelte:element>
   {/if}
 </li>
+
+<style lang="postcss">
+  .active::before {
+    @apply absolute -left-px h-2 w-2 flex-none -translate-x-1/2 rounded-full bg-neutral-light content-[""];
+  }
+</style>
