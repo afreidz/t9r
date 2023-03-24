@@ -52,7 +52,7 @@
       </main>
     </div>
     <footer
-      class="fixed left-0 bottom-2 z-30 flex h-full max-h-14 w-full items-center justify-center md:mb-4 md:max-w-xs"
+      class="fixed left-0 bottom-[calc(0.5rem_+_env(keyboard-inset-top))] z-30 flex h-full max-h-14 w-full items-center justify-center md:mb-4 md:max-w-xs"
     >
       <slot name="cta" />
     </footer>
