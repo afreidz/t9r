@@ -7,16 +7,18 @@
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
   import Colors from "@/core/Colors.svelte";
+  import Dialog from "@/core/Dialog.svelte";
   import Field from "@/foundation/Field.svelte";
+  import { ctaPosition } from "@/lib/stores/ui";
+  import Chart from "@/core/chart/Chart.svelte";
+  import Moveable from "@/core/Moveable.svelte";
+  import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
-  import Dialog from "@/components/core/Dialog.svelte";
+  import ChartItem from "@/core/chart/ChartItem.svelte";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
-  import Chart from "@/components/core/chart/Chart.svelte";
-  import Switch from "@/components/foundation/Switch.svelte";
   import projects, { fetchProjects } from "@/stores/projects";
-  import ChartItem from "@/components/core/chart/ChartItem.svelte";
 
   let dirty = false;
   let confirmDelete = false;
@@ -137,6 +139,18 @@
             }}
           />
         </Field>
+        <Field>
+          <Switch
+            class="justify-between"
+            name="archived"
+            label="Archived"
+            color={newValues.color}
+            enabled={newValues.archived}
+            on:change={(e) => {
+              if (newValues) newValues.archived = e.detail;
+            }}
+          />
+        </Field>
         <Field label="Project Budget">
           <input
             class="text-2xl"
@@ -144,13 +158,6 @@
             min={0}
             bind:value={newValues.budget}
           />
-        </Field>
-        <Field label="Project Status">
-          <strong class="flex flex-1 items-center justify-between gap-4"
-            >{#if project.archived}Archived <Icon
-                icon="mdi:eye-off-outline"
-              />{:else}Active <Icon icon="mdi:eye-outline" />{/if}</strong
-          >
         </Field>
       </section>
       <section
@@ -230,53 +237,51 @@
     </Container>
   {/if}
   <div slot="cta">
-    {#if dirty}
-      <div in:fade>
-        <DualAction as="div" label="Update Project?">
-          <Button
-            on:click={reset}
-            slot="secondary"
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-          >
-            <Icon icon="teenyicons:x-small-outline" />
-          </Button>
-          <span slot="content">{project?.name}</span>
-          <Button
-            on:click={update}
-            slot="primary"
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
-          >
-            <Icon icon="material-symbols:fitbit-check-small-sharp" />
-          </Button>
-        </DualAction>
-      </div>
-    {:else}
-      <div in:fade>
-        <DualAction as="div" label="Change Project Status">
-          <Button
-            title="Delete project"
-            on:click={() => (confirmDelete = true)}
-            slot="secondary"
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-          >
-            <Icon icon="material-symbols:skull-outline-sharp" />
-          </Button>
-          <span slot="content">{project?.name}</span>
-          <Button
-            title="Archive project"
-            on:click={archive}
-            slot="primary"
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-          >
-            {#if project?.archived}
-              <Icon icon="mdi:eye-off-outline" />
-            {:else}
-              <Icon icon="mdi:eye-outline" />
-            {/if}
-          </Button>
-        </DualAction>
-      </div>
-    {/if}
+    <Moveable state={$ctaPosition}>
+      {#if dirty}
+        <div in:fade>
+          <DualAction as="div" label="Update Project?">
+            <Button
+              on:click={reset}
+              slot="secondary"
+              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+            >
+              <Icon icon="teenyicons:x-small-outline" />
+            </Button>
+            <span slot="content">{project?.name}</span>
+            <Button
+              on:click={update}
+              slot="primary"
+              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
+            >
+              <Icon icon="material-symbols:fitbit-check-small-sharp" />
+            </Button>
+          </DualAction>
+        </div>
+      {:else}
+        <div in:fade>
+          <DualAction as="div" label="Delete Project">
+            <Button
+              title="Delete project"
+              on:click={() => (confirmDelete = true)}
+              slot="secondary"
+              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+            >
+              <Icon icon="material-symbols:skull-outline-sharp" />
+            </Button>
+            <span slot="content">{project?.name}</span>
+            <Button
+              slot="primary"
+              title="Navigate back"
+              on:click={pop}
+              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+            >
+              <Icon icon="ic:outline-arrow-back" />
+            </Button>
+          </DualAction>
+        </div>
+      {/if}
+    </Moveable>
   </div>
 </Layout>
 

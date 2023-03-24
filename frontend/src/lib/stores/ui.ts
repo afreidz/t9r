@@ -5,3 +5,8 @@ export const showProjects = writable(true);
 export const isSelecting = writable(false);
 export const showArchived = writable(false);
 export const selected = writable<string[]>([]);
+export const ctaPosition = writable<MoveableState>({
+  x: 0,
+  y: 0,
+  moved: false,
+});

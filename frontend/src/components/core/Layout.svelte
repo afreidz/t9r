@@ -3,27 +3,20 @@
   import Icon from "@iconify/svelte";
   import { fly } from "svelte/transition";
   import Nav from "@/core/nav/Nav.svelte";
-  import { push } from "svelte-spa-router";
-  import Moveable from "@/core/Moveable.svelte";
   import MenuTrigger from "./MenuTrigger.svelte";
-  import Button from "@/foundation/Button.svelte";
   import { fetchProjects } from "@/stores/projects";
-  import DualAction from "@/core/DualAction.svelte";
-  import { isSelecting, selected } from "@/lib/stores/ui";
-
-  $: if ($selected.length <= 0) $isSelecting = false;
 
   let menuOpen = false;
   export let loader: Promise<unknown> | undefined = undefined;
 </script>
 
 {#await fetchProjects()}
-  <div class="flex flex-1 items-center justify-center">
+  <div class="flex h-screen flex-1 items-center justify-center">
     <Icon icon="eos-icons:loading" class="h-20 w-20 text-white" />
   </div>
 {:then}
   {#await loader}
-    <div class="flex flex-1 items-center justify-center">
+    <div class="flex h-screen flex-1 items-center justify-center">
       <Icon icon="eos-icons:loading" class="h-20 w-20 text-white" />
     </div>
   {:then}
@@ -59,37 +52,9 @@
       </main>
     </div>
     <footer
-      class="absolute left-0 bottom-2 z-30 flex h-full max-h-14 w-full items-center justify-center md:mb-4 md:max-w-xs"
+      class="fixed left-0 bottom-2 z-30 flex h-full max-h-14 w-full items-center justify-center md:mb-4 md:max-w-xs"
     >
-      <Moveable>
-        {#if $isSelecting}
-          <DualAction>
-            <Button
-              slot="secondary"
-              on:click={() => {
-                $selected = [];
-                $isSelecting = false;
-              }}
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-            >
-              <Icon icon="teenyicons:x-small-outline" />
-            </Button>
-            <span slot="content">Edit {$selected.length} timers</span>
-            <Button
-              on:click={() => {
-                push("/timer/selected");
-                $isSelecting = false;
-              }}
-              slot="primary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-            >
-              <Icon icon="ri:pencil-line" />
-            </Button>
-          </DualAction>
-        {:else}
-          <slot name="cta" />
-        {/if}
-      </Moveable>
+      <slot name="cta" />
     </footer>
   {/await}
 {/await}

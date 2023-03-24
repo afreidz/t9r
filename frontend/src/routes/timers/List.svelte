@@ -12,14 +12,18 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import projects from "@/stores/projects";
+  import Layout from "@/core/Layout.svelte";
+  import Header from "@/core/Header.svelte";
   import { fetchTags } from "@/lib/stores/tags";
+  import NewTimer from "@/core/NewTimer.svelte";
+  import Moveable from "@/core/Moveable.svelte";
   import Tag from "@/components/core/Tag.svelte";
+  import Button from "@/foundation/Button.svelte";
+  import TimerComponent from "@/core/Timer.svelte";
+  import DualAction from "@/core/DualAction.svelte";
   import { location, push } from "svelte-spa-router";
   import type { Timer } from "@/backend/schema/timer";
-  import Layout from "@/components/core/Layout.svelte";
-  import Header from "@/components/core/Header.svelte";
-  import NewTimer from "@/components/core/NewTimer.svelte";
-  import TimerComponent from "@/components/core/Timer.svelte";
+  import { ctaPosition, isSelecting, selected } from "@/lib/stores/ui";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
@@ -189,11 +193,39 @@
   {/if}
 
   <div slot="cta">
-    {#if view === "all" || view === "day"}
-      <NewTimer
-        date={viewDate}
-        on:timer-update={() => (loader = updateTimers())}
-      />
+    {#if $isSelecting || ["all", "day"].includes(view)}
+      <Moveable state={$ctaPosition}>
+        {#if $isSelecting}
+          <DualAction>
+            <Button
+              slot="secondary"
+              on:click={() => {
+                $selected = [];
+                $isSelecting = false;
+              }}
+              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+            >
+              <Icon icon="teenyicons:x-small-outline" />
+            </Button>
+            <span slot="content">Edit {$selected.length} timers</span>
+            <Button
+              on:click={() => {
+                push("/timer/selected");
+                $isSelecting = false;
+              }}
+              slot="primary"
+              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+            >
+              <Icon icon="ri:pencil-line" />
+            </Button>
+          </DualAction>
+        {:else if view === "all" || view === "day"}
+          <NewTimer
+            date={viewDate}
+            on:timer-update={() => (loader = updateTimers())}
+          />
+        {/if}
+      </Moveable>
     {/if}
   </div>
 </Layout>
