@@ -46,7 +46,7 @@
       </aside>
       <main
         in:fly={{ x: 500, opacity: 0 }}
-        class="col-start-2 row-span-3 m-2 mt-0 flex flex-col overflow-auto rounded-xl bg-neutral-800 p-3 !pt-0 md:m-6 md:p-6"
+        class="relative z-[1] col-start-2 row-span-3 m-2 mt-0 flex flex-col overflow-auto rounded-xl bg-neutral-800 p-3 !pt-0 md:m-6 md:p-6"
       >
         <slot />
       </main>

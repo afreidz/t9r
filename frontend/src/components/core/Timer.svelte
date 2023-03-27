@@ -67,7 +67,7 @@
       >
     </button>
     {#if $$slots.left}
-      <div class="flex-none shrink pl-2">
+      <div class="flex-none pl-2">
         <slot name="left" />
       </div>
     {/if}
@@ -85,7 +85,7 @@
       </div>
     {/if}
     {#if $$slots.right}
-      <div class="flex-none shrink pr-2">
+      <div class="flex-none pr-2">
         <slot name="right" />
       </div>
     {/if}

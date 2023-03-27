@@ -22,7 +22,7 @@
     after:bottom-0
     after:left-0
     after:right-0
-    after:z-[-1] after:bg-gradient-to-br
+    after:bg-gradient-to-br
     after:opacity-50 after:blur-2xl
     after:content-[""]
   `}
@@ -30,7 +30,7 @@
   <figure>
     <Icon
       icon="ic:outline-watch-later"
-      class="backgr h-10 w-10 rounded-full bg-gradient-to-br from-violet-600 to-cyan-600 p-2 text-white"
+      class="relative z-[1] h-10 w-10 rounded-full bg-gradient-to-br from-violet-600 to-cyan-600 p-2 text-white"
     />
     <figcaption class="sr-only">t9r</figcaption>
   </figure>

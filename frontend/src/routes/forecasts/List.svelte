@@ -84,16 +84,21 @@
       <strong
         id="forecast_{formatForForecastWeek(week)}"
         style="grid-column-start: {i + 2}"
-        class={`flex items-center justify-center p-2 ${
-          week === thisWeek ? "bg-white/10" : ""
-        }`}
+        class:border-t-2={week === thisWeek}
+        class:border-r-2={week === thisWeek}
+        class:border-l-2={week === thisWeek}
+        class="flex items-center justify-center rounded-t-lg border-blue-500 p-2"
       >
         {formatForForecastWeek(week)}
       </strong>
       {#each $projects as project, z}
         <div
           style="grid-column-start: {i + 2}; grid-row-start: {z + 2}"
-          class={`px-2 ${week === thisWeek ? "bg-white/10" : ""}`}
+          class:border-l-2={week === thisWeek}
+          class:border-r-2={week === thisWeek}
+          class:border-b-2={week === thisWeek && z === $projects.length - 1}
+          class:rounded-b-lg={week === thisWeek && z === $projects.length - 1}
+          class="border-blue-500 px-2"
         >
           <Field label="Hrs">
             {#await queryForecast(project._id, week)}

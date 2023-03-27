@@ -12,7 +12,7 @@
 
 <svelte:element
   this={as}
-  class={`${$$props.class} my-1 mb-2 flex rounded-md border border-neutral-900 bg-white/5 p-4 pt-2 ring-blue-500 ring-offset-2 ring-offset-neutral-800 focus-within:ring-2`}
+  class={`${$$props.class} my-1 mb-2 flex rounded-md border border-neutral-900 bg-neutral-700 p-4 pt-2 ring-blue-500 ring-offset-2 ring-offset-neutral-800 focus-within:ring-2`}
 >
   <span class="flex flex-1 flex-col">
     <small class="my-1 font-pseudoMono font-light opacity-50"
