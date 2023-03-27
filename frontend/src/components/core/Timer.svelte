@@ -36,18 +36,27 @@
 
 {#if project}
   <a
+    inert={!disableNav ? undefined : true}
     href={`/#/timer/${id}`}
-    class={`relative mb-2 flex flex-none items-center overflow-auto !rounded-2xl pr-2 text-white ${
-      $$restProps.class || ""
+    class={`relative mb-2 flex flex-none items-center overflow-auto !rounded-2xl text-white ${
+      $$props.class || ""
     }`}
-    style={`background: ${grad}`}
+    style={`background: ${grad}; ${$$props.style || ""}`}
   >
     <button
-      class="sticky top-0 bottom-0 left-0 right-[200px] mr-2 flex h-full flex-none flex-col justify-around rounded-2xl py-2 px-6 md:py-3"
+      class="sticky top-0 bottom-0 left-0 right-[200px] flex h-full flex-col justify-around rounded-2xl py-2 px-6 md:py-3"
       on:press={holdHandler}
       on:click|preventDefault={clickHandler}
       style={`background: ${project.color}`}
       use:press={{ timeframe: 600, triggerBeforeFinished: true }}
+      class:flex-none={tags.length > 0 ||
+        $$slots.default ||
+        $$slots.left ||
+        $$slots.right}
+      class:flex-1={tags.length === 0 &&
+        !$$slots.default &&
+        !$$slots.left &&
+        !$$slots.right}
     >
       <small
         class="font-pseudoMono text-xs font-light leading-none opacity-50 line-clamp-1 md:text-base"
@@ -57,27 +66,29 @@
         >{title || "Timer"}</strong
       >
     </button>
-    <div class="flex-none">
-      {#if $$slots.left}
+    {#if $$slots.left}
+      <div class="flex-none shrink pl-2">
         <slot name="left" />
-      {/if}
-    </div>
-    <div class="flex flex-1 justify-center whitespace-nowrap text-sm">
-      {#if tags && tags.length > 0}
-        {#each tags as tag}
-          {#if tag}
-            <Tag>{$tagStore.find((t) => t._id === tag)?.value || tag}</Tag>
-          {/if}
-        {/each}
-      {:else}
-        <slot />
-      {/if}
-    </div>
-    <div class="flex-none">
-      {#if $$slots.right}
+      </div>
+    {/if}
+    {#if tags.length || $$slots.default || $$slots.right}
+      <div class="flex flex-1 justify-center whitespace-nowrap text-sm">
+        {#if tags && tags.length > 0}
+          {#each tags as tag}
+            {#if tag}
+              <Tag>{$tagStore.find((t) => t._id === tag)?.value || tag}</Tag>
+            {/if}
+          {/each}
+        {:else}
+          <slot />
+        {/if}
+      </div>
+    {/if}
+    {#if $$slots.right}
+      <div class="flex-none shrink pr-2">
         <slot name="right" />
-      {/if}
-    </div>
+      </div>
+    {/if}
   </a>
 {/if}
 

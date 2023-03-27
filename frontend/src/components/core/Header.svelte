@@ -12,7 +12,7 @@
 </script>
 
 <header
-  class={`sticky top-0 z-[1] flex items-center border-b border-neutral-900 bg-neutral-800 py-3 md:py-6 ${rest.class}`}
+  class={`sticky top-0 left-0 z-[1] flex items-center border-b border-neutral-900 bg-neutral-800 py-3 md:py-6 ${rest.class}`}
 >
   <svelte:element this={as || "h2"} class="flex-1">
     <small

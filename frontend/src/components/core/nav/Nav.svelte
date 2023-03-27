@@ -9,13 +9,18 @@
   import { location } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
   import NewProject from "@/core/NewProject.svelte";
-  import { showArchived, showProjects, showTimers } from "@/stores/ui";
+  import {
+    showTimers,
+    showProjects,
+    showArchived,
+    showForecasts,
+  } from "@/stores/ui";
 
   let newProject = false;
 </script>
 
 <nav class="flex flex-1 flex-col px-4 text-lg">
-  <ul class="flex flex-col items-stretch border-l-2 border-neutral-light/50">
+  <ul class="flex flex-col items-stretch border-l border-neutral-light/20">
     <MainItem
       clickable
       active={$location.startsWith("/timers")}
@@ -74,8 +79,8 @@
           >
             <Icon
               slot="icon"
-              icon="mdi:hamburger-menu"
-              class="text-neutral-light"
+              icon="teenyicons:cost-estimate-outline"
+              class="p-[2px] text-neutral-light"
             />
             All
           </SubItem>
@@ -161,22 +166,59 @@
         </SubNav>
       {/if}
     </MainItem>
-    <MainItem>
+    <MainItem
+      clickable
+      active={$location.startsWith("/forecasts")}
+      on:click={() => ($showForecasts = !$showForecasts)}
+    >
+      <Icon
+        slot="right"
+        icon="ph:caret-down-bold"
+        class={`flex-none transition-transform ease-in-out ${
+          $showForecasts ? "rotate-180" : ""
+        }`}
+      />
       <span slot="main">Forecasts</span>
-      <SubNav>
-        <SubItem
-          active={$location.startsWith("/forecasts/week")}
-          to="/forecasts/week"
-          on:navigate
-        >
-          <Icon
-            slot="icon"
-            class="p-[2px] text-neutral-light"
-            icon="teenyicons:cost-estimate-outline"
-          />
-          Weekly
-        </SubItem>
-      </SubNav>
+      {#if $showForecasts}
+        <SubNav>
+          <SubItem
+            active={$location === "/forecasts/5"}
+            to="/forecasts/5"
+            on:navigate
+          >
+            <Icon
+              slot="icon"
+              class="text-neutral-light"
+              icon="mdi:calendar-minus-outline"
+            />
+            Upcoming
+          </SubItem>
+          <SubItem
+            active={$location === "/forecasts/13"}
+            to="/forecasts/13"
+            on:navigate
+          >
+            <Icon
+              slot="icon"
+              class="text-neutral-light"
+              icon="mdi:calendar-month-outline"
+            />
+            Quarterly
+          </SubItem>
+          <SubItem
+            active={$location === "/forecasts/52"}
+            to="/forecasts/52"
+            on:navigate
+          >
+            <Icon
+              slot="icon"
+              class="p-[2px] text-neutral-light"
+              icon="teenyicons:cost-estimate-outline"
+            />
+            Annual
+          </SubItem>
+        </SubNav>
+      {/if}
     </MainItem>
   </ul>
 </nav>

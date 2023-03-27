@@ -6,7 +6,7 @@
   let gridCols = "";
   let gridRows = "";
 
-  $: gridCols = `2.5rem repeat(${cols}, minmax(0, 1fr))`;
+  $: gridCols = `4.5rem repeat(${cols}, minmax(0, 1fr))`;
   $: gridRows = `repeat(${rows}, minmax(0, 1fr)) 2.5rem`;
 </script>
 

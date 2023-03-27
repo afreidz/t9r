@@ -27,7 +27,7 @@ export function getDurationHoursFromString(a: string, b: string) {
 export function formatForMonth(s: string) {
   const date = Temporal.PlainDate.from(s);
 
-  return date.toLocaleString("en", {
+  return date.toLocaleString(locale, {
     weekday: "short",
     month: "2-digit",
     day: "2-digit",
@@ -37,7 +37,7 @@ export function formatForMonth(s: string) {
 export function formatForWeek(s: string) {
   const date = Temporal.PlainDate.from(s);
 
-  return date.toLocaleString("en", {
+  return date.toLocaleString(locale, {
     weekday: "short",
   });
 }
@@ -46,8 +46,34 @@ export function formatTime(s: string) {
   const date = Temporal.PlainTime.from(s);
 
   const hh = date.hour === 12 || date.hour === 24 ? 12 : date.hour % 12;
-  const mm = date.minute.toLocaleString("en", { minimumIntegerDigits: 2 });
+  const mm = date.minute.toLocaleString(locale, { minimumIntegerDigits: 2 });
   const ap = date.hour > 12 ? "PM" : "AM";
 
   return `${hh}:${mm} ${ap}`;
+}
+
+export function getWeeksArray(n: number = 1, forward = true) {
+  const date = getToday();
+  const Sunday = Temporal.PlainDate.from({
+    year: date.year,
+    month: date.month,
+    day: date.day - date.dayOfWeek,
+  });
+
+  const opp = forward ? "add" : "subtract";
+  const weeks: Temporal.PlainDate[] = [];
+
+  Array.from({ length: n }, (_, i) => {
+    weeks.push(Sunday[opp]({ weeks: i }));
+  });
+
+  return weeks;
+}
+
+export function formatForForecastWeek(d: Temporal.PlainDate) {
+  const timeZone = Temporal.Now.timeZone();
+  const zoned = d.toZonedDateTime({ timeZone });
+  const date = new Date(zoned.epochMilliseconds);
+
+  return date.toLocaleString(locale, { dateStyle: "short" });
 }

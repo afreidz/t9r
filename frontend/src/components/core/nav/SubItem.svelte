@@ -45,6 +45,6 @@
 
 <style lang="postcss">
   .active::before {
-    @apply absolute -left-px h-2 w-2 flex-none -translate-x-1/2 rounded-full bg-neutral-light content-[""];
+    @apply absolute left-0 h-2 w-2 flex-none -translate-x-1/2 rounded-full bg-neutral-light content-[""];
   }
 </style>

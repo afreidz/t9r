@@ -12,6 +12,7 @@
   import { ctaPosition } from "@/lib/stores/ui";
   import Chart from "@/core/chart/Chart.svelte";
   import Moveable from "@/core/Moveable.svelte";
+  import { queryForecast } from "@/lib/forecast";
   import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -19,12 +20,15 @@
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
   import projects, { fetchProjects } from "@/stores/projects";
+  import { formatForForecastWeek, getWeeksArray } from "@/lib/dates";
+
+  export let params: { id: string };
 
   let dirty = false;
   let confirmDelete = false;
   let project: Project | undefined;
   let newValues: Project | undefined;
-  export let params: { id: string };
+  let forecastWeeks = getWeeksArray(5, false);
 
   $: if (params.id && project?._id !== params.id) {
     project = $projects.find((p: Project) => p._id === params.id);
@@ -52,17 +56,6 @@
     });
     await fetchProjects();
     pop();
-  }
-
-  async function archive() {
-    if (!project || !project._id) return;
-    await trpc.projects.update.mutate({
-      id: project._id,
-      details: {
-        archived: !project.archived,
-      },
-    });
-    await fetchProjects();
   }
 
   async function handleDelete() {
@@ -127,7 +120,7 @@
             }}
           />
         </Field>
-        <Field>
+        <!-- <Field>
           <Switch
             class="justify-between"
             color={newValues.color}
@@ -138,7 +131,7 @@
               if (newValues) newValues.hideInReport = e.detail;
             }}
           />
-        </Field>
+        </Field> -->
         <Field>
           <Switch
             class="justify-between"
@@ -194,44 +187,22 @@
           </div>
         {/if}
         <h3 class="font-pseudoMono text-sm font-light opacity-50">
-          Recent Hours
+          Recent Weekly Hours
         </h3>
         <Chart cols={60} rows={5} height={320} axis={10}>
-          <ChartItem
-            max={chartVals[0].max}
-            value={chartVals[0].val}
-            index={0}
-            label="3/13"
-            color={project.color}
-          />
-          <ChartItem
-            max={chartVals[1].max}
-            value={chartVals[1].val}
-            index={1}
-            label="3/6"
-            color={project.color}
-          />
-          <ChartItem
-            max={chartVals[2].max}
-            value={chartVals[2].val}
-            index={2}
-            label="2/27"
-            color={project.color}
-          />
-          <ChartItem
-            max={chartVals[3].max}
-            value={chartVals[3].val}
-            index={3}
-            label="2/20"
-            color={project.color}
-          />
-          <ChartItem
-            max={chartVals[4].max}
-            value={chartVals[4].val}
-            index={4}
-            label="2/13"
-            color={project.color}
-          />
+          {#each forecastWeeks as week, i}
+            {#await queryForecast(project._id, week)}
+              <Icon icon="eos-icons:loading" class="h-4 w-4 text-white" />
+            {:then forecast}
+              <ChartItem
+                index={i}
+                value={20}
+                max={forecast?.hours}
+                color={project.color}
+                label={formatForForecastWeek(week)}
+              />
+            {/await}
+          {/each}
         </Chart>
       </section>
     </Container>
