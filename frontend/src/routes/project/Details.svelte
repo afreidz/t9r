@@ -8,6 +8,7 @@
   import Header from "@/core/Header.svelte";
   import Colors from "@/core/Colors.svelte";
   import Dialog from "@/core/Dialog.svelte";
+  import Copy from "@/foundation/Copy.svelte";
   import Field from "@/foundation/Field.svelte";
   import { ctaPosition } from "@/lib/stores/ui";
   import Chart from "@/core/chart/Chart.svelte";
@@ -158,20 +159,20 @@
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
         {#if project.budget}
-          <h3 class="font-pseudoMono text-sm font-light opacity-50">
+          <Copy dim as="h3" variant="pseudomono" class="text-sm">
             Project Lifetime
-          </h3>
+          </Copy>
           <header class="my-1 flex justify-between">
             <strong class="my-2 flex-none text-4xl"
-              >456 <span class="font-pseudoMono text-sm font-light opacity-50"
-                >worked</span
+              >456 <Copy dim as="span" variant="pseudomono" class="text-sm"
+                >worked</Copy
               ></strong
             >
             {#if project.budget}
               <strong class="my-2 flex-none text-4xl"
                 >{project.budget}
-                <span class="font-pseudoMono text-sm font-light opacity-50"
-                  >budget</span
+                <Copy dim as="span" variant="pseudomono" class="text-sm"
+                  >budget</Copy
                 ></strong
               >
             {/if}
@@ -186,9 +187,9 @@
             />
           </div>
         {/if}
-        <h3 class="font-pseudoMono text-sm font-light opacity-50">
+        <Copy dim as="h3" variant="pseudomono" class="text-sm">
           Recent Weekly Hours
-        </h3>
+        </Copy>
         <Chart cols={60} rows={5} height={320} axis={10}>
           {#each forecastWeeks as week, i}
             {#await queryForecast(project._id, week)}

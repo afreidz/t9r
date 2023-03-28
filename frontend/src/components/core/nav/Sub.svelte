@@ -1,5 +1,3 @@
-<ul
-  class="my-2 ml-6 flex flex-1 flex-col gap-2 font-pseudoMono text-lg font-light text-text-light/50"
->
+<ul class="my-2 ml-6 flex flex-1 flex-col gap-2 text-sm md:text-base">
   <slot />
 </ul>

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Link from "@/components/foundation/Link.svelte";
+  import Copy from "@/foundation/Copy.svelte";
+  import Link from "@/foundation/Link.svelte";
 
   export let to: string | undefined = undefined;
   export let clickable: boolean = false;
@@ -10,17 +11,13 @@
   $: if (clickable) tag = "button";
 </script>
 
-<li
-  class:active
-  class:text-text-light={active}
-  class={`flex items-center ${$$props.class || ""}`}
->
+<li class:active class="flex items-center {$$props.class}">
   {#if to}
     <Link {to} class="flex flex-1 items-center gap-2" on:navigate>
       <div class="flex-none">
         <slot name="icon" />
       </div>
-      <slot />
+      <Copy as="div" dim={!active} variant="pseudomono"><slot /></Copy>
       <div class="flex-none">
         <slot name="right" />
       </div>
@@ -35,7 +32,7 @@
       <div class="flex-none">
         <slot name="icon" />
       </div>
-      <slot />
+      <Copy as="div" dim={!active} variant="pseudomono"><slot /></Copy>
       <div class="flex-none">
         <slot name="right" />
       </div>

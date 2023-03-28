@@ -1,5 +1,16 @@
 export const locale = "en-us";
 
+export const roundDown: Temporal.RoundTo<"minute"> = {
+  smallestUnit: "minute",
+  roundingIncrement: 15,
+  roundingMode: "floor",
+};
+export const roundUp: Temporal.RoundTo<"minute"> = {
+  smallestUnit: "minute",
+  roundingIncrement: 15,
+  roundingMode: "ceil",
+};
+
 export function getToday() {
   return Temporal.Now.plainDateISO();
 }
@@ -76,4 +87,12 @@ export function formatForForecastWeek(d: Temporal.PlainDate) {
   const date = new Date(zoned.epochMilliseconds);
 
   return date.toLocaleString(locale, { dateStyle: "short" });
+}
+
+export function formatForShortTime(d: Temporal.PlainDateTime) {
+  const timeZone = Temporal.Now.timeZone();
+  const zoned = d.toZonedDateTime({ timeZone });
+  const date = new Date(zoned.epochMilliseconds);
+
+  return date.toLocaleString(locale, { timeStyle: "short" });
 }

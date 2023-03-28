@@ -123,7 +123,6 @@
           {#if $projects.some((p) => p.archived)}
             <SubItem
               clickable
-              class="mt-6"
               on:click={() => ($showArchived = !$showArchived)}
             >
               <Icon slot="icon" icon="mdi:eye-off-outline" />

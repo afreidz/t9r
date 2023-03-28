@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Copy from "@/foundation/Copy.svelte";
+
   export let cols: number = 2;
   export let rows: number = 2;
   export let axis: number = 10;
@@ -22,9 +24,9 @@
         idx * axis + 2
       } / span ${axis}; grid-row: 1 / span ${rows + 1}`}
     >
-      <span class="px-2 font-pseudoMono font-light opacity-50">
+      <Copy dim as="span" variant="pseudomono" class="px-2">
         {axis * (idx + 1)}
-      </span>
+      </Copy>
     </strong>
   {/each}
   <slot />

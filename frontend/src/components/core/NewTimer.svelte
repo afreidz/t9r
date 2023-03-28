@@ -1,6 +1,7 @@
 <script lang="ts">
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
+  import { roundDown } from "@/lib/dates";
   import { createEventDispatcher } from "svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -22,13 +23,7 @@
       title: $mostRecentProject.defaultTitle,
       utilized: $mostRecentProject.defaultUtilized === false ? false : true,
       date: date.toString(),
-      start: Temporal.Now.plainTimeISO()
-        .round({
-          smallestUnit: "minute",
-          roundingIncrement: 15,
-          roundingMode: "floor",
-        })
-        .toString(),
+      start: Temporal.Now.plainTimeISO().round(roundDown).toString(),
     });
 
     dispatch("timer-update");

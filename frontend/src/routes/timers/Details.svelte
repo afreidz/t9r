@@ -9,6 +9,7 @@
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
+  import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
   import Moveable from "@/core/Moveable.svelte";
   import Field from "@/foundation/Field.svelte";
@@ -328,9 +329,11 @@
               {#if !newValues.end && !multiple}
                 <Button
                   on:click={stop}
-                  class="h-9 px-8 text-center font-pseudoMono text-xl font-light text-white"
-                  style={` background-color: ${project?.color} `}>Stop</Button
+                  class="h-9 px-8 text-center text-xl font-light text-white"
+                  style={`background-color: ${project?.color}`}
                 >
+                  <Copy as="span" variant="pseudomono">Stop</Copy>
+                </Button>
               {:else if newValues.end}
                 <Time bind:value={newValues.end} />
               {/if}

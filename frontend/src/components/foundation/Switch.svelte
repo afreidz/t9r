@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Copy from "@/foundation/Copy.svelte";
   import { createEventDispatcher } from "svelte";
 
   let dispatch = createEventDispatcher();
@@ -14,9 +15,7 @@
 </script>
 
 <label class={`flex items-center ${$$props.class || ""}`}>
-  <span class={`mr-2 font-pseudoMono text-sm font-light opacity-50`}
-    >{label}</span
-  >
+  <Copy dim as="span" variant="pseudomono" class="mr-2 text-sm">{label}</Copy>
   <input
     {name}
     id={name}

@@ -3,6 +3,7 @@
   import { press } from "svelte-gestures";
   import tagStore from "@/lib/stores/tags";
   import { push } from "svelte-spa-router";
+  import Copy from "@/foundation/Copy.svelte";
   import { isSelecting, selected } from "@/lib/stores/ui";
   import type { Project } from "@/backend/schema/project";
 
@@ -11,8 +12,14 @@
   export let title: string | undefined = undefined;
   export let id: string | undefined = undefined;
   export let tags: (string | undefined)[] = [];
+  export let scrollto = false;
 
   let grad: string;
+  let elm: HTMLAnchorElement;
+
+  $: if (elm && scrollto) {
+    elm.scrollIntoView({ block: "end", behavior: "smooth" });
+  }
 
   $: if (project)
     grad = `linear-gradient(to right, ${project.color}80, ${project.color})`;
@@ -36,6 +43,7 @@
 
 {#if project}
   <a
+    bind:this={elm}
     inert={!disableNav ? undefined : true}
     href={`/#/timer/${id}`}
     class={`relative mb-2 flex flex-none items-center overflow-auto !rounded-2xl text-white ${
@@ -58,9 +66,12 @@
         !$$slots.left &&
         !$$slots.right}
     >
-      <small
-        class="font-pseudoMono text-xs font-light leading-none opacity-50 line-clamp-1 md:text-base"
-        >{project.name}</small
+      <Copy
+        dim
+        as="small"
+        variant="pseudomono"
+        class="text-xs leading-none line-clamp-1 md:text-base"
+        >{project.name}</Copy
       >
       <strong class="text-sm font-normal leading-tight line-clamp-1 md:text-lg"
         >{title || "Timer"}</strong

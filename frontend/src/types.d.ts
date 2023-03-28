@@ -5,3 +5,5 @@ type MoveableState = {
   y: number;
   moved: boolean;
 };
+
+type Views = "list" | "timeline" | "report";

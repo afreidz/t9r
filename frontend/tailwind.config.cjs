@@ -17,13 +17,10 @@ module.exports = {
           700: "#31343B",
         },
       },
-      fontSize: {
-        base: "13px",
-      },
       fontFamily: {
         sans: ["Inter", ...theme.fontFamily.sans],
-        pseudoMono: ["Space Grotesk", ...theme.fontFamily.mono],
-        mono: ["Space Mono", "Menlo", ...theme.fontFamily.mono],
+        pseudoMono: ["IBM Plex Mono", ...theme.fontFamily.mono],
+        mono: ["IBM Plex Mono", "Menlo", ...theme.fontFamily.mono],
       },
       gridTemplateColumns: {
         60: "repeat(40, minmax(0,1fr))",

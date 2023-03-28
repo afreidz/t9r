@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Copy from "@/foundation/Copy.svelte";
   export let label: string = "";
   export let as: keyof HTMLElementTagNameMap = "label";
 </script>
@@ -11,8 +12,11 @@
     <slot name="secondary" />
   </div>
   <div class="flex flex-1 flex-col text-black">
-    {#if label}<span class="font-pseudoMono text-xs font-light text-black/50"
-        >{label}</span
+    {#if label}<Copy
+        dim
+        as="span"
+        variant="pseudomono"
+        class="text-xs text-black">{label}</Copy
       >{/if}
     <slot name="content" />
   </div>
