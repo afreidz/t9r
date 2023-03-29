@@ -46,13 +46,13 @@
     bind:this={elm}
     inert={!disableNav ? undefined : true}
     href={`/#/timer/${id}`}
-    class={`relative mb-2 flex flex-none items-center overflow-auto !rounded-2xl text-white ${
+    class={`relative mb-2 flex h-10 flex-none items-center overflow-auto !rounded-2xl text-white md:h-14 ${
       $$props.class || ""
     }`}
     style={`background: ${grad}; ${$$props.style || ""}`}
   >
     <button
-      class="sticky top-0 bottom-0 left-0 right-[200px] flex h-full flex-col justify-around rounded-2xl py-2 px-6 md:py-3"
+      class="sticky top-0 bottom-0 left-0 right-[200px] flex h-full flex-col justify-center gap-1 rounded-2xl px-4"
       on:press={holdHandler}
       on:click|preventDefault={clickHandler}
       style={`background: ${project.color}`}
@@ -70,10 +70,10 @@
         dim
         as="small"
         variant="pseudomono"
-        class="text-xs leading-none line-clamp-1 md:text-base"
-        >{project.name}</Copy
+        class="flex-none text-xs leading-none line-clamp-1">{project.name}</Copy
       >
-      <strong class="text-sm font-normal leading-tight line-clamp-1 md:text-lg"
+      <strong
+        class="flex-none text-sm font-normal !leading-none line-clamp-1 md:text-lg"
         >{title || "Timer"}</strong
       >
     </button>

@@ -29,8 +29,8 @@ export function isToday(d: Temporal.PlainDate | string) {
 }
 
 export function getDurationHoursFromString(a: string, b: string) {
-  const start = Temporal.PlainTime.from(a);
-  const end = Temporal.PlainTime.from(b);
+  const start = Temporal.PlainTime.from(a).round(roundUp);
+  const end = Temporal.PlainTime.from(b).round(roundUp);
 
   return end.since(start).total("hour");
 }
@@ -81,18 +81,20 @@ export function getWeeksArray(n: number = 1, forward = true) {
   return weeks;
 }
 
-export function formatForForecastWeek(d: Temporal.PlainDate) {
+export function plainDateToLegacy(
+  d: Temporal.PlainDate | Temporal.PlainDateTime
+) {
   const timeZone = Temporal.Now.timeZone();
   const zoned = d.toZonedDateTime({ timeZone });
-  const date = new Date(zoned.epochMilliseconds);
+  return new Date(zoned.epochMilliseconds);
+}
 
+export function formatForForecastWeek(d: Temporal.PlainDate) {
+  const date = plainDateToLegacy(d);
   return date.toLocaleString(locale, { dateStyle: "short" });
 }
 
 export function formatForShortTime(d: Temporal.PlainDateTime) {
-  const timeZone = Temporal.Now.timeZone();
-  const zoned = d.toZonedDateTime({ timeZone });
-  const date = new Date(zoned.epochMilliseconds);
-
+  const date = plainDateToLegacy(d);
   return date.toLocaleString(locale, { timeStyle: "short" });
 }

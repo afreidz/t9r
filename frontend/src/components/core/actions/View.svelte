@@ -1,20 +1,14 @@
 <script lang="ts">
   import Base from "./Base.svelte";
   import Icon from "@iconify/svelte";
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
 
   export let current: Views = "list";
   export let disableTimeline = false;
-  export let disableReport = false;
   let views: Views[] = [];
 
-  $: views = [
-    "list",
-    disableTimeline ? undefined : "timeline",
-    disableReport ? undefined : "report",
-  ].filter(Boolean) as Views[];
+  $: views = ["list", disableTimeline ? undefined : "timeline"].filter(
+    Boolean
+  ) as Views[];
 
   function cycle() {
     const ci = views.indexOf(current);
@@ -24,10 +18,8 @@
 </script>
 
 <Base {...$$restProps} on:click={cycle}>
-  {#if current === "report"}
-    <Icon icon="mdi:report-bar" />
-  {:else if current === "list"}
-    <Icon icon="ic:sharp-list" />
+  {#if current === "list"}
+    <Icon icon="ic:baseline-list-alt" />
   {:else if current === "timeline"}
     <Icon icon="material-symbols:view-timeline-outline-sharp" />
   {/if}

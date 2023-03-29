@@ -51,7 +51,7 @@
   function changeForecast({ hours, project, week }: LocalForecast) {
     if (!project || !week) return;
     newForecasts.set(`${project}_${week}`, { project, week, hours });
-    dirty = [...newForecasts.values()].some((f) => f.hours > 0);
+    dirty = true;
   }
 
   async function update() {

@@ -53,6 +53,19 @@ const timersRouter = router({
         .sort(timerSort)
         .toArray();
     }),
+
+  getByProject: protectedProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("timers");
+
+      return collection
+        .find<Timer>({ owner: userId, project: input })
+        .sort(timerSort)
+        .toArray();
+    }),
   getByDate: protectedProcedure
     .input(PlainDate)
     .query(async ({ input, ctx }) => {
@@ -84,12 +97,20 @@ const timersRouter = router({
         .toArray();
     }),
   getByWeek: protectedProcedure
-    .input(PlainDate)
+    .input(z.object({ week: PlainDate, project: z.string().optional() }))
     .query(async ({ input, ctx }) => {
       const { userId } = ctx.user;
       const db = await getDBClient();
       const collection = db.collection("timers");
-      const date = Temporal.PlainDate.from(input);
+      const date = Temporal.PlainDate.from(input.week);
+
+      type Query = {
+        project?: string;
+        owner: string;
+        date: {
+          $regex: RegExp;
+        };
+      };
 
       const Sunday = Temporal.PlainDate.from({
         year: date.year,
@@ -102,9 +123,14 @@ const timersRouter = router({
       const year = date.year;
       const month = `${date.month}`.padStart(2, "0");
       const $regex = new RegExp(`^${year}-${month}-\\d{2}`);
+      const query: Query = { owner: userId, date: { $regex } };
+
+      if (input.project) {
+        query.project = input.project;
+      }
 
       const monthly = await collection
-        .find<Timer>({ owner: userId, date: { $regex } })
+        .find<Timer>(query)
         .sort(timerSort)
         .toArray();
 

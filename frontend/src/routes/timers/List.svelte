@@ -12,8 +12,8 @@
     getDurationHoursFromString,
   } from "@/lib/dates";
   import trpc from "@/lib/trpc";
-  import { onMount } from "svelte";
   import Icon from "@iconify/svelte";
+  import now from "@/lib/stores/now";
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
@@ -38,61 +38,42 @@
 
   let loaded = false;
   let nowText: string;
-  let page: number = 0;
-  let per: number = 10;
+  let page: number = 1;
+  let per: number = 100;
   let timers: Timer[] = [];
   let view: Views = "list";
-  let now: Date = new Date();
-  let loader: Promise<unknown>;
   let nowIndicator: HTMLElement;
-  let viewDate: Temporal.PlainDate = getToday();
-  let duration: "day" | "month" | "week" | "all" = "day";
-  let mapping = {
-    day: "days",
-    week: "weeks",
-    all: undefined,
-    month: "months",
-  };
+  let viewDate: Temporal.PlainDate;
+  let loader: Promise<unknown> | undefined;
+  let duration: "days" | "months" | "weeks" | "all" = "days";
 
-  onMount(() => {
-    if (isToday(viewDate)) {
-      setInterval(() => {
-        loaded = true;
-        now = new Date();
-      }, 20000);
-    }
-  });
-
-  $: if (now) nowText = now.toLocaleString("en", { timeStyle: "short" });
-  $: if ((duration === "all" && page) || page === 0) loader = updateTimers();
+  $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
-  $: if (viewDate) loader = updateTimers();
+  $: if ($now) nowText = formatForShortTime($now);
+  $: if (view) loaded = false;
+
+  $: view = duration === "days" ? "timeline" : "list";
   $: duration = $location.includes("/timers/month")
-    ? "month"
+    ? "months"
     : $location.includes("/timers/week")
-    ? "week"
+    ? "weeks"
     : $location.includes("/timers/all")
     ? "all"
-    : "day";
-  $: view = duration === "day" ? "timeline" : "list";
-  $: if (isToday(viewDate) && nowIndicator && !loaded) {
-    nowIndicator.scrollIntoView({ block: "end", behavior: "smooth" });
+    : "days";
+
+  $: if (nowIndicator && !loaded) {
+    loaded = true;
+    nowIndicator.scrollIntoView({ inline: "center", behavior: "smooth" });
   }
 
   function navigateNext() {
     if (duration === "all") return page++;
-
-    const mapped = mapping[duration];
-    if (!mapped) return;
-    push(`/timers/${duration}/${viewDate.add({ [mapped]: 1 })}`);
+    push(`/timers/${duration}/${viewDate.add({ [duration]: 1 })}`);
   }
 
   function navigatePrev() {
     if (duration === "all") return page--;
-
-    const mapped = mapping[duration];
-    if (!mapped) return;
-    push(`/timers/${duration}/${viewDate.subtract({ [mapped]: 1 })}`);
+    push(`/timers/${duration}/${viewDate.subtract({ [duration]: 1 })}`);
   }
 
   function navigateCurrent() {
@@ -101,20 +82,26 @@
   }
 
   async function updateTimers() {
+    loaded = false;
     switch (duration) {
       case "all":
         timers = await trpc.timers.getByPage.query({
           limit: per,
-          offset: per * page,
+          offset: per * (page - 1),
         });
         break;
-      case "month":
+      case "months":
+        if (!viewDate) break;
         timers = await trpc.timers.getByMonth.query(viewDate.toString());
         break;
-      case "week":
-        timers = await trpc.timers.getByWeek.query(viewDate.toString());
+      case "weeks":
+        if (!viewDate) break;
+        timers = await trpc.timers.getByWeek.query({
+          week: viewDate.toString(),
+        });
         break;
-      case "day":
+      case "days":
+        if (!viewDate) break;
         timers = await trpc.timers.getByDate.query(viewDate.toString());
         break;
     }
@@ -131,11 +118,12 @@
       ? Temporal.PlainTime.from(e)
       : Temporal.Now.plainTimeISO().round(roundUp);
 
-    return `grid-column-start: ${
-      start.hour * 4 + start.minute / 15
-    }; grid-column-end: ${end.hour * 4 + end.minute / 15}; grid-row-start: ${
-      i + 2
-    }; grid-row-end: ${i + 3}`;
+    const startRow = i + 2;
+    const endRow = startRow + 1;
+    const startCol = start.hour * 4 + start.minute / 15;
+    const endCol = Math.max(end.hour * 4 + end.minute / 15, startCol + 4);
+
+    return `grid-column-start: ${startCol}; grid-column-end: ${endCol}; grid-row-start: ${startRow}; grid-row-end: ${endRow}`;
   }
 
   function calculateNowGridPosition(l: number = 0) {
@@ -158,14 +146,25 @@
   }
 
   function hourFromIndex(h: number = 0) {
-    const pt = new Temporal.PlainDateTime(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      h,
-      0
-    );
+    const pt = Temporal.PlainDateTime.from({
+      year: $now.year,
+      month: $now.month,
+      day: $now.day,
+      hour: h,
+      minute: 0,
+      second: 0,
+    });
+
     return formatForShortTime(pt);
+  }
+
+  function shouldScrollTo(i: number) {
+    if (i !== timers.length - 1) return false;
+    if (view !== "timeline") return false;
+    if (isToday(viewDate)) return false;
+    if (!viewDate) return false;
+    if (loaded) return false;
+    return true;
   }
 </script>
 
@@ -174,9 +173,9 @@
     <div slot="sub" class="flex flex-1 items-center gap-2">
       {#if duration === "all"}
         <Icon icon="mdi:hamburger-menu" />
-      {:else if duration === "month"}
+      {:else if duration === "months"}
         <Icon icon="mdi:calendar-month-outline" class="text-neutral-light" />
-      {:else if duration === "week"}
+      {:else if duration === "weeks"}
         <Icon icon="mdi:calendar-minus-outline" class="text-neutral-light" />
       {:else if isToday(viewDate)}
         <Icon icon="ic:round-arrow-circle-down" class="text-neutral-light" />
@@ -185,17 +184,17 @@
       {/if}
       <span>
         Timers
-        {#if duration === "day"}
+        {#if duration === "days"}
           for {getWeekDay(viewDate)}
-        {:else if duration === "week"}
+        {:else if duration === "weeks"}
           for week of
-        {:else if duration === "month"}
+        {:else if duration === "months"}
           for
         {/if}
       </span>
     </div>
     <div slot="main">
-      {#if duration === "month"}
+      {#if duration === "months"}
         {getMonth(viewDate)}
         {viewDate.year}
       {:else if duration !== "all"}
@@ -218,19 +217,17 @@
       on:click={navigateNext}
       disabled={duration === "all" ? timers.length === 0 : isToday(viewDate)}
     />
-    <ActionView
-      slot="right"
-      bind:current={view}
-      disableReport={true}
-      disableTimeline={duration !== "day"}
-    />
+    <div slot="right">
+      {#if duration === "days"}
+        <ActionView bind:current={view} />
+      {/if}
+    </div>
   </ActionBar>
 
   <div
-    class="flex-1"
+    class="flex-1 gap-y-1"
     class:grid={view === "timeline"}
-    class:grid-cols-[repeat(96,50px)]={view === "timeline"}
-    style="grid-template-rows: 2rem repeat({timers.length}, minmax(min-content, 80px)) auto;"
+    style="grid-template-columns: repeat(96, 40px); grid-template-rows: 2rem repeat({timers.length}, min-content) auto;"
   >
     {#if view === "timeline"}
       {#each new Array(24) as _, hour}
@@ -246,7 +243,7 @@
         </div>
       {/each}
     {/if}
-    {#key now}
+    {#key $now}
       {#if view === "timeline" && isToday(viewDate)}
         <div
           class="relative z-10 h-full border-l border-red-500"
@@ -265,34 +262,29 @@
           id={timer._id}
           tags={timer.tags}
           title={timer.title}
-          scrollto={i === timers.length - 1 && !isToday(viewDate)}
+          scrollto={shouldScrollTo(i)}
           project={$projects.find((p) => p._id === timer.project)}
           style={calculateGridPosition(timer.start, timer.end, i)}
         >
           <div slot="left">
             {#if duration === "all"}
               <Tag>{timer.date}</Tag>
-            {:else if duration === "month"}
+            {:else if duration === "months"}
               <Tag>{formatForMonth(timer.date)}</Tag>
-            {:else if duration === "week"}
+            {:else if duration === "weeks"}
               <Tag>{formatForWeek(timer.date)}</Tag>
             {/if}
             <Tag>{formatTime(timer.start)}</Tag>
           </div>
           <div slot="right">
-            {#if timer.utilized}
-              <Tag>utilized</Tag>
-            {/if}
-            {#if timer.end}
+            {#if timer.start && timer.end}
               <Tag>{getDurationHoursFromString(timer.start, timer.end)}hrs</Tag>
+            {:else if timer.start}
+              <Tag>
+                {getDurationHoursFromString(timer.start, $now.toString())}hrs
+              </Tag>
+              <Tag>running</Tag>
             {/if}
-            <Tag>
-              {#if timer.end}
-                {formatTime(timer.end)}
-              {:else}
-                running
-              {/if}
-            </Tag>
           </div>
         </TimerComponent>
       {/each}
@@ -307,7 +299,7 @@
   {/if}
 
   <div slot="cta">
-    {#if $isSelecting || ["all", "day"].includes(duration)}
+    {#if $isSelecting || ["all", "days"].includes(duration)}
       <Moveable state={$ctaPosition}>
         {#if $isSelecting}
           <DualAction>
@@ -333,7 +325,7 @@
               <Icon icon="ri:pencil-line" />
             </Button>
           </DualAction>
-        {:else if duration === "all" || duration === "day"}
+        {:else if duration === "all" || duration === "days"}
           <NewTimer
             date={viewDate}
             on:timer-update={() => (loader = updateTimers())}

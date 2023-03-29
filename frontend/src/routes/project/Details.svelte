@@ -9,6 +9,7 @@
   import Colors from "@/core/Colors.svelte";
   import Dialog from "@/core/Dialog.svelte";
   import Copy from "@/foundation/Copy.svelte";
+  import { sumTimerHours } from "@/lib/timers";
   import Field from "@/foundation/Field.svelte";
   import { ctaPosition } from "@/lib/stores/ui";
   import Chart from "@/core/chart/Chart.svelte";
@@ -68,27 +69,10 @@
       pop();
     }
   }
-
-  const maxVals = [40, 50, 30];
-  const valVals = [22, 30, 10];
-  let chartVals: { max: number; val: number }[];
-  function random() {
-    return Math.floor(Math.random() * (maxVals.length - 0)) + 0;
-  }
-
-  $: if (params.id) {
-    chartVals = [
-      { max: maxVals[random()], val: valVals[random()] },
-      { max: maxVals[random()], val: valVals[random()] },
-      { max: maxVals[random()], val: valVals[random()] },
-      { max: maxVals[random()], val: valVals[random()] },
-      { max: maxVals[random()], val: valVals[random()] },
-    ];
-  }
 </script>
 
 <Layout>
-  {#if project && newValues}
+  {#if project && project._id && newValues}
     <Header sub="Details For" main={project.name} class="mb-1" />
     <Container class="flex-1">
       <section slot="primary" class="xl:flex-1">
@@ -121,18 +105,6 @@
             }}
           />
         </Field>
-        <!-- <Field>
-          <Switch
-            class="justify-between"
-            color={newValues.color}
-            name="show_in_reports"
-            label="Hide project from reports"
-            enabled={newValues.hideInReport}
-            on:change={(e) => {
-              if (newValues) newValues.hideInReport = e.detail;
-            }}
-          />
-        </Field> -->
         <Field>
           <Switch
             class="justify-between"
@@ -158,13 +130,16 @@
         slot="secondary"
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
-        {#if project.budget}
-          <Copy dim as="h3" variant="pseudomono" class="text-sm">
-            Project Lifetime
-          </Copy>
+        <Copy dim as="h3" variant="pseudomono" class="text-sm">
+          Project Lifetime
+        </Copy>
+        {#await trpc.timers.getByProject.query(project._id)}
+          <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
+        {:then timers}
           <header class="my-1 flex justify-between">
             <strong class="my-2 flex-none text-4xl"
-              >456 <Copy dim as="span" variant="pseudomono" class="text-sm"
+              >{sumTimerHours(timers)}
+              <Copy dim as="span" variant="pseudomono" class="text-sm"
                 >worked</Copy
               ></strong
             >
@@ -177,16 +152,18 @@
               >
             {/if}
           </header>
-          <div class="group my-2 mb-6 grid h-12 grid-cols-2">
-            <ChartItem
-              max={2}
-              index={0}
-              value={456}
-              color={project.color}
-              percent={(456 / project.budget) * 100}
-            />
-          </div>
-        {/if}
+          {#if project.budget}
+            <div class="group my-2 mb-6 grid h-12 grid-cols-2">
+              <ChartItem
+                max={2}
+                index={0}
+                value={sumTimerHours(timers)}
+                color={project.color}
+                percent={(sumTimerHours(timers) / project.budget) * 100}
+              />
+            </div>
+          {/if}
+        {/await}
         <Copy dim as="h3" variant="pseudomono" class="text-sm">
           Recent Weekly Hours
         </Copy>
@@ -197,9 +174,9 @@
             {:then forecast}
               <ChartItem
                 index={i}
-                value={20}
                 max={forecast?.hours}
                 color={project.color}
+                value={forecast?.actual}
                 label={formatForForecastWeek(week)}
               />
             {/await}

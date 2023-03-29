@@ -1,6 +1,7 @@
 <script lang="ts">
   import same from "@/lib/same";
   import trpc from "@/lib/trpc";
+  import now from "@/lib/stores/now";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import { pop } from "svelte-spa-router";
@@ -308,7 +309,13 @@
                     newValues.end
                   )}hrs</Tag
                 >
-              {:else}
+              {:else if newValues.start}
+                <Tag>
+                  {getDurationHoursFromString(
+                    newValues.start,
+                    $now.toString()
+                  )}hrs
+                </Tag>
                 <Tag>running</Tag>
               {/if}
             </div>

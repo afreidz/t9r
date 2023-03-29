@@ -11,6 +11,7 @@
   import NewProject from "@/core/NewProject.svelte";
   import {
     showTimers,
+    showReports,
     showProjects,
     showArchived,
     showForecasts,
@@ -79,8 +80,8 @@
           >
             <Icon
               slot="icon"
-              icon="teenyicons:cost-estimate-outline"
-              class="p-[2px] text-neutral-light"
+              class="text-neutral-light"
+              icon="ic:baseline-list-alt"
             />
             All
           </SubItem>
@@ -211,10 +212,52 @@
           >
             <Icon
               slot="icon"
-              class="p-[2px] text-neutral-light"
-              icon="teenyicons:cost-estimate-outline"
+              class="text-neutral-light"
+              icon="mdi:calendar-blank-outline"
             />
             Annual
+          </SubItem>
+        </SubNav>
+      {/if}
+    </MainItem>
+    <MainItem
+      clickable
+      active={$location.startsWith("/reports")}
+      on:click={() => ($showReports = !$showReports)}
+    >
+      <Icon
+        slot="right"
+        icon="ph:caret-down-bold"
+        class={`flex-none transition-transform ease-in-out ${
+          $showReports ? "rotate-180" : ""
+        }`}
+      />
+      <span slot="main">Reports</span>
+      {#if $showReports}
+        <SubNav>
+          <SubItem
+            active={$location === "/reports/utilization"}
+            to="/reports/utilization"
+            on:navigate
+          >
+            <Icon
+              slot="icon"
+              icon="mdi:graph-line"
+              class="text-neutral-light"
+            />
+            Utilization
+          </SubItem>
+          <SubItem
+            active={$location === "/reports/week"}
+            to="/reports/week"
+            on:navigate
+          >
+            <Icon
+              slot="icon"
+              icon="mdi:calendar-minus-outline"
+              class="text-neutral-light"
+            />
+            Weekly Timesheet
           </SubItem>
         </SubNav>
       {/if}
