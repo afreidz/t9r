@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Link from "@/components/foundation/Link.svelte";
+  import Copy from "@/foundation/Copy.svelte";
+  import Link from "@/foundation/Link.svelte";
 
   export let active: boolean = false;
   export let clickable: boolean = false;
@@ -10,15 +11,12 @@
   $: if (clickable) tag = "button";
 </script>
 
-<li
-  class="relative flex flex-col py-2 pl-4 text-2xl"
-  class:active={clickable && active}
->
+<li class="relative flex flex-col py-2 pl-4" class:active={clickable && active}>
   {#if to}
     <Link {to} on:navigate class="flex flex-1 items-center font-bold">
-      <div class="flex-1">
+      <Copy as="div" variant="gradient" class="flex-1 text-lg md:text-2xl">
         <slot name="main" />
-      </div>
+      </Copy>
       <div class="flex-none">
         <slot name="right" />
       </div>
@@ -31,9 +29,9 @@
       on:keypress
       class="flex flex-1 items-center font-bold"
     >
-      <div class="flex-1">
+      <Copy as="div" variant="gradient" class="flex-1 text-lg md:text-2xl">
         <slot name="main" />
-      </div>
+      </Copy>
       <div class="flex-none">
         <slot name="right" />
       </div>

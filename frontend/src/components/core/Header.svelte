@@ -24,15 +24,15 @@
       {/if}
     </Copy>
 
-    <strong
-      class="block bg-gradient-to-b from-white to-neutral-light bg-clip-text text-lg text-transparent md:text-3xl"
-    >
+    <Copy as="strong" variant="gradient" class="block text-lg md:text-3xl">
       {#if main}
         {main}
       {:else if $$slots.main}
         <slot name="main" />
       {/if}
-    </strong>
+    </Copy>
   </svelte:element>
-  <slot />
+  <div class="flex-none">
+    <slot />
+  </div>
 </header>

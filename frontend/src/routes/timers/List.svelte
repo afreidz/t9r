@@ -33,6 +33,8 @@
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
+  import Copy from "@/components/foundation/Copy.svelte";
+  import { sumTimerHours } from "@/lib/timers";
 
   export let params: { date: string };
 
@@ -202,6 +204,21 @@
       {:else}
         All Timers
       {/if}
+    </div>
+    <div class="flex flex-col items-center">
+      <Copy dim as="small" variant="pseudomono">
+        {#if duration === "days"}
+          Daily
+        {:else if duration === "months"}
+          Monthly
+        {:else if duration === "weeks"}
+          Weekly
+        {/if}
+        Hours
+      </Copy>
+      <Copy as="strong" variant="gradient" class=" text-lg md:text-3xl">
+        {sumTimerHours(timers)}
+      </Copy>
     </div>
   </Header>
 
