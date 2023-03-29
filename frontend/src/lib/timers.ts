@@ -12,6 +12,6 @@ export function sumTimerHours(timers: Timer[] = []) {
       : Temporal.PlainTime.from({ hour: 17, minute: 0 });
     const dur = end.since(start);
 
-    return (hours += dur.hours + dur.minutes / 60);
+    return (hours += dur.total("hours"));
   }, 0);
 }

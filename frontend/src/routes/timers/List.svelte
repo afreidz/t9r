@@ -216,9 +216,11 @@
         {/if}
         Hours
       </Copy>
-      <Copy as="strong" variant="gradient" class=" text-lg md:text-3xl">
-        {sumTimerHours(timers)}
-      </Copy>
+      {#key $now}
+        <Copy as="strong" variant="gradient" class=" text-lg md:text-3xl">
+          {sumTimerHours(timers)}
+        </Copy>
+      {/key}
     </div>
   </Header>
 
