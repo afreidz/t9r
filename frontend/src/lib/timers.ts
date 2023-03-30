@@ -10,7 +10,12 @@ export function sumTimerHours(timers: Timer[] = []) {
       : isToday(d)
       ? Temporal.Now.plainTimeISO().round(roundUp)
       : Temporal.PlainTime.from({ hour: 17, minute: 0 });
-    const dur = end.since(start);
+    const dur = end.since(start, {
+      largestUnit: "hour",
+      smallestUnit: "minute",
+      roundingIncrement: 0.25,
+      roundingMode: "ceil",
+    });
 
     return (hours += dur.total("hours"));
   }, 0);

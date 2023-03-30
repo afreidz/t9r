@@ -3,11 +3,16 @@
   import Icon from "@iconify/svelte";
   import { fly } from "svelte/transition";
   import Nav from "@/core/nav/Nav.svelte";
+  import observeResize from "@/lib/resize";
   import MenuTrigger from "./MenuTrigger.svelte";
   import { fetchProjects } from "@/stores/projects";
+  import { mainResizeObserver } from "@/lib/stores/ui";
 
   let menuOpen = false;
+  let main: HTMLElement;
   export let loader: Promise<unknown> | undefined = undefined;
+
+  $: if (main) observeResize(main, mainResizeObserver);
 </script>
 
 {#await fetchProjects()}
@@ -45,6 +50,7 @@
         <Nav on:navigate={() => (menuOpen = false)} />
       </aside>
       <main
+        bind:this={main}
         in:fly={{ x: 500, opacity: 0 }}
         class="relative z-[1] col-start-2 row-span-3 m-2 mt-0 flex flex-col overflow-auto rounded-xl bg-neutral-800 p-3 !pt-0 md:m-6 md:p-6"
       >

@@ -248,7 +248,7 @@
             Utilization
           </SubItem>
           <SubItem
-            active={$location === "/reports/week"}
+            active={$location.startsWith("/reports/week")}
             to="/reports/week"
             on:navigate
           >

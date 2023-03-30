@@ -65,7 +65,11 @@
 
   $: if (nowIndicator && !loaded) {
     loaded = true;
-    nowIndicator.scrollIntoView({ inline: "center", behavior: "smooth" });
+    nowIndicator.scrollIntoView({
+      inline: "center",
+      block: undefined,
+      behavior: "smooth",
+    });
   }
 
   function navigateNext() {
@@ -104,7 +108,9 @@
         break;
       case "days":
         if (!viewDate) break;
-        timers = await trpc.timers.getByDate.query(viewDate.toString());
+        timers = await trpc.timers.getByDate.query({
+          date: viewDate.toString(),
+        });
         break;
     }
     await fetchTags();
@@ -347,7 +353,10 @@
         {:else if duration === "all" || duration === "days"}
           <NewTimer
             date={viewDate}
-            on:timer-update={() => (loader = updateTimers())}
+            on:timer-update={() => {
+              loaded = false;
+              loader = updateTimers();
+            }}
           />
         {/if}
       </Moveable>

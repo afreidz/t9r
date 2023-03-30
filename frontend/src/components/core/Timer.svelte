@@ -18,7 +18,7 @@
   let elm: HTMLAnchorElement;
 
   $: if (elm && scrollto) {
-    elm.scrollIntoView({ block: "end", behavior: "smooth" });
+    elm.scrollIntoView({ inline: "end", block: undefined, behavior: "smooth" });
   }
 
   $: if (project)

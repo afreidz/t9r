@@ -10,7 +10,8 @@
 </script>
 
 <strong
-  class="m-1 inline-block max-w-fit rounded-xl bg-white/30 text-xs font-normal !leading-8 ring-blue-500 focus-within:ring-2 md:text-sm"
+  class="m-1 inline-block max-w-fit rounded-xl bg-white/30 text-xs font-normal !leading-8 ring-blue-500 focus-within:ring-2 md:text-sm {$$props.class ||
+    ''}"
   class:px-2={!round}
   style={`color: ${color}`}
   class:aspect-square={round}

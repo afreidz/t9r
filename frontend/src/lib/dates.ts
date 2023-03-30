@@ -63,13 +63,16 @@ export function formatTime(s: string) {
   return `${hh}:${mm} ${ap}`;
 }
 
-export function getWeeksArray(n: number = 1, forward = true) {
-  const date = getToday();
-  const Sunday = Temporal.PlainDate.from({
-    year: date.year,
-    month: date.month,
-    day: date.day - date.dayOfWeek,
+export function getSunday(d: Temporal.PlainDate = getToday()) {
+  return Temporal.PlainDate.from({
+    year: d.year,
+    month: d.month,
+    day: d.day - d.dayOfWeek,
   });
+}
+
+export function getWeeksArray(n: number = 1, forward = true) {
+  const Sunday = getSunday();
 
   const opp = forward ? "add" : "subtract";
   const weeks: Temporal.PlainDate[] = [];

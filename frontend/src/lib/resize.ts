@@ -10,8 +10,11 @@ const observer = new ResizeObserver((entries) => {
   });
 });
 
-export default function observeResize(elm: Element) {
-  const store = writable<ResizeObserverValue>(null);
+export default function observeResize(
+  elm: Element,
+  store?: Writable<ResizeObserverValue>
+) {
+  if (!store) store = writable<ResizeObserverValue>(null);
   observerMap.set(elm, store);
   observer.observe(elm);
   return store;

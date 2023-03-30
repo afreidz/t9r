@@ -9,6 +9,16 @@ import TimerSchema, { type Timer, PlainDate } from "../../schema/timer";
 
 const timerSort: Sort = { date: 1, start: 1 };
 
+type Query = {
+  project?: string;
+  owner: string;
+  date: string | RegExFilter;
+};
+
+type RegExFilter = {
+  $regex: RegExp;
+};
+
 const timersRouter = router({
   get: protectedProcedure.input(z.string()).query(async ({ input, ctx }) => {
     const { userId } = ctx.user;
@@ -67,17 +77,19 @@ const timersRouter = router({
         .toArray();
     }),
   getByDate: protectedProcedure
-    .input(PlainDate)
+    .input(z.object({ date: PlainDate, project: z.string().optional() }))
     .query(async ({ input, ctx }) => {
       const { userId } = ctx.user;
       const db = await getDBClient();
       const collection = db.collection("timers");
-      const date = Temporal.PlainDate.from(input).toString();
+      const date = Temporal.PlainDate.from(input.date).toString();
+      const query: Query = { owner: userId, date };
 
-      return collection
-        .find<Timer>({ owner: userId, date })
-        .sort(timerSort)
-        .toArray();
+      if (input.project) {
+        query.project = input.project;
+      }
+
+      return collection.find<Timer>(query).sort(timerSort).toArray();
     }),
   getByMonth: protectedProcedure
     .input(PlainDate)
@@ -103,14 +115,6 @@ const timersRouter = router({
       const db = await getDBClient();
       const collection = db.collection("timers");
       const date = Temporal.PlainDate.from(input.week);
-
-      type Query = {
-        project?: string;
-        owner: string;
-        date: {
-          $regex: RegExp;
-        };
-      };
 
       const Sunday = Temporal.PlainDate.from({
         year: date.year,
