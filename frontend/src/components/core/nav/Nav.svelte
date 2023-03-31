@@ -20,7 +20,7 @@
   let newProject = false;
 </script>
 
-<nav class="flex flex-1 flex-col px-4 text-lg">
+<nav class="flex flex-1 flex-col px-5 text-lg">
   <ul class="flex flex-col items-stretch border-l border-neutral-light/20">
     <MainItem
       clickable

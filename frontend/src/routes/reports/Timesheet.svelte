@@ -1,6 +1,14 @@
 <script lang="ts">
+  import {
+    isToday,
+    getToday,
+    getMonth,
+    getSunday,
+    getDurationHoursFromString,
+  } from "@/lib/dates";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
+  import clipboard from "clipboardy";
   import Tag from "@/core/Tag.svelte";
   import { pop } from "svelte-spa-router";
   import { fade } from "svelte/transition";
@@ -19,7 +27,6 @@
   import { mainResizeObserver } from "@/lib/stores/ui";
   import Copy from "@/components/foundation/Copy.svelte";
   import type { Project } from "@/backend/schema/project";
-  import { isToday, getToday, getMonth, getSunday } from "@/lib/dates";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
@@ -67,25 +74,21 @@
     );
 
   function getTasksAndTagsFromTimers(timers: Timer[]) {
-    const taskMap = new Map<string, string[]>();
-    const tasks: Tasks = [];
+    const tasks: Tasks = timers.map((timer) => {
+      let title = timer.title || "";
 
-    timers.forEach((timer) => {
-      if (!timer.title) return;
-      if (!taskMap.has(timer.title)) taskMap.set(timer.title, []);
+      if (timer.start && timer.end) {
+        title += ` (${getDurationHoursFromString(timer.start, timer.end)}hrs)`;
+      }
 
-      const existing = taskMap.get(timer.title) || [];
-      const newTasks = $tags
-        .filter((t) => timer.tags && t._id && timer.tags.includes(t._id))
-        .map((t) => t.value);
-
-      taskMap.set(timer.title, [...existing, ...newTasks]);
-    });
-
-    const taskObject = Object.fromEntries(taskMap);
-
-    Object.entries(taskObject).forEach(([title, tags]) => {
-      tasks.push({ title, tags });
+      return {
+        title,
+        tags: $tags
+          .filter(
+            (tag) => timer.tags && tag._id && timer.tags.includes(tag._id)
+          )
+          .map((tag) => tag.value),
+      };
     });
 
     return tasks;
@@ -155,6 +158,16 @@
             {@const detailsString = `details_${
               entry.project._id
             }_${day.date.toString()}`}
+            {@const details = tasks
+              .map(
+                (task) =>
+                  "• " +
+                  task.title +
+                  (task.tags.length
+                    ? "\n" + task.tags.map((tag) => `\t◦ ${tag}`).join("\n")
+                    : "")
+              )
+              .join("\n")}
             <Field label="Hours" class="h-56 w-full">
               <section class="flex flex-1 flex-col">
                 <div class="flex flex-1 items-center justify-center">
@@ -193,7 +206,11 @@
                   {/if}
                 </div>
                 <div class="flex flex-none items-stretch justify-evenly">
-                  <ActionCopy />
+                  <ActionCopy
+                    title="copy hours"
+                    on:click={() =>
+                      clipboard.write(`${sumTimerHours(day.timers)}`)}
+                  />
                   {#if tasks.length}
                     <ActionInfo
                       on:click={() =>
@@ -204,7 +221,13 @@
                     />
                   {/if}
                   {#if showDetailsFor === detailsString}
-                    <ActionCopy />
+                    <ActionCopy
+                      title="copy details"
+                      on:click={async () => {
+                        await clipboard.write(details);
+                        showDetailsFor = undefined;
+                      }}
+                    />
                   {/if}
                 </div>
               </section>

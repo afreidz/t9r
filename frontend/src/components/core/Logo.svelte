@@ -12,9 +12,7 @@
     gap-2
     from-violet-600
     to-cyan-600
-    p-6
-    pl-5
-    pr-7
+    py-6
 
     text-2xl
     after:absolute

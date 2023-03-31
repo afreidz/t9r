@@ -26,7 +26,7 @@
     </div>
   {:then}
     <div
-      class="grid h-screen min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_6rem] bg-neutral-900 pb-14 text-text-light md:grid-cols-[320px_auto] md:grid-rows-[6rem_auto] md:pb-0"
+      class="grid h-screen min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_3rem] bg-neutral-900 p-4 pt-0 text-text-light md:grid-cols-[320px_auto] md:p-6 md:pt-4"
     >
       <header
         class={`relative col-span-2 col-start-1 row-start-1 mr-6 flex items-center justify-between md:col-span-1  ${
@@ -41,9 +41,9 @@
         />
       </header>
       <aside
-        class={`fixed left-0 bottom-0 top-0 right-0 z-40 col-start-1 row-span-2 row-start-2 flex w-full flex-1 -translate-x-full flex-col overflow-auto pl-3 transition-transform ease-in-out md:static md:z-0 md:max-w-xs md:translate-x-0 md:pl-6 ${
+        class={`fixed left-0 bottom-0 top-0 right-0 z-40 row-start-2 flex w-full flex-1 -translate-x-full flex-col overflow-auto transition-transform ease-in-out md:static md:z-0 md:max-w-xs md:translate-x-0 ${
           menuOpen
-            ? "translate-x-0 bg-neutral-900/80 pt-20 pl-6 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
+            ? "translate-x-0 bg-neutral-900/80 pt-20 pl-4 backdrop-blur-md md:border-none md:bg-transparent md:pt-0 md:pl-0"
             : ""
         }`}
       >
@@ -52,15 +52,15 @@
       <main
         bind:this={main}
         in:fly={{ x: 500, opacity: 0 }}
-        class="relative z-[1] col-start-2 row-span-3 m-2 mt-0 flex flex-col overflow-auto rounded-xl bg-neutral-800 p-3 !pt-0 md:m-6 md:p-6"
+        class="relative z-[1] col-start-2 mb-4 flex flex-col overflow-auto rounded-xl bg-neutral-800 px-6 md:row-span-3 md:mb-0"
       >
         <slot />
       </main>
+      <footer
+        class="col-span-2 flex w-full items-center justify-center md:col-span-1"
+      >
+        <slot name="cta" />
+      </footer>
     </div>
-    <footer
-      class="fixed left-0 bottom-[calc(0.5rem_+_env(keyboard-inset-top))] z-30 flex h-full max-h-14 w-full items-center justify-center md:mb-4 md:max-w-xs"
-    >
-      <slot name="cta" />
-    </footer>
   {/await}
 {/await}
