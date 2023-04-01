@@ -64,11 +64,7 @@ export function formatTime(s: string) {
 }
 
 export function getSunday(d: Temporal.PlainDate = getToday()) {
-  return Temporal.PlainDate.from({
-    year: d.year,
-    month: d.month,
-    day: d.day - d.dayOfWeek,
-  });
+  return d.subtract({ days: d.dayOfWeek });
 }
 
 export function getWeeksArray(n: number = 1, forward = true) {
