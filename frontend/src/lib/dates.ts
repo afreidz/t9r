@@ -1,3 +1,4 @@
+import { Temporal } from "temporal-polyfill";
 export const locale = "en-us";
 
 export const roundDown: Temporal.RoundTo<"minute"> = {
@@ -64,6 +65,7 @@ export function formatTime(s: string) {
 }
 
 export function getSunday(d: Temporal.PlainDate = getToday()) {
+  if (d.dayOfWeek === 7) return d;
   return d.subtract({ days: d.dayOfWeek });
 }
 
