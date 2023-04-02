@@ -15,7 +15,7 @@
 </script>
 
 <label class={`flex items-center ${$$props.class || ""}`}>
-  <Copy dim as="span" variant="pseudomono" class="mr-2 text-sm">{label}</Copy>
+  <Copy dim as="span" light class="mr-2 text-sm">{label}</Copy>
   <input
     {name}
     id={name}

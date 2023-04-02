@@ -14,13 +14,15 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import now from "@/lib/stores/now";
+  import Tag from "@/core/Tag.svelte";
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
+  import HourSum from "@/core/HourSum.svelte";
+  import { sumTimerHours } from "@/lib/timers";
   import { fetchTags } from "@/lib/stores/tags";
   import NewTimer from "@/core/NewTimer.svelte";
   import Moveable from "@/core/Moveable.svelte";
-  import Tag from "@/components/core/Tag.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -33,8 +35,6 @@
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
-  import Copy from "@/components/foundation/Copy.svelte";
-  import { sumTimerHours } from "@/lib/timers";
 
   export let params: { date: string };
 
@@ -47,11 +47,13 @@
   let nowIndicator: HTMLElement;
   let viewDate: Temporal.PlainDate;
   let loader: Promise<unknown> | undefined;
+  let key: Temporal.PlainDateTime | null = null;
   let duration: "days" | "months" | "weeks" | "all" = "days";
 
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
   $: if ($now) nowText = formatForShortTime($now);
+  $: if (view === "timeline") key = $now;
   $: if (view) loaded = false;
 
   $: view = duration === "days" ? "timeline" : "list";
@@ -211,8 +213,9 @@
         All Timers
       {/if}
     </div>
-    <div class="flex flex-col items-center">
-      <Copy dim as="small" variant="pseudomono">
+
+    <HourSum>
+      <span slot="title">
         {#if duration === "days"}
           Daily
         {:else if duration === "months"}
@@ -221,13 +224,11 @@
           Weekly
         {/if}
         Hours
-      </Copy>
-      {#key $now}
-        <Copy as="strong" variant="gradient" class=" text-lg md:text-3xl">
-          {sumTimerHours(timers)}
-        </Copy>
+      </span>
+      {#key key}
+        {sumTimerHours(timers)}
       {/key}
-    </div>
+    </HourSum>
   </Header>
 
   <ActionBar>
@@ -268,10 +269,10 @@
         </div>
       {/each}
     {/if}
-    {#key $now}
+    {#key key}
       {#if view === "timeline" && isToday(viewDate)}
         <div
-          class="relative z-10 h-full border-l border-red-500"
+          class="pointer-events-none relative z-10 h-full border-l border-red-500"
           style={calculateNowGridPosition(timers.length)}
         >
           <span

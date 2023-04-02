@@ -130,9 +130,7 @@
         slot="secondary"
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
-        <Copy dim as="h3" variant="pseudomono" class="text-sm">
-          Project Lifetime
-        </Copy>
+        <Copy dim as="h3" light class="text-sm">Project Lifetime</Copy>
         {#await trpc.timers.getByProject.query(project._id)}
           <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
         {:then timers}
@@ -164,9 +162,7 @@
             </div>
           {/if}
         {/await}
-        <Copy dim as="h3" variant="pseudomono" class="text-sm">
-          Recent Weekly Hours
-        </Copy>
+        <Copy dim as="h3" light class="text-sm">Recent Weekly Hours</Copy>
         <Chart cols={60} rows={5} height={320} axis={10}>
           {#each forecastWeeks as week, i}
             {#await queryForecast(project._id, week)}

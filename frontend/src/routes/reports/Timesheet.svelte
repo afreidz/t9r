@@ -14,6 +14,8 @@
   import { fade } from "svelte/transition";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
+  import HourSum from "@/core/HourSum.svelte";
+  import Copy from "@/foundation/Copy.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import projects from "@/lib/stores/projects";
   import Field from "@/foundation/Field.svelte";
@@ -25,7 +27,6 @@
   import tags, { fetchTags } from "@/lib/stores/tags";
   import type { Timer } from "@/backend/schema/timer";
   import { mainResizeObserver } from "@/lib/stores/ui";
-  import Copy from "@/components/foundation/Copy.svelte";
   import type { Project } from "@/backend/schema/project";
 
   import ActionBar from "@/core/actions/Bar.svelte";
@@ -111,12 +112,10 @@
       main={`${getSunday(viewDate).day} ${getMonth(viewDate)} ${viewDate.year}`}
       class="mb-1"
     >
-      <div class="flex flex-col items-center">
-        <Copy dim as="small" variant="pseudomono">Timesheet Hours</Copy>
-        <Copy as="strong" variant="gradient" class=" text-lg md:text-3xl">
-          {sumTimerHours(getAllTimersFromTimesheet(timesheet))}
-        </Copy>
-      </div>
+      <HourSum>
+        <span slot="title"> Timesheet Hours </span>
+        {sumTimerHours(getAllTimersFromTimesheet(timesheet))}
+      </HourSum>
     </Header>
 
     <ActionBar>
