@@ -98,7 +98,7 @@
             class="justify-between"
             color={newValues.color}
             name="default_utilized"
-            label="Timers default to utilized?"
+            label="Default timers to utilized?"
             enabled={newValues.defaultUtilized}
             on:change={(e) => {
               if (newValues) newValues.defaultUtilized = e.detail;

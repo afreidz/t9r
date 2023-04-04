@@ -8,6 +8,7 @@
   } from "@/lib/dates";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
+  import now from "@/lib/stores/now";
   import clipboard from "clipboardy";
   import Tag from "@/core/Tag.svelte";
   import { pop } from "svelte-spa-router";
@@ -112,10 +113,9 @@
       main={`${getSunday(viewDate).day} ${getMonth(viewDate)} ${viewDate.year}`}
       class="mb-1"
     >
-      <HourSum>
-        <span slot="title"> Timesheet Hours </span>
-        {sumTimerHours(getAllTimersFromTimesheet(timesheet))}
-      </HourSum>
+      {#key $now}
+        <HourSum hours={sumTimerHours(getAllTimersFromTimesheet(timesheet))} />
+      {/key}
     </Header>
 
     <ActionBar>

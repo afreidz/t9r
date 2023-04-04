@@ -4,6 +4,7 @@
     isToday,
     getMonth,
     getToday,
+    getSunday,
     getWeekDay,
     formatTime,
     formatForWeek,
@@ -208,27 +209,15 @@
         {getMonth(viewDate)}
         {viewDate.year}
       {:else if duration !== "all"}
-        {viewDate.day} {getMonth(viewDate)} {viewDate.year}
+        {getSunday(viewDate).day} {getMonth(viewDate)} {viewDate.year}
       {:else}
         All Timers
       {/if}
     </div>
 
-    <HourSum>
-      <span slot="title">
-        {#if duration === "days"}
-          Daily
-        {:else if duration === "months"}
-          Monthly
-        {:else if duration === "weeks"}
-          Weekly
-        {/if}
-        Hours
-      </span>
-      {#key key}
-        {sumTimerHours(timers)}
-      {/key}
-    </HourSum>
+    {#key $now}
+      <HourSum hours={sumTimerHours(timers)} />
+    {/key}
   </Header>
 
   <ActionBar>

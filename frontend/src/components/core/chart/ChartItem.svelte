@@ -12,7 +12,7 @@
   let grad = "";
 
   $: bg = `${color}66`;
-  $: if (!percent) percent = max ? (value / max) * 100 : value;
+  $: if (!percent) percent = max ? (value / max) * 100 : (value / 60) * 100;
   $: grad = `linear-gradient(to right, ${color}80, ${color})`;
 </script>
 

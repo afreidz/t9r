@@ -19,6 +19,11 @@ type RegExFilter = {
   $regex: RegExp;
 };
 
+export function getSunday(d: Temporal.PlainDate = Temporal.Now.plainDateISO()) {
+  if (d.dayOfWeek === 7) return d;
+  return d.subtract({ days: d.dayOfWeek });
+}
+
 const timersRouter = router({
   get: protectedProcedure.input(z.string()).query(async ({ input, ctx }) => {
     const { userId } = ctx.user;
@@ -116,12 +121,7 @@ const timersRouter = router({
       const collection = db.collection("timers");
       const date = Temporal.PlainDate.from(input.week);
 
-      const Sunday = Temporal.PlainDate.from({
-        year: date.year,
-        month: date.month,
-        day: date.day - date.dayOfWeek,
-      });
-
+      const Sunday = getSunday(date);
       const Saturday = Sunday.add({ days: 6 });
 
       const year = date.year;

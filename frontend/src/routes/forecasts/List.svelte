@@ -34,7 +34,7 @@
       params.num > 5
         ? [
             ...getWeeksArray(5, false).reverse(),
-            ...getWeeksArray(params.num - 5),
+            ...getWeeksArray(params.num - 5).slice(1),
           ]
         : getWeeksArray(params.num);
   }
