@@ -5,10 +5,12 @@
     "module": "es2022",
     "baseUrl": "./",
     "types": ["svelte"],
+    "allowJs": true,
     "esModuleInterop": true,
     "emitDeclarationOnly": true,
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "skipLibCheck": true,
     "paths": {

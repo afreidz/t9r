@@ -28,6 +28,7 @@
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import { location, push } from "svelte-spa-router";
+  import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
   import { ctaPosition, isSelecting, selected } from "@/lib/stores/ui";
 
@@ -53,11 +54,13 @@
 
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
+  $: if ($breakpoints.lg && duration === "days") view = "timeline";
+  $: if ($breakpoints.lg && duration === "days") loaded = false;
   $: if ($now) nowText = formatForShortTime($now);
+  $: if (!$breakpoints.lg) view = "list";
   $: if (view === "timeline") key = $now;
   $: if (view) loaded = false;
 
-  $: view = duration === "days" ? "timeline" : "list";
   $: duration = $location.includes("/timers/month")
     ? "months"
     : $location.includes("/timers/week")
