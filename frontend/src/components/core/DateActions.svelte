@@ -88,20 +88,12 @@
         <Icon icon="ic:round-arrow-circle-down" />
       </Button>
     {/if}
-    <Button
-      class={buttonClasses}
-      on:click={next}
-      disabled={!page && isToday(date)}
-    >
+    <Button class={buttonClasses} on:click={next} disabled={!page && isToday(date)}>
       <Icon icon="ooui:previous-rtl" />
     </Button>
   </div>
   <div>
-    <Button
-      class={buttonClasses}
-      on:click={toggleView}
-      disabled={disableTimelineView}
-    >
+    <Button class={buttonClasses} on:click={toggleView} disabled={disableTimelineView}>
       {#if view === "list"}
         <Icon icon="ri:file-list-line" />
       {:else if view === "timeline"}

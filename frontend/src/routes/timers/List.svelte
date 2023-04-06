@@ -44,20 +44,19 @@
   let nowText: string;
   let page: number = 1;
   let per: number = 100;
-  let timers: Timer[] = [];
   let view: Views = "list";
+  let timers: Timer[] = [];
   let nowIndicator: HTMLElement;
+  let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
   let loader: Promise<unknown> | undefined;
   let key: Temporal.PlainDateTime | null = null;
   let duration: "days" | "months" | "weeks" | "all" = "days";
 
+  $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
-  $: if ($breakpoints.lg && duration === "days") view = "timeline";
-  $: if ($breakpoints.lg && duration === "days") loaded = false;
   $: if ($now) nowText = formatForShortTime($now);
-  $: if (!$breakpoints.lg) view = "list";
   $: if (view === "timeline") key = $now;
   $: if (view) loaded = false;
 
@@ -122,11 +121,7 @@
     await fetchTags();
   }
 
-  function calculateGridPosition(
-    s: string,
-    e: string | null | undefined,
-    i: number
-  ) {
+  function calculateGridPosition(s: string, e: string | null | undefined, i: number) {
     const start = Temporal.PlainTime.from(s);
     const end = e
       ? Temporal.PlainTime.from(e)
@@ -224,10 +219,7 @@
   </Header>
 
   <ActionBar>
-    <ActionPrev
-      on:click={navigatePrev}
-      disabled={duration === "all" && page === 0}
-    />
+    <ActionPrev on:click={navigatePrev} disabled={duration === "all" && page === 0} />
     {#if duration !== "all"}
       <ActionCurrent on:click={navigateCurrent} disabled={isToday(viewDate)} />
     {/if}
@@ -237,7 +229,13 @@
     />
     <div slot="right">
       {#if duration === "days"}
-        <ActionView bind:current={view} />
+        <ActionView
+          bind:current={view}
+          on:click={() => {
+            viewChanged = true;
+            console.log(view);
+          }}
+        />
       {/if}
     </div>
   </ActionBar>

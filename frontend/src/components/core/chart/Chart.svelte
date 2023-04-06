@@ -20,9 +20,9 @@
     <strong
       class:border-l={idx === 0}
       class="flex flex-col items-end justify-end border-r border-white/10 text-xs font-light"
-      style={`grid-column: ${
-        idx * axis + 2
-      } / span ${axis}; grid-row: 1 / span ${rows + 1}`}
+      style={`grid-column: ${idx * axis + 2} / span ${axis}; grid-row: 1 / span ${
+        rows + 1
+      }`}
     >
       <Copy dim as="span" variant="pseudomono" class="px-2">
         {axis * (idx + 1)}

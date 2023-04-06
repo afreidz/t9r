@@ -14,8 +14,7 @@
   }
 
   function handleChange() {
-    const hour =
-      hh === 12 ? (ap === "AM" ? 23 : 12) : ap === "PM" ? hh + 12 : hh;
+    const hour = hh === 12 ? (ap === "AM" ? 23 : 12) : ap === "PM" ? hh + 12 : hh;
 
     const pt = new Temporal.PlainTime(hour, mm);
     value = pt.toString();

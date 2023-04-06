@@ -26,8 +26,7 @@
 
   function clickHandler() {
     if ($isSelecting && id) {
-      if ($selected.includes(id))
-        return ($selected = $selected.filter((t) => t !== id));
+      if ($selected.includes(id)) return ($selected = $selected.filter((t) => t !== id));
       return ($selected = [...new Set([...$selected, id])]);
     }
     if (!disableNav) return push(`/timer/${id}`);
@@ -72,8 +71,7 @@
         variant="pseudomono"
         class="flex-none text-xs leading-none line-clamp-1">{project.name}</Copy
       >
-      <strong
-        class="flex-none text-sm font-normal !leading-none line-clamp-1 md:text-lg"
+      <strong class="flex-none text-sm font-normal !leading-none line-clamp-1 md:text-lg"
         >{title || "Timer"}</strong
       >
     </button>

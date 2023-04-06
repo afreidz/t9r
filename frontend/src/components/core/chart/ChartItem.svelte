@@ -22,16 +22,13 @@
     as="small"
     variant="pseudomono"
     style={`grid-row-start: ${index + 1}; grid-row-end: ${index + 2};`}
-    class="col-start-1 col-end-2 cursor-pointer self-center text-xs"
-    >{label}</Copy
+    class="col-start-1 col-end-2 cursor-pointer self-center text-xs">{label}</Copy
   >
 {/if}
 <div
-  style={`grid-column: ${label ? 2 : 1} / ${
-    max ? "span " + max : -1
-  }; grid-row-start: ${index + 1}; grid-row-end: ${index + 2}; ${
-    max ? "background-color: " + bg : ""
-  };`}
+  style={`grid-column: ${label ? 2 : 1} / ${max ? "span " + max : -1}; grid-row-start: ${
+    index + 1
+  }; grid-row-end: ${index + 2}; ${max ? "background-color: " + bg : ""};`}
   class="my-2 flex flex-col justify-center overflow-hidden rounded-md transition-all ease-in-out"
 >
   <Copy

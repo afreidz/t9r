@@ -86,9 +86,7 @@
       return {
         title,
         tags: $tags
-          .filter(
-            (tag) => timer.tags && tag._id && timer.tags.includes(tag._id)
-          )
+          .filter((tag) => timer.tags && tag._id && timer.tags.includes(tag._id))
           .map((tag) => tag.value),
       };
     });
@@ -119,9 +117,7 @@
     </Header>
 
     <ActionBar>
-      <ActionPrev
-        on:click={() => (viewDate = viewDate.subtract({ weeks: 1 }))}
-      />
+      <ActionPrev on:click={() => (viewDate = viewDate.subtract({ weeks: 1 }))} />
       <ActionCurrent
         on:click={() => (viewDate = getToday())}
         disabled={isToday(viewDate)}
@@ -154,9 +150,7 @@
           </div>
           {#each entry.days as day}
             {@const tasks = getTasksAndTagsFromTimers(day.timers)}
-            {@const detailsString = `details_${
-              entry.project._id
-            }_${day.date.toString()}`}
+            {@const detailsString = `details_${entry.project._id}_${day.date.toString()}`}
             {@const details = tasks
               .map(
                 (task) =>
@@ -167,13 +161,13 @@
                     : "")
               )
               .join("\n")}
-            <Field label="Hours" class="h-56 w-full">
+            <Field as="div" label="Hours" class="h-56 w-full max-w-[288px] md:max-w-none">
               <section class="flex flex-1 flex-col">
-                <div class="flex flex-1 items-center justify-center">
+                <div class="flex flex-1 items-center justify-center gap-6">
                   <Copy
                     as="strong"
                     variant="gradient"
-                    class="m-6 min-w-[50px] flex-none text-center text-3xl"
+                    class="flex flex-none items-center justify-center text-3xl"
                     >{sumTimerHours(day.timers)}</Copy
                   >
                   {#if showDetailsFor === detailsString}
@@ -207,16 +201,13 @@
                 <div class="flex flex-none items-stretch justify-evenly">
                   <ActionCopy
                     title="copy hours"
-                    on:click={() =>
-                      clipboard.write(`${sumTimerHours(day.timers)}`)}
+                    on:click={() => clipboard.write(`${sumTimerHours(day.timers)}`)}
                   />
                   {#if tasks.length}
                     <ActionInfo
                       on:click={() =>
                         (showDetailsFor =
-                          showDetailsFor === detailsString
-                            ? undefined
-                            : detailsString)}
+                          showDetailsFor === detailsString ? undefined : detailsString)}
                     />
                   {/if}
                   {#if showDetailsFor === detailsString}

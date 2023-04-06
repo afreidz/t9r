@@ -14,7 +14,6 @@
   import { ctaPosition } from "@/lib/stores/ui";
   import Chart from "@/core/chart/Chart.svelte";
   import Moveable from "@/core/Moveable.svelte";
-  import { queryForecast } from "@/lib/forecast";
   import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -23,6 +22,8 @@
   import type { Project } from "@/backend/schema/project";
   import projects, { fetchProjects } from "@/stores/projects";
   import { formatForForecastWeek, getWeeksArray } from "@/lib/dates";
+  import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
+  import type { Timer } from "@/backend/schema/timer";
 
   export let params: { id: string };
 
@@ -30,7 +31,9 @@
   let confirmDelete = false;
   let project: Project | undefined;
   let newValues: Project | undefined;
+  let projectTimers: Promise<Timer[]>;
   let forecastWeeks = getWeeksArray(5, false);
+  let forecasts: Promise<(ForecastAndActual | undefined)[]>;
 
   $: if (params.id && project?._id !== params.id) {
     project = $projects.find((p: Project) => p._id === params.id);
@@ -39,14 +42,23 @@
 
   $: if (newValues && project) dirty = !same<Project>(newValues, project);
 
+  $: if (forecastWeeks && project && !forecasts) {
+    forecasts = Promise.all(
+      forecastWeeks.map((week) => queryForecast(project?._id, week))
+    );
+  }
+
+  $: if (project && project._id && !projectTimers) {
+    projectTimers = trpc.timers.getByProject.query(project._id);
+  }
+
   async function reset() {
     if (!project || !newValues) return;
     newValues = { ...project };
   }
 
   async function update() {
-    if (!project || !project._id || !newValues?.name || !newValues?.color)
-      return;
+    if (!project || !project._id || !newValues?.name || !newValues?.color) return;
 
     await trpc.projects.update.mutate({
       id: project._id,
@@ -72,10 +84,10 @@
 </script>
 
 <Layout>
-  {#if project && project._id && newValues}
-    <Header sub="Details For" main={project.name} class="mb-1" />
-    <Container class="flex-1">
-      <section slot="primary" class="xl:flex-1">
+  <Header sub="Details For" main={project?.name} class="mb-1" />
+  <Container class="flex-1">
+    <section slot="primary" class="xl:flex-1">
+      {#if newValues}
         <Field label="Project Name">
           <input bind:value={newValues.name} />
         </Field>
@@ -118,40 +130,39 @@
           />
         </Field>
         <Field label="Project Budget">
-          <input
-            class="text-2xl"
-            type="number"
-            min={0}
-            bind:value={newValues.budget}
-          />
+          <input class="text-2xl" type="number" min={0} bind:value={newValues.budget} />
         </Field>
-      </section>
-      <section
-        slot="secondary"
-        class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
+      {/if}
+    </section>
+    <section
+      slot="secondary"
+      class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
+    >
+      <Copy as="h3" semibold variant="gradient" class="my-4 uppercase"
+        >Project Lifetime</Copy
       >
-        <Copy dim as="h3" light class="text-sm">Project Lifetime</Copy>
-        {#await trpc.timers.getByProject.query(project._id)}
+      {#if project?._id}
+        {#await projectTimers}
           <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
         {:then timers}
-          <header class="my-1 flex justify-between">
-            <strong class="my-2 flex-none text-4xl"
-              >{sumTimerHours(timers)}
-              <Copy dim as="span" variant="pseudomono" class="text-sm"
-                >worked</Copy
-              ></strong
+          <header class="my-1 mx-4 flex flex-col justify-between md:mx-6 md:flex-row">
+            <strong
+              class="my-2 flex flex-none items-center justify-between text-4xl md:flex-col md:items-start"
             >
+              <Copy dim as="span" variant="pseudomono" class="text-sm">Worked:</Copy>
+              {sumTimerHours(timers)}
+            </strong>
             {#if project.budget}
-              <strong class="my-2 flex-none text-4xl"
-                >{project.budget}
-                <Copy dim as="span" variant="pseudomono" class="text-sm"
-                  >budget</Copy
-                ></strong
+              <strong
+                class="my-2 flex flex-none items-center justify-between text-4xl md:flex-col md:items-start"
               >
+                <Copy dim as="span" variant="pseudomono" class="text-sm">Budget:</Copy>
+                {project.budget}
+              </strong>
             {/if}
           </header>
           {#if project.budget}
-            <div class="group my-2 mb-6 grid h-12 grid-cols-2">
+            <div class="group my-2 mx-4 mb-6 grid h-12 grid-cols-2 md:mx-6">
               <ChartItem
                 max={2}
                 index={0}
@@ -162,25 +173,31 @@
             </div>
           {/if}
         {/await}
-        <Copy dim as="h3" light class="text-sm">Recent Weekly Hours</Copy>
+      {/if}
+      <Copy as="h3" semibold variant="gradient" class="my-4 uppercase"
+        >Recent Weekly Hours</Copy
+      >
+      <div class="mx-4 md:mx-6">
         <Chart cols={60} rows={5} height={320} axis={10}>
-          {#each forecastWeeks as week, i}
-            {#await queryForecast(project._id, week)}
-              <Icon icon="eos-icons:loading" class="h-4 w-4 text-white" />
-            {:then forecast}
-              <ChartItem
-                index={i}
-                max={forecast?.hours}
-                color={project.color}
-                value={forecast?.actual}
-                label={formatForForecastWeek(week)}
-              />
-            {/await}
-          {/each}
+          {#await forecasts}
+            <Icon icon="eos-icons:loading" class="h-4 w-4 text-white" />
+          {:then forecasts}
+            {#each forecasts as forecast, i}
+              {#if forecast}
+                <ChartItem
+                  index={i}
+                  max={forecast?.hours}
+                  color={project?.color}
+                  value={forecast?.actual}
+                  label={formatForForecastWeek(forecastWeeks[i])}
+                />
+              {/if}
+            {/each}
+          {/await}
         </Chart>
-      </section>
-    </Container>
-  {/if}
+      </div>
+    </section>
+  </Container>
   <div slot="cta">
     <Moveable state={$ctaPosition}>
       {#if dirty}
@@ -232,11 +249,7 @@
 
 {#if confirmDelete}
   <Dialog open={true} title="Delete {project?.name}" sub="You are about to...">
-    <Button
-      slot="close"
-      value="cancel"
-      on:click={() => (confirmDelete = false)}
-    >
+    <Button slot="close" value="cancel" on:click={() => (confirmDelete = false)}>
       <Icon icon="material-symbols:close" class="h-7 w-7" />
     </Button>
     <section class="flex flex-1 flex-col items-center justify-center py-4">

@@ -3,10 +3,7 @@ import { Temporal } from "temporal-polyfill";
 
 const interval = 10000;
 
-let updateInterval: ReturnType<typeof setInterval> = setInterval(
-  callback,
-  interval
-);
+let updateInterval: ReturnType<typeof setInterval> = setInterval(callback, interval);
 
 const now = writable<Temporal.PlainDateTime>(Temporal.Now.plainDateTimeISO());
 

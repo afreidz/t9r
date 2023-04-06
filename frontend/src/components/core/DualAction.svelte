@@ -12,11 +12,8 @@
     <slot name="secondary" />
   </div>
   <div class="flex flex-1 flex-col text-black">
-    {#if label}<Copy
-        dim
-        as="span"
-        variant="pseudomono"
-        class="text-xs text-black">{label}</Copy
+    {#if label}<Copy dim as="span" variant="pseudomono" class="text-xs text-black"
+        >{label}</Copy
       >{/if}
     <slot name="content" />
   </div>

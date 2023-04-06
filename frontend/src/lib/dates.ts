@@ -82,9 +82,7 @@ export function getWeeksArray(n: number = 1, forward = true) {
   return weeks;
 }
 
-export function plainDateToLegacy(
-  d: Temporal.PlainDate | Temporal.PlainDateTime
-) {
+export function plainDateToLegacy(d: Temporal.PlainDate | Temporal.PlainDateTime) {
   const timeZone = Temporal.Now.timeZone();
   const zoned = d.toZonedDateTime({ timeZone });
   return new Date(zoned.epochMilliseconds);

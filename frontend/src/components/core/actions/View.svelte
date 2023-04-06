@@ -17,7 +17,7 @@
   }
 </script>
 
-<Base {...$$restProps} on:click={cycle}>
+<Base {...$$restProps} on:click={cycle} on:click>
   {#if current === "list"}
     <Icon icon="ic:baseline-list-alt" />
   {:else if current === "timeline"}

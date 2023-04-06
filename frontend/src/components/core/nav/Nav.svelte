@@ -78,11 +78,7 @@
             to="/timers/all"
             on:navigate
           >
-            <Icon
-              slot="icon"
-              class="text-neutral-light"
-              icon="ic:baseline-list-alt"
-            />
+            <Icon slot="icon" class="text-neutral-light" icon="ic:baseline-list-alt" />
             All
           </SubItem>
         </SubNav>
@@ -114,18 +110,13 @@
                 class="h-4 w-4 rounded"
                 style={`background-color: ${project.color}`}
               >
-                <figcaption class="sr-only">
-                  Color assigned to project
-                </figcaption>
+                <figcaption class="sr-only">Color assigned to project</figcaption>
               </figure>
               {project.name}
             </SubItem>
           {/each}
           {#if $projects.some((p) => p.archived)}
-            <SubItem
-              clickable
-              on:click={() => ($showArchived = !$showArchived)}
-            >
+            <SubItem clickable on:click={() => ($showArchived = !$showArchived)}>
               <Icon slot="icon" icon="mdi:eye-off-outline" />
               <span class="flex-1 text-neutral-light">Archived Projects</span>
               <Icon
@@ -150,9 +141,7 @@
                     class="h-4 w-4 rounded"
                     style={`background-color: ${project.color}`}
                   >
-                    <figcaption class="sr-only">
-                      Color assigned to project
-                    </figcaption>
+                    <figcaption class="sr-only">Color assigned to project</figcaption>
                   </figure>
                   {project.name}
                 </SubItem>
@@ -181,11 +170,7 @@
       <span slot="main">Forecasts</span>
       {#if $showForecasts}
         <SubNav>
-          <SubItem
-            active={$location === "/forecasts/5"}
-            to="/forecasts/5"
-            on:navigate
-          >
+          <SubItem active={$location === "/forecasts/5"} to="/forecasts/5" on:navigate>
             <Icon
               slot="icon"
               class="text-neutral-light"
@@ -193,11 +178,7 @@
             />
             Upcoming
           </SubItem>
-          <SubItem
-            active={$location === "/forecasts/13"}
-            to="/forecasts/13"
-            on:navigate
-          >
+          <SubItem active={$location === "/forecasts/13"} to="/forecasts/13" on:navigate>
             <Icon
               slot="icon"
               class="text-neutral-light"
@@ -205,11 +186,7 @@
             />
             Quarterly
           </SubItem>
-          <SubItem
-            active={$location === "/forecasts/52"}
-            to="/forecasts/52"
-            on:navigate
-          >
+          <SubItem active={$location === "/forecasts/52"} to="/forecasts/52" on:navigate>
             <Icon
               slot="icon"
               class="text-neutral-light"
@@ -240,11 +217,7 @@
             to="/reports/utilization"
             on:navigate
           >
-            <Icon
-              slot="icon"
-              icon="mdi:graph-line"
-              class="text-neutral-light"
-            />
+            <Icon slot="icon" icon="mdi:graph-line" class="text-neutral-light" />
             Utilization
           </SubItem>
           <SubItem

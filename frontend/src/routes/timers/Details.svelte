@@ -116,8 +116,7 @@
   async function addTag(e: { currentTarget: HTMLInputElement }) {
     const val = e.currentTarget.value;
 
-    let existing =
-      tags.find((t) => t._id === val) || (await trpc.tags.get.query(val));
+    let existing = tags.find((t) => t._id === val) || (await trpc.tags.get.query(val));
 
     if (!existing && newValues) {
       const result = await trpc.tags.create.mutate({ value: val });
@@ -131,9 +130,7 @@
     newTag = "";
 
     if (existing && existing._id && newValues) {
-      const newTags = newValues.tags
-        ? [...newValues.tags, existing._id]
-        : [existing._id];
+      const newTags = newValues.tags ? [...newValues.tags, existing._id] : [existing._id];
       newValues.tags = [...new Set(newTags)];
       return;
     }
@@ -226,11 +223,7 @@
             on:change={addTag}
             bind:value={newTag}
           />
-          <Icon
-            slot="icon"
-            icon="material-symbols:search"
-            class="text-neutral-light"
-          />
+          <Icon slot="icon" icon="material-symbols:search" class="text-neutral-light" />
           <datalist id="tags">
             {#each tags as tag}
               <option value={tag._id}>{tag.value}</option>
@@ -266,9 +259,7 @@
         class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4"
       >
         {#if multiple && timers}
-          <h3 class="mb-3 text-center text-xl font-bold md:text-left">
-            Timers
-          </h3>
+          <h3 class="mb-3 text-center text-xl font-bold md:text-left">Timers</h3>
           {#each timers as timer}
             <TimerComponent
               disableNav
@@ -281,20 +272,13 @@
               </div>
               <div slot="right">
                 {#if timer.start && timer.end}
-                  <Tag
-                    >{getDurationHoursFromString(
-                      timer.start,
-                      timer.end
-                    )}hrs</Tag
-                  >
+                  <Tag>{getDurationHoursFromString(timer.start, timer.end)}hrs</Tag>
                 {/if}
               </div>
             </TimerComponent>
           {/each}
         {:else}
-          <h3 class="mb-3 text-center text-xl font-bold md:text-left">
-            Timing
-          </h3>
+          <h3 class="mb-3 text-center text-xl font-bold md:text-left">Timing</h3>
           <TimerComponent
             disableNav
             class="mt-3"
@@ -303,18 +287,10 @@
           >
             <div slot="right">
               {#if newValues.start && newValues.end}
-                <Tag
-                  >{getDurationHoursFromString(
-                    newValues.start,
-                    newValues.end
-                  )}hrs</Tag
-                >
+                <Tag>{getDurationHoursFromString(newValues.start, newValues.end)}hrs</Tag>
               {:else if newValues.start}
                 <Tag>
-                  {getDurationHoursFromString(
-                    newValues.start,
-                    $now.toString()
-                  )}hrs
+                  {getDurationHoursFromString(newValues.start, $now.toString())}hrs
                 </Tag>
                 <Tag>running</Tag>
               {/if}
@@ -328,10 +304,7 @@
                 <Time bind:value={newValues.start} />
               {/if}
             </Field>
-            <Icon
-              icon="material-symbols:arrow-range"
-              class="hidden text-4xl md:block"
-            />
+            <Icon icon="material-symbols:arrow-range" class="hidden text-4xl md:block" />
             <Field label={newValues.end ? "End Time" : "Running..."}>
               {#if !newValues.end && !multiple}
                 <Button
@@ -413,16 +386,8 @@
 </Layout>
 
 {#if confirmDelete}
-  <Dialog
-    open={true}
-    title="Delete {timer?.title || ''}"
-    sub="You are about to..."
-  >
-    <Button
-      slot="close"
-      value="cancel"
-      on:click={() => (confirmDelete = false)}
-    >
+  <Dialog open={true} title="Delete {timer?.title || ''}" sub="You are about to...">
+    <Button slot="close" value="cancel" on:click={() => (confirmDelete = false)}>
       <Icon icon="material-symbols:close" class="h-7 w-7" />
     </Button>
     <section class="flex flex-1 flex-col items-center justify-center py-4">

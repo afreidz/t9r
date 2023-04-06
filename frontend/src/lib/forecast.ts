@@ -3,7 +3,7 @@ import { sumTimerHours } from "@/lib/timers";
 import type { Project } from "@/backend/schema/project";
 import type { Forecast } from "@/backend/schema/forecast";
 
-type ForecastAndActual = Partial<Forecast> & {
+export type ForecastAndActual = Partial<Forecast> & {
   actual?: number;
 };
 

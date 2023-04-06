@@ -68,9 +68,7 @@
     on:press={holdHandler}
     class:fixed={moving || state.moved}
     use:press={{ timeframe: 300, triggerBeforeFinished: true }}
-    style={moving || state.moved
-      ? `left: ${state.x}px; top: ${state.y}px;`
-      : ""}
+    style={moving || state.moved ? `left: ${state.x}px; top: ${state.y}px;` : ""}
   >
     <slot />
     {#if state.moved && enabled}

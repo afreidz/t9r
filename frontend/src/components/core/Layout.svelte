@@ -52,13 +52,11 @@
       <main
         bind:this={main}
         in:fly={{ x: 500, opacity: 0 }}
-        class="relative z-[1] col-start-2 mb-4 flex flex-col overflow-auto rounded-xl bg-neutral-800 px-6 md:row-span-3 md:mb-0"
+        class="relative z-[1] col-start-2 mb-4 flex flex-col overflow-auto rounded-xl bg-neutral-800 px-4 md:row-span-3 md:mb-0 md:px-6"
       >
         <slot />
       </main>
-      <footer
-        class="col-span-2 flex w-full items-center justify-center md:col-span-1"
-      >
+      <footer class="col-span-2 flex w-full items-center justify-center md:col-span-1">
         <slot name="cta" />
       </footer>
     </div>
