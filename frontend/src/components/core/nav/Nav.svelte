@@ -12,6 +12,7 @@
   import {
     showTimers,
     showReports,
+    showAccount,
     showProjects,
     showArchived,
     showForecasts,
@@ -231,6 +232,36 @@
               class="text-neutral-light"
             />
             Weekly Timesheet
+          </SubItem>
+        </SubNav>
+      {/if}
+    </MainItem>
+    <MainItem
+      clickable
+      active={$location.startsWith("/account")}
+      on:click={() => ($showAccount = !$showAccount)}
+    >
+      <Icon
+        slot="right"
+        icon="ph:caret-down-bold"
+        class={`flex-none transition-transform ease-in-out ${
+          $showAccount ? "rotate-180" : ""
+        }`}
+      />
+      <span slot="main">Account</span>
+      {#if $showAccount}
+        <SubNav>
+          <SubItem
+            active={$location === "/account/settings"}
+            to="/account/settings"
+            on:navigate
+          >
+            <Icon slot="icon" icon="ic:outline-settings" class="text-neutral-light" />
+            Settings
+          </SubItem>
+          <SubItem as="a" href="/logout" on:navigate>
+            <Icon slot="icon" icon="ic:sharp-logout" class="text-neutral-light" />
+            Logout
           </SubItem>
         </SubNav>
       {/if}

@@ -1,3 +1,5 @@
+/// <reference types="svelte-gestures" />
+
 type MoveableState = {
   x: number;
   y: number;
