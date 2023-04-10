@@ -23,22 +23,19 @@
   import { sumTimerHours } from "@/lib/timers";
   import { fetchTags } from "@/lib/stores/tags";
   import NewTimer from "@/core/NewTimer.svelte";
-  import Moveable from "@/core/Moveable.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import { location, push } from "svelte-spa-router";
   import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
-  import { ctaPosition, isSelecting, selected } from "@/lib/stores/ui";
+  import { isSelecting, selected } from "@/lib/stores/ui";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
-  import { writable } from "svelte/store";
-  import type { ResizeObserverValue } from "@/lib/resize";
 
   export let params: { date: string };
 
@@ -319,41 +316,39 @@
 
   <div slot="cta">
     {#if $isSelecting || ["all", "days"].includes(duration)}
-      <Moveable state={$ctaPosition}>
-        {#if $isSelecting}
-          <DualAction>
-            <Button
-              slot="secondary"
-              on:click={() => {
-                $selected = [];
-                $isSelecting = false;
-              }}
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-            >
-              <Icon icon="teenyicons:x-small-outline" />
-            </Button>
-            <span slot="content">Edit {$selected.length} timers</span>
-            <Button
-              on:click={() => {
-                push("/timer/selected");
-                $isSelecting = false;
-              }}
-              slot="primary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-            >
-              <Icon icon="ri:pencil-line" />
-            </Button>
-          </DualAction>
-        {:else if duration === "all" || duration === "days"}
-          <NewTimer
-            date={viewDate}
-            on:timer-update={() => {
-              loaded = false;
-              loader = updateTimers();
+      {#if $isSelecting}
+        <DualAction>
+          <Button
+            slot="secondary"
+            on:click={() => {
+              $selected = [];
+              $isSelecting = false;
             }}
-          />
-        {/if}
-      </Moveable>
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+          >
+            <Icon icon="teenyicons:x-small-outline" />
+          </Button>
+          <span slot="content">Edit {$selected.length} timers</span>
+          <Button
+            on:click={() => {
+              push("/timer/selected");
+              $isSelecting = false;
+            }}
+            slot="primary"
+            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+          >
+            <Icon icon="ri:pencil-line" />
+          </Button>
+        </DualAction>
+      {:else if duration === "all" || duration === "days"}
+        <NewTimer
+          date={viewDate}
+          on:timer-update={() => {
+            loaded = false;
+            loader = updateTimers();
+          }}
+        />
+      {/if}
     {/if}
   </div>
 </Layout>

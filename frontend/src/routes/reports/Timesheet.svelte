@@ -20,8 +20,6 @@
   import { sumTimerHours } from "@/lib/timers";
   import projects from "@/lib/stores/projects";
   import Field from "@/foundation/Field.svelte";
-  import Moveable from "@/core/Moveable.svelte";
-  import { ctaPosition } from "@/lib/stores/ui";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -228,24 +226,20 @@
     </div>
   {/await}
   <div slot="cta">
-    <Moveable state={$ctaPosition}>
-      <div in:fade>
-        <DualAction as="div" label="Showing timesheet for">
-          <span slot="content"
-            >{getSunday(viewDate).day}
-            {getMonth(viewDate)}
-            {viewDate.year}</span
-          >
-          <Button
-            slot="primary"
-            title="Navigate back"
-            on:click={pop}
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-          >
-            <Icon icon="ic:outline-arrow-back" />
-          </Button>
-        </DualAction>
-      </div>
-    </Moveable>
+    <DualAction as="div" label="Showing timesheet for">
+      <span slot="content"
+        >{getSunday(viewDate).day}
+        {getMonth(viewDate)}
+        {viewDate.year}</span
+      >
+      <Button
+        slot="primary"
+        title="Navigate back"
+        on:click={pop}
+        class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+      >
+        <Icon icon="ic:outline-arrow-back" />
+      </Button>
+    </DualAction>
   </div>
 </Layout>

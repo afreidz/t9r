@@ -3,7 +3,6 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import { pop } from "svelte-spa-router";
-  import { fade } from "svelte/transition";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
   import Colors from "@/core/Colors.svelte";
@@ -11,9 +10,7 @@
   import Copy from "@/foundation/Copy.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import Field from "@/foundation/Field.svelte";
-  import { ctaPosition } from "@/lib/stores/ui";
   import Chart from "@/core/chart/Chart.svelte";
-  import Moveable from "@/core/Moveable.svelte";
   import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -264,51 +261,45 @@
     </section>
   </Container>
   <div slot="cta">
-    <Moveable state={$ctaPosition}>
-      {#if dirty}
-        <div in:fade>
-          <DualAction as="div" label="Update Project?">
-            <Button
-              on:click={reset}
-              slot="secondary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-            >
-              <Icon icon="teenyicons:x-small-outline" />
-            </Button>
-            <span slot="content">{project?.name}</span>
-            <Button
-              on:click={update}
-              slot="primary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
-            >
-              <Icon icon="material-symbols:fitbit-check-small-sharp" />
-            </Button>
-          </DualAction>
-        </div>
-      {:else}
-        <div in:fade>
-          <DualAction as="div" label="Delete Project">
-            <Button
-              title="Delete project"
-              on:click={() => (confirmDelete = true)}
-              slot="secondary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-            >
-              <Icon icon="material-symbols:skull-outline-sharp" />
-            </Button>
-            <span slot="content">{project?.name}</span>
-            <Button
-              slot="primary"
-              title="Navigate back"
-              on:click={pop}
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-            >
-              <Icon icon="ic:outline-arrow-back" />
-            </Button>
-          </DualAction>
-        </div>
-      {/if}
-    </Moveable>
+    {#if dirty}
+      <DualAction as="div" label="Update Project?">
+        <Button
+          on:click={reset}
+          slot="secondary"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <span slot="content">{project?.name}</span>
+        <Button
+          on:click={update}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    {:else}
+      <DualAction as="div" label="Delete Project">
+        <Button
+          title="Delete project"
+          on:click={() => (confirmDelete = true)}
+          slot="secondary"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:skull-outline-sharp" />
+        </Button>
+        <span slot="content">{project?.name}</span>
+        <Button
+          slot="primary"
+          title="Navigate back"
+          on:click={pop}
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+        >
+          <Icon icon="ic:outline-arrow-back" />
+        </Button>
+      </DualAction>
+    {/if}
   </div>
 </Layout>
 

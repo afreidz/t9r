@@ -2,13 +2,10 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import { pop } from "svelte-spa-router";
-  import { fade } from "svelte/transition";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
   import projects from "@/lib/stores/projects";
   import Field from "@/foundation/Field.svelte";
-  import Moveable from "@/core/Moveable.svelte";
-  import { ctaPosition } from "@/lib/stores/ui";
   import { queryForecast } from "@/lib/forecast";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
@@ -140,42 +137,36 @@
   </div>
 
   <div slot="cta">
-    <Moveable state={$ctaPosition}>
-      {#if dirty}
-        <div in:fade>
-          <DualAction as="div" label="Do you want to">
-            <Button
-              slot="secondary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-            >
-              <Icon icon="teenyicons:x-small-outline" />
-            </Button>
-            <span slot="content">Update Forecast?</span>
-            <Button
-              on:click={update}
-              slot="primary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
-            >
-              <Icon icon="material-symbols:fitbit-check-small-sharp" />
-            </Button>
-          </DualAction>
-        </div>
-      {:else}
-        <div in:fade>
-          <DualAction as="div" label="Showing forecast for">
-            <span slot="content">{params.num} Weeks</span>
-            <Button
-              slot="primary"
-              title="Navigate back"
-              on:click={pop}
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-            >
-              <Icon icon="ic:outline-arrow-back" />
-            </Button>
-          </DualAction>
-        </div>
-      {/if}
-    </Moveable>
+    {#if dirty}
+      <DualAction as="div" label="Do you want to">
+        <Button
+          slot="secondary"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <span slot="content">Update Forecast?</span>
+        <Button
+          on:click={update}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    {:else}
+      <DualAction as="div" label="Showing forecast for">
+        <span slot="content">{params.num} Weeks</span>
+        <Button
+          slot="primary"
+          title="Navigate back"
+          on:click={pop}
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+        >
+          <Icon icon="ic:outline-arrow-back" />
+        </Button>
+      </DualAction>
+    {/if}
   </div>
 </Layout>
 

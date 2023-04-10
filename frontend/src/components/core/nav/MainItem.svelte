@@ -11,7 +11,10 @@
   $: if (clickable) tag = "button";
 </script>
 
-<li class="relative flex flex-col py-2 pl-4" class:active={clickable && active}>
+<li
+  class="relative mr-20 flex max-w-xs flex-col py-2 pl-6 md:mr-0"
+  class:active={clickable && active}
+>
   {#if to}
     <Link {to} on:navigate class="flex flex-1 items-center font-bold">
       <Copy as="div" variant="gradient" class="flex-1 text-lg md:text-2xl">

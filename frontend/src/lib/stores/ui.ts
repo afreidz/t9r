@@ -11,9 +11,3 @@ export const showForecasts = writable(true);
 export const selected = writable<string[]>([]);
 export const defaultTimerView = writable<Views>("timeline");
 export const mainResizeObserver = writable<ResizeObserverValue>(null);
-
-export const ctaPosition = writable<MoveableState>({
-  x: 0,
-  y: 0,
-  moved: false,
-});

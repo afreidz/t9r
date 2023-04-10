@@ -6,13 +6,11 @@
   import Tag from "@/core/Tag.svelte";
   import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
-  import { fade } from "svelte/transition";
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
-  import Moveable from "@/core/Moveable.svelte";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import Switch from "@/foundation/Switch.svelte";
@@ -20,11 +18,11 @@
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
   import Container from "@/foundation/Container.svelte";
+  import { isSelecting, selected } from "@/lib/stores/ui";
   import type { Project } from "@/backend/schema/project";
   import { getDurationHoursFromString } from "@/lib/dates";
   import type { Tag as TagType } from "@/backend/schema/tag";
   import { formatForMonth, getToday, isToday } from "@/lib/dates";
-  import { ctaPosition, isSelecting, selected } from "@/lib/stores/ui";
 
   let newTag: string;
   let multiple = false;
@@ -333,55 +331,49 @@
     </Container>
   {/if}
   <div slot="cta">
-    <Moveable state={$ctaPosition}>
-      {#if dirty}
-        <div in:fade>
-          <DualAction as="div" label="Update Timer?">
-            <Button
-              on:click={reset}
-              slot="secondary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-            >
-              <Icon icon="teenyicons:x-small-outline" />
-            </Button>
-            <span slot="content"
-              >{multiple ? $selected.length + " Timers" : timer?.title}</span
-            >
-            <Button
-              on:click={update}
-              slot="primary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
-            >
-              <Icon icon="material-symbols:fitbit-check-small-sharp" />
-            </Button>
-          </DualAction>
-        </div>
-      {:else}
-        <div in:fade>
-          <DualAction as="div" label="Delete Timer(s)">
-            <Button
-              title="Delete project"
-              on:click={() => (confirmDelete = true)}
-              slot="secondary"
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
-            >
-              <Icon icon="material-symbols:skull-outline-sharp" />
-            </Button>
-            <span slot="content"
-              >{multiple ? $selected.length + " Timers" : timer?.title}</span
-            >
-            <Button
-              slot="primary"
-              title="Navigate back"
-              on:click={pop}
-              class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
-            >
-              <Icon icon="ic:outline-arrow-back" />
-            </Button>
-          </DualAction>
-        </div>
-      {/if}
-    </Moveable>
+    {#if dirty}
+      <DualAction as="div" label="Update Timer?">
+        <Button
+          on:click={reset}
+          slot="secondary"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <span slot="content"
+          >{multiple ? $selected.length + " Timers" : timer?.title}</span
+        >
+        <Button
+          on:click={update}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    {:else}
+      <DualAction as="div" label="Delete Timer(s)">
+        <Button
+          title="Delete project"
+          on:click={() => (confirmDelete = true)}
+          slot="secondary"
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:skull-outline-sharp" />
+        </Button>
+        <span slot="content"
+          >{multiple ? $selected.length + " Timers" : timer?.title}</span
+        >
+        <Button
+          slot="primary"
+          title="Navigate back"
+          on:click={pop}
+          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+        >
+          <Icon icon="ic:outline-arrow-back" />
+        </Button>
+      </DualAction>
+    {/if}
   </div>
 </Layout>
 

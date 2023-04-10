@@ -65,3 +65,14 @@
     </div>
   {/await}
 {/await}
+
+<style>
+  aside::-webkit-scrollbar {
+    display: none;
+  }
+
+  aside {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

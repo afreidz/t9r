@@ -17,6 +17,7 @@
       width="40"
       class:rotate-45={enabled}
       class:translate-y-[6px]={enabled}
+      class:translate-x-[-6px]={enabled}
       class="origin-center transition-transform ease-in-out"
     />
     <rect
@@ -26,6 +27,7 @@
       width="40"
       class:-rotate-45={enabled}
       class:translate-y-[-8px]={enabled}
+      class:translate-x-[-6px]={enabled}
       class="origin-center transition-transform ease-in-out"
     />
   </svg>
