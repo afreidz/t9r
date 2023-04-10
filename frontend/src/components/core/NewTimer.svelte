@@ -7,36 +7,35 @@
   import DualAction from "@/core/DualAction.svelte";
   import projects, { mostRecentProject } from "@/stores/projects";
 
-  let value: string;
   let dispatch = createEventDispatcher();
   export let date: Temporal.PlainDate = Temporal.Now.plainDateISO();
 
-  function handleChange() {
-    const match = $projects.find((p) => p._id === value);
+  function handleChange(e: { currentTarget: EventTarget & HTMLSelectElement }) {
+    const match = $projects.find((p) => p._id === e.currentTarget.value);
     if (match) $mostRecentProject = match;
   }
 
   async function newTimer() {
     if (!$mostRecentProject._id) return;
     await trpc.timers.create.mutate({
+      date: date.toString(),
       project: $mostRecentProject._id,
       title: $mostRecentProject.defaultTitle,
-      utilized: $mostRecentProject.defaultUtilized === false ? false : true,
-      date: date.toString(),
       start: Temporal.Now.plainTimeISO().round(roundDown).toString(),
+      utilized: $mostRecentProject.defaultUtilized === false ? false : true,
     });
 
     dispatch("timer-update");
   }
 </script>
 
-<DualAction label="Select Project">
+<DualAction label="Start new timer for">
   <span slot="secondary" />
   <select
     slot="content"
     class="appearance-none !bg-transparent text-black outline-none"
-    bind:value
     on:change={handleChange}
+    value={$mostRecentProject._id}
   >
     {#each $projects.filter((p) => !p.archived) as project}
       <option selected={project === $mostRecentProject} value={project._id}
