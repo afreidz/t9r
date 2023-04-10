@@ -15,14 +15,6 @@
     py-6
 
     text-2xl
-    after:absolute
-    after:top-0
-    after:bottom-0
-    after:left-0
-    after:right-0
-    after:bg-gradient-to-br
-    after:opacity-50 after:blur-2xl
-    after:content-[""]
   `}
 >
   <figure>

@@ -17,6 +17,9 @@ module.exports = {
           700: "#31343B",
         },
       },
+      dropShadow: {
+        timer: "8px 0px 16px rgba(0,0,0,0.3)",
+      },
       fontFamily: {
         sans: ["Inter", ...theme.fontFamily.sans],
         pseudoMono: ["IBM Plex Mono", ...theme.fontFamily.mono],

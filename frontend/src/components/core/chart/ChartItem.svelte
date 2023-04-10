@@ -29,13 +29,13 @@
   style={`grid-column: ${label ? 2 : 1} / ${max ? "span " + max : -1}; grid-row-start: ${
     index + 1
   }; grid-row-end: ${index + 2}; ${max ? "background-color: " + bg : ""};`}
-  class="my-2 flex flex-col justify-center overflow-hidden rounded-md transition-all ease-in-out"
+  class="my-2 flex flex-col justify-center overflow-hidden rounded-full transition-all ease-in-out"
 >
   <Copy
     as="span"
     variant="pseudomono"
     style={`width: ${percent}%; background: ${grad};`}
-    class="flex flex-1 items-center justify-center rounded-md bg-gradient-to-r from-indigo-400/50 to-indigo-400 px-3 text-xs transition-all ease-in-out group-hover:text-white/100 md:text-white/0"
+    class="flex flex-1 items-center justify-center rounded-full bg-gradient-to-r from-indigo-400/50 to-indigo-400 px-3 text-xs transition-all ease-in-out group-hover:text-white/100 md:text-white/0"
     >{value}</Copy
   >
 </div>

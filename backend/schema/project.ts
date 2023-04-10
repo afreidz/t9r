@@ -11,6 +11,16 @@ const ProjectSchema = z
     hideInReport: z.boolean().optional().default(false),
     defaultUtilized: z.boolean().optional().default(true),
     color: z.string().regex(/^#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})$/),
+    color2: z
+      .string()
+      .regex(/^#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})$/)
+      .nullable()
+      .optional(),
+    color3: z
+      .string()
+      .regex(/^#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})$/)
+      .nullable()
+      .optional(),
   })
   .passthrough();
 

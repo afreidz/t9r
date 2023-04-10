@@ -19,7 +19,7 @@
   {#each new Array(cols / axis) as _, idx}
     <strong
       class:border-l={idx === 0}
-      class="flex flex-col items-end justify-end border-r border-white/10 text-xs font-light"
+      class="flex flex-col items-end justify-end border-r border-dotted border-white/10 text-xs font-light"
       style={`grid-column: ${idx * axis + 2} / span ${axis}; grid-row: 1 / span ${
         rows + 1
       }`}

@@ -22,7 +22,7 @@
 </script>
 
 <nav class="flex flex-1 flex-col px-5 text-lg">
-  <ul class="flex flex-col items-stretch border-l border-neutral-light/20">
+  <ul class="flex flex-col items-stretch border-l border-dotted border-neutral-light/20">
     <MainItem
       clickable
       active={$location.startsWith("/timers")}
@@ -108,7 +108,7 @@
             >
               <figure
                 slot="icon"
-                class="h-4 w-4 rounded"
+                class="h-4 w-4 rounded-full"
                 style={`background-color: ${project.color}`}
               >
                 <figcaption class="sr-only">Color assigned to project</figcaption>
@@ -139,7 +139,7 @@
                 >
                   <figure
                     slot="icon"
-                    class="h-4 w-4 rounded"
+                    class="h-4 w-4 rounded-full"
                     style={`background-color: ${project.color}`}
                   >
                     <figcaption class="sr-only">Color assigned to project</figcaption>

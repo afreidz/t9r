@@ -37,6 +37,8 @@
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
+  import { writable } from "svelte/store";
+  import type { ResizeObserverValue } from "@/lib/resize";
 
   export let params: { date: string };
 
@@ -55,9 +57,9 @@
 
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
+  $: if (viewDate && view === "timeline" && isToday(viewDate)) key = $now;
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
   $: if ($now) nowText = formatForShortTime($now);
-  $: if (view === "timeline") key = $now;
   $: if (view) loaded = false;
 
   $: duration = $location.includes("/timers/month")
@@ -130,9 +132,9 @@
     const startRow = i + 2;
     const endRow = startRow + 1;
     const startCol = start.hour * 4 + start.minute / 15;
-    const endCol = Math.max(end.hour * 4 + end.minute / 15, startCol + 4);
+    const endCol = Math.max(end.hour * 4 + end.minute / 15, startCol);
 
-    return `grid-column-start: ${startCol}; grid-column-end: ${endCol}; grid-row-start: ${startRow}; grid-row-end: ${endRow}`;
+    return `grid-column-start: ${startCol}; grid-column-end: ${endCol}; grid-row-start: ${startRow}; grid-row-end: ${endRow};`;
   }
 
   function calculateNowGridPosition(l: number = 0) {
@@ -142,7 +144,7 @@
 
     return `grid-column-start: ${start}; grid-column-end: ${end}; grid-row-start: 1; grid-row-end: ${
       l + 3
-    }`;
+    };`;
   }
 
   function calculateHourGridPosition(h: number = 0, l: number = 0) {
@@ -151,7 +153,7 @@
 
     return `grid-column-start: ${start}; grid-column-end: ${end}; grid-row-start: 1; grid-row-end: ${
       l + 3
-    }`;
+    };`;
   }
 
   function hourFromIndex(h: number = 0) {
@@ -213,7 +215,7 @@
       {/if}
     </div>
 
-    {#key $now}
+    {#key key}
       <HourSum hours={sumTimerHours(timers)} />
     {/key}
   </Header>
@@ -233,7 +235,6 @@
           bind:current={view}
           on:click={() => {
             viewChanged = true;
-            console.log(view);
           }}
         />
       {/if}
@@ -243,12 +244,14 @@
   <div
     class="flex-1 gap-y-1"
     class:grid={view === "timeline"}
-    style="grid-template-columns: repeat(96, 40px); grid-template-rows: 2rem repeat({timers.length}, min-content) auto;"
+    style={`grid-template-columns: repeat(96, ${
+      $breakpoints.md ? "3.5rem" : "2.5rem"
+    }); grid-template-rows: 2rem repeat(${timers.length}, min-content) auto;`}
   >
     {#if view === "timeline"}
       {#each new Array(24) as _, hour}
         <div
-          class="relative h-full border-l border-white/10 opacity-50"
+          class="relative h-full border-l border-dotted border-white/10 opacity-50"
           style={calculateHourGridPosition(hour, timers.length)}
         >
           <span

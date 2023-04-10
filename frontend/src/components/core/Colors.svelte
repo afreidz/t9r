@@ -10,6 +10,7 @@
 </script>
 
 <datalist {id}>
+  <option value="" />
   {#each colors as color}
     <option value={color} />
   {/each}

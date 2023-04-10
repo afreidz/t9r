@@ -15,7 +15,7 @@
 
 <svelte:element
   this={as}
-  class="font-thin font-light font-extralight font-medium font-semibold font-bold font-extrabold"
+  on:click
   class:font-thin={thin}
   class:font-bold={bold}
   class:opacity-50={dim}

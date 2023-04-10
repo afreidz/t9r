@@ -51,7 +51,8 @@ input[type="search"] {
   @apply h-3 w-3 rounded-none shadow-none;
 }
 
-::-webkit-scrollbar-track {
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
   @apply rounded-none bg-white/5 shadow-none;
 }
 
@@ -63,3 +64,7 @@ input[type="search"] {
 ::-webkit-scrollbar-thumb:active {
   @apply bg-white/10;
 }
+
+/* *:not(:focus-visible) {
+  @apply !ring-0;
+} */

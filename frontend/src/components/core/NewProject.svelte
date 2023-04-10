@@ -34,7 +34,7 @@
     <label class="flex-none" slot="secondary">
       <span class="sr-only">Color</span>
       <div
-        class="relative h-10 w-10 overflow-hidden rounded-full ring-blue-500 ring-offset-2 ring-offset-white focus-within:ring"
+        class="relative h-10 w-10 overflow-hidden rounded-full ring-blue-500 ring-offset-0 focus-within:ring"
       >
         <input
           class="h-full w-full appearance-none bg-transparent text-black"
