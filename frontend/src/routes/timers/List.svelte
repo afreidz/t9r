@@ -35,6 +35,7 @@
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
+  import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
   export let params: { date: string };
@@ -218,6 +219,9 @@
   </Header>
 
   <ActionBar>
+    <div slot="left">
+      <ActionFilter />
+    </div>
     <ActionPrev on:click={navigatePrev} disabled={duration === "all" && page === 0} />
     {#if duration !== "all"}
       <ActionCurrent on:click={navigateCurrent} disabled={isToday(viewDate)} />
@@ -324,7 +328,7 @@
               $selected = [];
               $isSelecting = false;
             }}
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
           >
             <Icon icon="teenyicons:x-small-outline" />
           </Button>
@@ -335,7 +339,7 @@
               $isSelecting = false;
             }}
             slot="primary"
-            class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+            class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
           >
             <Icon icon="ri:pencil-line" />
           </Button>

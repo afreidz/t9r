@@ -59,7 +59,7 @@
     />
     <Button
       slot="primary"
-      class="flex aspect-square h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+      class="flex aspect-square h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
     >
       <Icon icon="ic:baseline-plus" />
     </Button>

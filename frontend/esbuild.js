@@ -7,14 +7,14 @@ import preprocess from "svelte-preprocess";
 
 const config = {
   entryPoints: [`src/app.ts`],
-  bundle: true,
-  outdir: `./dist`,
-  mainFields: ["svelte", "browser", "module", "main"],
-  minify: false,
-  sourcemap: "inline",
-  splitting: true,
   write: true,
+  bundle: true,
   format: `esm`,
+  minify: false,
+  splitting: true,
+  outdir: `./dist`,
+  sourcemap: "inline",
+  mainFields: ["svelte", "browser", "module", "main"],
   plugins: [
     postcss(),
     svelte({

@@ -46,7 +46,7 @@
   <Button
     slot="primary"
     on:click={newTimer}
-    class="flex h-10 w-10 items-center justify-center !rounded-2xl text-white !ring-offset-white"
+    class="flex h-10 w-10 items-center justify-center !rounded-full text-white !ring-offset-white"
     style={`background-color: ${$mostRecentProject.color}`}
   >
     <Icon icon="ic:baseline-plus" />

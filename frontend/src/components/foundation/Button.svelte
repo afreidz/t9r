@@ -1,9 +1,3 @@
-<script lang="ts">
-  import type { HTMLButtonAttributes } from "svelte/elements";
-
-  type $$Props = HTMLButtonAttributes;
-</script>
-
 <button
   on:click
   class:rounded-md={true}

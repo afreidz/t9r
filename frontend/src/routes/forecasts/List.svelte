@@ -141,7 +141,7 @@
       <DualAction as="div" label="Do you want to">
         <Button
           slot="secondary"
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
@@ -149,7 +149,7 @@
         <Button
           on:click={update}
           slot="primary"
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
         >
           <Icon icon="material-symbols:fitbit-check-small-sharp" />
         </Button>
@@ -161,7 +161,7 @@
           slot="primary"
           title="Navigate back"
           on:click={pop}
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
         >
           <Icon icon="ic:outline-arrow-back" />
         </Button>

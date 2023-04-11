@@ -266,7 +266,7 @@
         <Button
           on:click={reset}
           slot="secondary"
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
@@ -274,7 +274,7 @@
         <Button
           on:click={update}
           slot="primary"
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
         >
           <Icon icon="material-symbols:fitbit-check-small-sharp" />
         </Button>
@@ -285,7 +285,7 @@
           title="Delete project"
           on:click={() => (confirmDelete = true)}
           slot="secondary"
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
         >
           <Icon icon="material-symbols:skull-outline-sharp" />
         </Button>
@@ -294,7 +294,7 @@
           slot="primary"
           title="Navigate back"
           on:click={pop}
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
         >
           <Icon icon="ic:outline-arrow-back" />
         </Button>
@@ -313,7 +313,7 @@
         <Button
           slot="secondary"
           on:click={() => (confirmDelete = false)}
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-red-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
@@ -321,7 +321,7 @@
         <Button
           on:click={handleDelete}
           slot="primary"
-          class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-green-500 text-white !ring-offset-white"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
         >
           <Icon icon="material-symbols:fitbit-check-small-sharp" />
         </Button>

@@ -1,5 +1,5 @@
 <div
-  class="sticky left-0 mb-3 flex flex-none justify-between border-b border-neutral-900 px-3"
+  class="sticky left-0 z-20 mb-3 flex flex-none justify-between border-b border-neutral-900 px-3"
 >
   <div>
     <slot name="left" />

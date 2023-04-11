@@ -67,7 +67,7 @@
     style={`background: ${grad}; ${$$props.style || ""}`}
   >
     <button
-      class="sticky top-0 bottom-0 left-0 right-[200px] flex h-full items-center justify-center rounded-full drop-shadow-timer"
+      class="sticky top-0 bottom-0 left-0 right-[200px] flex h-full items-center justify-center gap-1 rounded-full drop-shadow-timer"
       on:press={holdHandler}
       class:px-4={!compact}
       class:flex-col={!compact}
@@ -86,7 +86,8 @@
           dim
           as="small"
           variant="pseudomono"
-          class="flex-none text-xs leading-none line-clamp-1">{project.name}</Copy
+          class="w-full flex-none text-left text-xs leading-none line-clamp-1"
+          >{project.name}</Copy
         >
         <strong
           class="flex-none text-sm font-normal !leading-none line-clamp-1 md:text-lg"

@@ -27,7 +27,7 @@ const TimerSchema = z
     project: z.string().optional(),
     end: PlainTime.optional().nullable(),
     tags: z.array(z.string()).default([]),
-    title: z.string().min(2).max(30).optional(),
+    title: z.string().min(2).max(60).optional(),
     utilized: z.boolean().optional().default(false),
   })
   .passthrough();

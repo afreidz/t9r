@@ -236,7 +236,7 @@
         slot="primary"
         title="Navigate back"
         on:click={pop}
-        class="flex h-10 w-10 items-center justify-center !rounded-2xl bg-blue-500 text-white !ring-offset-white"
+        class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
       >
         <Icon icon="ic:outline-arrow-back" />
       </Button>
