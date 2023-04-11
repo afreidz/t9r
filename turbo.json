@@ -2,7 +2,7 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "outputs": ["frontend/dist/**", "backend/dist/**"]
+      "outputs": ["frontend/serve/**", "backend/dist/**"]
     },
     "dev": {},
     "//#swa": {},

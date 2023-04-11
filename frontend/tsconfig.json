@@ -21,5 +21,5 @@
       "@/foundation/*": ["./src/components/foundation/*"]
     }
   },
-  "exclude": ["node_modules/**", "dist/**"]
+  "exclude": ["node_modules/**", "serve/**"]
 }

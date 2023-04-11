@@ -6,7 +6,7 @@
       "outputLocation": ".",
       "swaConfigLocation": "./",
       "apiLocation": "backend/dist",
-      "appLocation": "frontend/dist",
+      "appLocation": "frontend/serve",
       "apiDevserverUrl": "http://localhost:20232",
       "appDevserverUrl": "http://localhost:20231",
       "apiBuildCommand": "npm run build -w backend",

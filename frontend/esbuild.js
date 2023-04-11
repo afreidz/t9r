@@ -12,7 +12,7 @@ const config = {
   format: `esm`,
   minify: false,
   splitting: true,
-  outdir: `./dist`,
+  outdir: `./serve`,
   sourcemap: "inline",
   mainFields: ["svelte", "browser", "module", "main"],
   plugins: [
@@ -41,7 +41,7 @@ if (!process.argv.includes(`--watch`)) {
   });
 } else {
   const ctx = await esbuild.context(config);
-  const { host, port } = await ctx.serve({ servedir: "./dist" });
+  const { host, port } = await ctx.serve({ servedir: "./serve" });
 
   http
     .createServer((req, res) => {

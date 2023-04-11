@@ -2,7 +2,7 @@
   "name": "t9r-frontend",
   "scripts": {
     "watch": "node ./esbuild.js --watch",
-    "build:pwa": "npx create-pwa --icon=./dist/icon.png --launch=./dist/launch.png --output=./dist",
+    "build:pwa": "npx create-pwa --icon=./serve/icon.png --launch=./serve/launch.png --output=./serve",
     "build:app": "node ./esbuild.js",
     "build": "npm run build:app",
     "check": "prettier --check ./ && svelte-check"
