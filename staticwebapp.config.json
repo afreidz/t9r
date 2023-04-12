@@ -24,23 +24,11 @@
       "allowedRoles": ["anonymous"]
     },
     {
-      "route": "/service-worker.js",
-      "allowedRoles": ["anonymous"]
-    },
-    {
-      "route": "/config.xml",
-      "allowedRoles": ["anonymous"]
-    },
-    {
-      "route": "/favicons/*",
+      "route": "/sw.js",
       "allowedRoles": ["anonymous"]
     },
     {
       "route": "/icons/*",
-      "allowedRoles": ["anonymous"]
-    },
-    {
-      "route": "/launch-screens/*",
       "allowedRoles": ["anonymous"]
     },
     {

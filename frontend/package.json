@@ -2,9 +2,7 @@
   "name": "t9r-frontend",
   "scripts": {
     "watch": "node ./esbuild.js --watch",
-    "build:pwa": "npx create-pwa --icon=./serve/icon.png --launch=./serve/launch.png --output=./serve",
-    "build:app": "node ./esbuild.js",
-    "build": "npm run build:app",
+    "build": "node ./esbuild.js",
     "check": "prettier --check ./ && svelte-check"
   },
   "type": "module",
@@ -17,7 +15,6 @@
     "@tsconfig/svelte": "^3.0.0",
     "autoprefixer": "^10.4.13",
     "clipboardy": "^3.0.0",
-    "create-pwa": "^2.7.0",
     "esbuild": "^0.17.10",
     "esbuild-plugin-alias": "^0.2.1",
     "esbuild-postcss": "^0.0.4",
