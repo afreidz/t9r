@@ -5,9 +5,11 @@
   import { createEventDispatcher } from "svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
+  import type { Timer } from "@/backend/schema/timer";
   import projects, { mostRecentProject } from "@/stores/projects";
 
   let dispatch = createEventDispatcher();
+  export let lastTimer: Timer | undefined = undefined;
   export let date: Temporal.PlainDate = Temporal.Now.plainDateISO();
 
   function handleChange(e: { currentTarget: EventTarget & HTMLSelectElement }) {
@@ -21,7 +23,10 @@
       date: date.toString(),
       project: $mostRecentProject._id,
       title: $mostRecentProject.defaultTitle,
-      start: Temporal.Now.plainTimeISO().round(roundDown).toString(),
+      start:
+        lastTimer && lastTimer.end
+          ? Temporal.PlainTime.from(lastTimer.end).toString()
+          : Temporal.Now.plainTimeISO().round(roundDown).toString(),
       utilized: $mostRecentProject.defaultUtilized === false ? false : true,
     });
 

@@ -11,6 +11,7 @@
   import Header from "@/core/Header.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
+  import Input from "@/foundation/Input.svelte";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import Switch from "@/foundation/Switch.svelte";
@@ -41,19 +42,19 @@
 
   if (params.id !== "selected") {
     loader = async () => {
-      tags = await trpc.tags.list.query();
       timer = await trpc.timers.get.query(params.id);
 
       if (timer) newValues = { ...timer };
       if (timer) project = $projects.find((p) => p._id === timer?.project);
+      if (timer) tags = await trpc.tags.getAllByProject.query(timer.project);
       return;
     };
   } else {
     loader = async () => {
-      tags = await trpc.tags.list.query();
       timers = await trpc.timers.bulkGet.query($selected);
 
       if (timers) newValues = { ...emptyTimer };
+      if (timers) tags = await trpc.tags.getAllByProject.query(timers[0].project);
     };
   }
 
@@ -111,17 +112,18 @@
     if (picker) picker.showPicker();
   }
 
-  async function addTag(e: { currentTarget: HTMLInputElement }) {
-    const val = e.currentTarget.value;
+  async function addTag(e: unknown) {
+    const val = (e as { currentTarget: EventTarget & HTMLInputElement }).currentTarget
+      .value;
 
     let existing = tags.find((t) => t._id === val) || (await trpc.tags.get.query(val));
 
-    if (!existing && newValues) {
-      const result = await trpc.tags.create.mutate({ value: val });
+    if (!existing && newValues && project && project._id) {
+      const result = await trpc.tags.create.mutate({ value: val, project: project._id });
 
       if (result.acknowledged && result.insertedId) {
-        tags = await trpc.tags.list.query();
         existing = await trpc.tags.get.query(result.insertedId);
+        tags = await trpc.tags.getAllByProject.query(project._id);
       }
     }
 
@@ -185,7 +187,7 @@
     <Container class="flex-1">
       <section slot="primary" class="xl:flex-1">
         <Field label="Title">
-          <input bind:value={newValues.title} />
+          <Input bind:value={newValues.title} />
         </Field>
         <Field label="Project">
           <select bind:value={newValues.project}>
@@ -211,7 +213,7 @@
           />
         </Field>
         <Field label="Tags">
-          <input
+          <Input
             min={2}
             max={30}
             list="tags"
@@ -230,11 +232,9 @@
           <div class="flex flex-wrap border-t border-neutral-900/50 pb-1 pt-5">
             {#if newValues.tags}
               {#each newValues.tags as tag}
-                {#if tags.find((t) => t._id === tag)}
-                  <Tag closeable on:close={() => removeTag(tag)}>
-                    {tags.find((t) => t._id === tag)?.value}
-                  </Tag>
-                {/if}
+                <Tag closeable on:close={() => removeTag(tag)}>
+                  {tags.find((t) => t._id === tag)?.value || tag}
+                </Tag>
               {/each}
             {/if}
           </div>
@@ -403,10 +403,3 @@
     </section>
   </Dialog>
 {/if}
-
-<style>
-  [list]::-webkit-calendar-picker-indicator,
-  [list]::-webkit-list-button {
-    opacity: 0;
-  }
-</style>

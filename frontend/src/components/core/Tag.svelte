@@ -10,7 +10,7 @@
 </script>
 
 <strong
-  class="m-1 inline-block max-w-fit rounded-full bg-white/30 text-xs font-normal !leading-8 ring-blue-500 focus-within:ring-2 md:text-sm {$$props.class ||
+  class="m-1 inline-flex max-w-fit items-center gap-1 rounded-full bg-white/30 text-xs font-normal !leading-8 ring-blue-500 focus-within:ring-2 md:text-sm {$$props.class ||
     ''}"
   class:px-2={!round}
   style={`color: ${color}`}
@@ -18,7 +18,11 @@
 >
   <slot />
   {#if closeable}
-    <button class="!ring-0 !ring-offset-0" on:click={() => dispatch("close")}>
+    <button
+      type="button"
+      class="!ring-0 !ring-offset-0"
+      on:click={() => dispatch("close")}
+    >
       <Icon icon="ri:close-circle-line" />
     </button>
   {/if}

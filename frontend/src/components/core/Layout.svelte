@@ -1,11 +1,9 @@
 <script lang="ts">
   import Logo from "./Logo.svelte";
   import Icon from "@iconify/svelte";
-  import now from "@/lib/stores/now";
   import { fly } from "svelte/transition";
   import Nav from "@/core/nav/Nav.svelte";
   import observeResize from "@/lib/resize";
-  import { update } from "@/lib/stores/user";
   import MenuTrigger from "./MenuTrigger.svelte";
   import { fetchProjects } from "@/stores/projects";
   import { mainResizeObserver } from "@/lib/stores/ui";
@@ -15,7 +13,6 @@
   export let loader: Promise<unknown> | undefined = undefined;
 
   $: if (main) observeResize(main, mainResizeObserver);
-  $: if ($now) update();
 </script>
 
 {#await fetchProjects()}

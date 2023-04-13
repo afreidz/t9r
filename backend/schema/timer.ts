@@ -22,9 +22,9 @@ const TimerSchema = z
   .object({
     date: PlainDate,
     start: PlainTime,
+    project: z.string(),
     _id: z.string().optional(),
     owner: z.string().optional(),
-    project: z.string().optional(),
     end: PlainTime.optional().nullable(),
     tags: z.array(z.string()).default([]),
     title: z.string().min(2).max(60).optional(),

@@ -8,9 +8,11 @@
   import Colors from "@/core/Colors.svelte";
   import Dialog from "@/core/Dialog.svelte";
   import Copy from "@/foundation/Copy.svelte";
+  import Input from "@/foundation/Input.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import Field from "@/foundation/Field.svelte";
   import Chart from "@/core/chart/Chart.svelte";
+  import Tag from "@/components/core/Tag.svelte";
   import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -18,6 +20,7 @@
   import ChartItem from "@/core/chart/ChartItem.svelte";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
+  import type { Tag as TagType } from "@/backend/schema/tag";
   import projects, { fetchProjects } from "@/stores/projects";
   import { formatForForecastWeek, getWeeksArray } from "@/lib/dates";
   import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
@@ -29,7 +32,9 @@
   let showGradientStops = false;
   let project: Project | undefined;
   let newValues: Project | undefined;
+  let deletedTag: TagType | undefined;
   let forecastWeeks = getWeeksArray(5, false);
+  let projectTags: Promise<TagType[]> | undefined;
   let projectTimers: Promise<Timer[]> | undefined;
   let forecasts: Promise<(ForecastAndActual | undefined)[]> | undefined;
 
@@ -38,6 +43,7 @@
     projectTimers = undefined;
     project = $projects.find((p: Project) => p._id === params.id);
     if (project) newValues = { ...project, budget: project.budget || null };
+    if (project?._id) projectTags = trpc.tags.getAllByProject.query(project._id);
   }
 
   $: if (newValues && project) dirty = !same<Project>(newValues, project);
@@ -93,6 +99,16 @@
       newValues.color3 = null;
     }
   }
+
+  async function handleDeleteTag() {
+    if (!deletedTag?._id || !project?._id) return;
+    const result = await trpc.tags.deleteTag.mutate({ id: deletedTag._id });
+
+    if (result.acknowledged) {
+      deletedTag = undefined;
+      projectTags = trpc.tags.getAllByProject.query(project._id);
+    }
+  }
 </script>
 
 <Layout>
@@ -101,11 +117,11 @@
     <section slot="primary" class="xl:flex-1">
       {#if newValues}
         <Field label="Project Name">
-          <input bind:value={newValues.name} />
+          <Input bind:value={newValues.name} />
         </Field>
         <Field label="Project Color">
           <div class="w-full overflow-hidden rounded-full">
-            <input
+            <Input
               type="color"
               class="h-full w-full"
               bind:value={newValues.color}
@@ -130,10 +146,11 @@
           </Copy>
           {#if showGradientStops}
             <div class="flex gap-4">
-              <label class="flex flex-1 flex-col">
+              <label class="flex flex-1 flex-col" for="color1">
                 <Copy dim as="span" variant="pseudomono" class="text-xs">Stop 2</Copy>
                 <div class="my-1 flex w-full items-stretch overflow-hidden rounded-full">
-                  <input
+                  <Input
+                    name="color2"
                     type="color"
                     class="w-full"
                     bind:value={newValues.color2}
@@ -141,10 +158,11 @@
                   />
                 </div>
               </label>
-              <label class="flex flex-1 flex-col">
+              <label class="flex flex-1 flex-col" for="color3">
                 <Copy dim as="span" variant="pseudomono" class="text-xs">Stop 3</Copy>
                 <div class="my-1 flex w-full items-stretch overflow-hidden rounded-full">
-                  <input
+                  <Input
+                    name="color3"
                     class="w-full"
                     type="color"
                     bind:value={newValues.color3}
@@ -156,7 +174,7 @@
           {/if}
         </Field>
         <Field label="Default Timer Title">
-          <input min={0} max={30} bind:value={newValues.defaultTitle} />
+          <Input min={0} max={30} bind:value={newValues.defaultTitle} />
         </Field>
         <Field>
           <Switch
@@ -183,7 +201,7 @@
           />
         </Field>
         <Field label="Project Budget">
-          <input
+          <Input
             class="w-full text-2xl"
             type="number"
             min={0}
@@ -258,6 +276,22 @@
           {/if}
         </div>
       {/key}
+      {#if projectTags}
+        <Copy as="h3" semibold variant="gradient" class="my-4 uppercase"
+          >Project Tags</Copy
+        >
+        <div>
+          {#await projectTags}
+            <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
+          {:then tags}
+            {#each tags as tag}
+              <Tag closeable on:close={() => (deletedTag = tag)}>
+                {tag.value}
+              </Tag>
+            {/each}
+          {/await}
+        </div>
+      {/if}
     </section>
   </Container>
   <div slot="cta">
@@ -320,6 +354,37 @@
         <span slot="content">Are you sure?</span>
         <Button
           on:click={handleDelete}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    </section>
+  </Dialog>
+{/if}
+
+{#if deletedTag}
+  <Dialog
+    open={true}
+    title="Permanently delete tag {deletedTag.value}"
+    sub="You are about to..."
+  >
+    <Button slot="close" value="cancel" on:click={() => (deletedTag = undefined)}>
+      <Icon icon="material-symbols:close" class="h-7 w-7" />
+    </Button>
+    <section class="flex flex-1 flex-col items-center justify-center py-4">
+      <DualAction>
+        <Button
+          slot="secondary"
+          on:click={() => (deletedTag = undefined)}
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <span slot="content">Are you sure?</span>
+        <Button
+          on:click={handleDeleteTag}
           slot="primary"
           class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
         >

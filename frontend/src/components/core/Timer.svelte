@@ -1,8 +1,9 @@
 <script lang="ts">
+  import trpc from "@/lib/trpc";
+  import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import { writable } from "svelte/store";
   import { press } from "svelte-gestures";
-  import tagStore from "@/lib/stores/tags";
   import { push } from "svelte-spa-router";
   import Copy from "@/foundation/Copy.svelte";
   import breakpoints from "@/lib/stores/breakpoints";
@@ -54,6 +55,11 @@
     $isSelecting = true;
     return clickHandler();
   }
+
+  async function getTagValue(t: string) {
+    const existing = await trpc.tags.get.query(t);
+    return existing?.value || t;
+  }
 </script>
 
 {#if project}
@@ -78,7 +84,7 @@
       use:press={{ timeframe: 600, triggerBeforeFinished: true }}
     >
       {#if compact}
-        <Tag class="h-8 w-8 !max-w-none flex-none text-center text-2xl font-semibold"
+        <Tag class="h-8 w-8 !max-w-none flex-none justify-evenly text-2xl font-semibold"
           >{project.name.charAt(0)}</Tag
         >
       {:else}
@@ -105,7 +111,13 @@
         {#if tags && tags.length > 0}
           {#each tags as tag}
             {#if tag}
-              <Tag>{$tagStore.find((t) => t._id === tag)?.value || tag}</Tag>
+              <Tag>
+                {#await getTagValue(tag)}
+                  <Icon icon="eos-icons:loading" class="h-3 w-3 text-white" />
+                {:then tagValue}
+                  {tagValue}
+                {/await}
+              </Tag>
             {/if}
           {/each}
         {:else}

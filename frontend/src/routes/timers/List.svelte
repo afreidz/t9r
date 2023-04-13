@@ -246,7 +246,15 @@
     class="flex-1 gap-y-1"
     class:grid={view === "timeline"}
     style={`grid-template-columns: repeat(96, ${
-      $breakpoints.md ? "3.5rem" : "2.5rem"
+      $breakpoints.xxl
+        ? "3%"
+        : $breakpoints.xl
+        ? "4%"
+        : $breakpoints.lg
+        ? "6%"
+        : $breakpoints.md
+        ? "8%"
+        : "10%"
     }); grid-template-rows: 2rem repeat(${timers.length}, min-content) auto;`}
   >
     {#if view === "timeline"}
@@ -346,6 +354,7 @@
         </DualAction>
       {:else if duration === "all" || duration === "days"}
         <NewTimer
+          lastTimer={timers.at(-1)}
           date={viewDate}
           on:timer-update={() => {
             loaded = false;

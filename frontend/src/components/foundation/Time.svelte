@@ -21,7 +21,7 @@
   }
 
   const inputClass =
-    "focus:ring-2 rounded-md ring-blue-500 flex font-mono max-w-[3rem] w-fit appearance-none items-center justify-center text-xl lg:text-3xl";
+    "focus:ring-2 text-center rounded-md ring-blue-500 flex font-mono max-w-[3rem] w-fit appearance-none items-center justify-center text-xl lg:text-3xl";
 </script>
 
 <div class="ring-b mr-4 flex justify-center gap-2">
@@ -33,17 +33,25 @@
       type="number"
       class={inputClass}
       bind:value={hh}
-      class:text-center={true}
       on:change={handleChange}
+      on:focus={(e) => e.currentTarget.select()}
     />
     :
   </span>
-  <select class={inputClass} bind:value={mm} on:change={handleChange}>
-    <option value={0}>00</option>
-    <option value={15}>15</option>
-    <option value={30}>30</option>
-    <option value={45}>45</option>
-  </select>
+  <input
+    type="number"
+    class={inputClass}
+    step={15}
+    min="00"
+    max={45}
+    pattern="[0-9]*"
+    bind:value={mm}
+    on:change={handleChange}
+    on:focus={(e) => e.currentTarget.select()}
+    on:input={(e) => {
+      if (e.currentTarget.value === "0") e.currentTarget.value = "00";
+    }}
+  />
   <select class={inputClass} bind:value={ap} on:change={handleChange}>
     <option value="AM">AM</option>
     <option value="PM">PM</option>

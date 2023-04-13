@@ -1,5 +1,6 @@
 <button
   on:click
+  type="button"
   class:rounded-md={true}
   class:focus:ring={true}
   class:inline-block={true}
