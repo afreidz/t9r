@@ -247,7 +247,7 @@
     class:grid={view === "timeline"}
     style={`grid-template-columns: repeat(96, ${
       $breakpoints.xxl
-        ? "3%"
+        ? "2%"
         : $breakpoints.xl
         ? "4%"
         : $breakpoints.lg

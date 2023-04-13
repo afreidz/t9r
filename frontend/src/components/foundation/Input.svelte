@@ -1,4 +1,14 @@
-<input {...$$props} on:change on:focus on:focus={(e) => e.currentTarget.select()} />
+<script lang="ts">
+  export let value: unknown = "";
+</script>
+
+<input
+  {...$$restProps}
+  on:focus
+  on:change
+  bind:value
+  on:focus={(e) => e.currentTarget.select()}
+/>
 
 <style>
   [list]::-webkit-calendar-picker-indicator,

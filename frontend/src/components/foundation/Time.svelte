@@ -1,8 +1,8 @@
 <script lang="ts">
   import { roundUp } from "@/lib/dates";
   export let value: string;
+  let mm: number | string;
   let ap: "AM" | "PM";
-  let mm: number;
   let hh: number;
 
   $: if (value) {
@@ -10,13 +10,13 @@
 
     hh = pt.hour === 12 ? 12 : pt.hour % 12;
     ap = pt.hour >= 12 ? "PM" : "AM";
-    mm = pt.minute;
+    mm = pt.minute === 0 ? "00" : pt.minute;
   }
 
   function handleChange() {
     const hour = hh === 12 ? (ap === "AM" ? 23 : 12) : ap === "PM" ? hh + 12 : hh;
 
-    const pt = new Temporal.PlainTime(hour, mm);
+    const pt = new Temporal.PlainTime(hour, Number(mm));
     value = pt.toString();
   }
 

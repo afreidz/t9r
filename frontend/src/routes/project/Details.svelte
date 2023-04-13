@@ -314,7 +314,7 @@
         </Button>
       </DualAction>
     {:else}
-      <DualAction as="div" label="Delete Project">
+      <DualAction as="div" label="Details for">
         <Button
           title="Delete project"
           on:click={() => (confirmDelete = true)}

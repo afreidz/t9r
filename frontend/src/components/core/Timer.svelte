@@ -1,3 +1,7 @@
+<script context="module">
+  const tagCache = new Map();
+</script>
+
 <script lang="ts">
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
@@ -6,7 +10,6 @@
   import { press } from "svelte-gestures";
   import { push } from "svelte-spa-router";
   import Copy from "@/foundation/Copy.svelte";
-  import breakpoints from "@/lib/stores/breakpoints";
   import { isSelecting, selected } from "@/lib/stores/ui";
   import type { Project } from "@/backend/schema/project";
   import observeResize, { type ResizeObserverValue } from "@/lib/resize";
@@ -39,7 +42,7 @@
   }
 
   $: if (elm) observeResize(elm, size);
-  $: if ($size && $size.width > ($breakpoints.md ? 112 : 80)) compact = false;
+  $: if ($size) compact = $size.width < 112;
 
   function clickHandler() {
     if ($isSelecting && id) {
@@ -57,8 +60,12 @@
   }
 
   async function getTagValue(t: string) {
+    if (tagCache.has(t)) return tagCache.get(t);
+
     const existing = await trpc.tags.get.query(t);
-    return existing?.value || t;
+    tagCache.set(t, existing?.value || t);
+
+    return tagCache.get(t);
   }
 </script>
 

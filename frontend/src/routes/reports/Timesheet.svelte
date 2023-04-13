@@ -26,6 +26,7 @@
   import tags, { fetchTags } from "@/lib/stores/tags";
   import type { Timer } from "@/backend/schema/timer";
   import { mainResizeObserver } from "@/lib/stores/ui";
+  import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
 
   import ActionBar from "@/core/actions/Bar.svelte";
@@ -92,6 +93,12 @@
     return tasks;
   }
 
+  function sumDayHours(timesheet: Timesheet, d: number) {
+    return timesheet.reduce((hours, projectTime) => {
+      return (hours += sumTimerHours(projectTime.days[d].timers));
+    }, 0);
+  }
+
   function getAllTimersFromTimesheet(timesheet: Timesheet): Timer[] {
     const mapped = timesheet.map((entry) => entry.days.map((d) => d.timers));
     return mapped.flat(Infinity) as Timer[];
@@ -113,7 +120,6 @@
         <HourSum hours={sumTimerHours(getAllTimersFromTimesheet(timesheet))} />
       {/key}
     </Header>
-
     <ActionBar>
       <ActionPrev on:click={() => (viewDate = viewDate.subtract({ weeks: 1 }))} />
       <ActionCurrent
@@ -125,10 +131,11 @@
         disabled={isToday(viewDate)}
       />
     </ActionBar>
-
     <div
-      class="grid-cols-[repeat(7,_minmax(1fr,_320px)] grid items-center justify-items-center gap-2 pr-4"
-      style="grid-template-rows: {timesheet.length + 1 + $projects.length}"
+      class="grid flex-1 items-center justify-items-center gap-2 pr-4"
+      style="grid-template-rows: repeat({timesheet.length +
+        1 +
+        $projects.length}, max-content); grid-template-columns: repeat(7, minmax(130px, 320px));"
     >
       {#each week as day, i}
         <Copy as="strong" variant="gradient" class="sticky top-0"
@@ -143,7 +150,6 @@
               class="sticky left-0 !mb-0"
               project={entry.project}
               title={entry.project.name}
-              style="width: calc({$mainResizeObserver?.width}px);"
             />
           </div>
           {#each entry.days as day}
@@ -222,6 +228,16 @@
             </Field>
           {/each}
         {/if}
+      {/each}
+      {#each week as _, i}
+        <Field as="div" label="Total hours" class="w-full">
+          <Copy
+            as="strong"
+            variant="gradient"
+            class="my-8 flex flex-none items-center justify-center text-3xl"
+            >{sumDayHours(timesheet, i)}</Copy
+          >
+        </Field>
       {/each}
     </div>
   {/await}

@@ -352,7 +352,7 @@
         </Button>
       </DualAction>
     {:else}
-      <DualAction as="div" label="Delete Timer(s)">
+      <DualAction as="div" label="Details for timer">
         <Button
           title="Delete project"
           on:click={() => (confirmDelete = true)}

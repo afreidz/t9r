@@ -6,6 +6,7 @@
   import observeResize from "@/lib/resize";
   import MenuTrigger from "./MenuTrigger.svelte";
   import { fetchProjects } from "@/stores/projects";
+  import breakpoints from "@/lib/stores/breakpoints";
   import { mainResizeObserver } from "@/lib/stores/ui";
 
   let menuOpen = false;
@@ -34,11 +35,13 @@
         }`}
       >
         <Logo />
-        <MenuTrigger
-          enabled={menuOpen}
-          on:click={() => (menuOpen = !menuOpen)}
-          class="h-8 w-8 md:hidden"
-        />
+        {#if !$breakpoints.md}
+          <MenuTrigger
+            enabled={menuOpen}
+            on:click={() => (menuOpen = !menuOpen)}
+            class="h-8 w-8"
+          />
+        {/if}
       </header>
       <aside
         class={`fixed left-0 bottom-0 top-0 right-0 z-40 row-start-2 flex w-full flex-1 -translate-x-full flex-col overflow-auto transition-transform ease-in-out md:static md:z-0 md:max-w-xs md:translate-x-0 ${
