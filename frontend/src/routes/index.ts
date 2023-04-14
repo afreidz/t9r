@@ -1,6 +1,7 @@
 import Main from "@/routes/Main.svelte";
 import NotFound from "@/routes/NotFound.svelte";
 import Timers from "@/routes/timers/List.svelte";
+import Settings from "@/routes/settings/Settings.svelte";
 import TimesheetReport from "./reports/Timesheet.svelte";
 import ForecastList from "@/routes/forecasts/List.svelte";
 import TimerDetails from "@/routes/timers/Details.svelte";
@@ -14,6 +15,7 @@ export default {
   "/timers/week": Timers,
   "/timers/day/:date": Timers,
   "/timers/days/:date": Timers,
+  "/account/settings": Settings,
   "/timers/month/:date": Timers,
   "/timers/months/:date": Timers,
   "/timers/week/:date": Timers,

@@ -1,11 +1,12 @@
 <script lang="ts">
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
-  import { roundDown } from "@/lib/dates";
+  import { isToday, roundDown } from "@/lib/dates";
   import { createEventDispatcher } from "svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
+  import settings, { getSettings } from "@/lib/stores/settings";
   import projects, { mostRecentProject } from "@/stores/projects";
 
   let dispatch = createEventDispatcher();
@@ -19,14 +20,18 @@
 
   async function newTimer() {
     if (!$mostRecentProject._id) return;
+    await getSettings();
     await trpc.timers.create.mutate({
       date: date.toString(),
       project: $mostRecentProject._id,
       title: $mostRecentProject.defaultTitle,
+      end: isToday(date)
+        ? null
+        : $settings?.eod || Temporal.Now.plainTimeISO().round(roundDown).toString(),
       start:
         lastTimer && lastTimer.end
           ? Temporal.PlainTime.from(lastTimer.end).toString()
-          : Temporal.Now.plainTimeISO().round(roundDown).toString(),
+          : $settings?.sod || Temporal.Now.plainTimeISO().round(roundDown).toString(),
       utilized: $mostRecentProject.defaultUtilized === false ? false : true,
     });
 

@@ -11,7 +11,6 @@
   import Header from "@/core/Header.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
-  import Input from "@/foundation/Input.svelte";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import Switch from "@/foundation/Switch.svelte";
@@ -187,7 +186,7 @@
     <Container class="flex-1">
       <section slot="primary" class="xl:flex-1">
         <Field label="Title">
-          <Input bind:value={newValues.title} />
+          <input bind:value={newValues.title} />
         </Field>
         <Field label="Project">
           <select bind:value={newValues.project}>
@@ -213,7 +212,7 @@
           />
         </Field>
         <Field label="Tags">
-          <Input
+          <input
             min={2}
             max={30}
             list="tags"

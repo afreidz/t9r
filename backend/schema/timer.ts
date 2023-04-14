@@ -18,6 +18,24 @@ export const PlainDate = z.string().refine((s) => {
   }
 });
 
+export const PlainMonthDay = z.string().refine((s) => {
+  try {
+    Temporal.PlainMonthDay.from(s);
+    return true;
+  } catch (err) {
+    return false;
+  }
+});
+
+export const PlainYearMonth = z.string().refine((s) => {
+  try {
+    Temporal.PlainYearMonth.from(s);
+    return true;
+  } catch (err) {
+    return false;
+  }
+});
+
 const TimerSchema = z
   .object({
     date: PlainDate,

@@ -21,38 +21,36 @@
   }
 
   const inputClass =
-    "focus:ring-2 text-center rounded-md ring-blue-500 flex font-mono max-w-[3rem] w-fit appearance-none items-center justify-center text-xl lg:text-3xl";
+    "focus:ring-2 bg-white/5 p-3 text-center rounded-md ring-blue-500 flex font-mono w-fit appearance-none items-center justify-center text-xl lg:text-3xl";
 </script>
 
-<div class="ring-b mr-4 flex justify-center gap-2">
-  <span class="flex items-center">
-    <input
-      step={1}
-      min={1}
-      max={12}
-      type="number"
-      class={inputClass}
-      bind:value={hh}
-      on:change={handleChange}
-      on:focus={(e) => e.currentTarget.select()}
-    />
-    :
-  </span>
+<div class="flex justify-center gap-2">
   <input
+    min={1}
+    step={1}
+    max={12}
     type="number"
     class={inputClass}
-    step={15}
+    bind:value={hh}
+    on:change={handleChange}
+    on:focus={(e) => e.currentTarget.select()}
+  />
+  <span class="flex items-center">:</span>
+  <input
+    type="number"
     min="00"
     max={45}
-    pattern="[0-9]*"
+    step={15}
     bind:value={mm}
+    pattern="[0-9]*"
+    class={inputClass}
     on:change={handleChange}
     on:focus={(e) => e.currentTarget.select()}
     on:input={(e) => {
       if (e.currentTarget.value === "0") e.currentTarget.value = "00";
     }}
   />
-  <select class={inputClass} bind:value={ap} on:change={handleChange}>
+  <select class={inputClass} class:ml-2={true} bind:value={ap} on:change={handleChange}>
     <option value="AM">AM</option>
     <option value="PM">PM</option>
   </select>

@@ -5,7 +5,6 @@
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
   import projects from "@/lib/stores/projects";
-  import Input from "@/foundation/Input.svelte";
   import Field from "@/foundation/Field.svelte";
   import { queryForecast } from "@/lib/forecast";
   import Button from "@/foundation/Button.svelte";
@@ -46,11 +45,14 @@
     );
   });
 
-  function changeForecast(e: unknown, week: Temporal.PlainDate, project?: string) {
+  function changeForecast(
+    e: Event & { currentTarget: EventTarget & HTMLInputElement },
+    week: Temporal.PlainDate,
+    project?: string
+  ) {
     if (!project || !week) return;
 
-    const value = (e as { currentTarget: EventTarget & HTMLInputElement }).currentTarget
-      .value;
+    const value = e.currentTarget.value;
 
     newForecasts.set(`${project}_${week}`, {
       week,
@@ -110,7 +112,7 @@
             {#await queryForecast(project._id, week)}
               <Icon icon="eos-icons:loading" class="h-4 w-4 text-white" />
             {:then forecast}
-              <Input
+              <input
                 min={0}
                 step={1}
                 max={168}

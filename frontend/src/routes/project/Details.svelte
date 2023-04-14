@@ -8,7 +8,6 @@
   import Colors from "@/core/Colors.svelte";
   import Dialog from "@/core/Dialog.svelte";
   import Copy from "@/foundation/Copy.svelte";
-  import Input from "@/foundation/Input.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import Field from "@/foundation/Field.svelte";
   import Chart from "@/core/chart/Chart.svelte";
@@ -117,11 +116,11 @@
     <section slot="primary" class="xl:flex-1">
       {#if newValues}
         <Field label="Project Name">
-          <Input bind:value={newValues.name} />
+          <input bind:value={newValues.name} />
         </Field>
         <Field label="Project Color">
           <div class="w-full overflow-hidden rounded-full">
-            <Input
+            <input
               type="color"
               class="h-full w-full"
               bind:value={newValues.color}
@@ -149,7 +148,7 @@
               <label class="flex flex-1 flex-col" for="color1">
                 <Copy dim as="span" variant="pseudomono" class="text-xs">Stop 2</Copy>
                 <div class="my-1 flex w-full items-stretch overflow-hidden rounded-full">
-                  <Input
+                  <input
                     name="color2"
                     type="color"
                     class="w-full"
@@ -161,7 +160,7 @@
               <label class="flex flex-1 flex-col" for="color3">
                 <Copy dim as="span" variant="pseudomono" class="text-xs">Stop 3</Copy>
                 <div class="my-1 flex w-full items-stretch overflow-hidden rounded-full">
-                  <Input
+                  <input
                     name="color3"
                     class="w-full"
                     type="color"
@@ -174,7 +173,7 @@
           {/if}
         </Field>
         <Field label="Default Timer Title">
-          <Input min={0} max={30} bind:value={newValues.defaultTitle} />
+          <input min={0} max={30} bind:value={newValues.defaultTitle} />
         </Field>
         <Field>
           <Switch
@@ -201,7 +200,7 @@
           />
         </Field>
         <Field label="Project Budget">
-          <Input
+          <input
             class="w-full text-2xl"
             type="number"
             min={0}
