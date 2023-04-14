@@ -53,7 +53,7 @@
   <Container>
     <section slot="primary" class="max-w-xs xl:flex-1">
       <Copy as="h3" semibold variant="gradient" class="my-4 uppercase">Business Day</Copy>
-      <div class="ml-4">
+      <div class="md:ml-4">
         {#if newValues?.sod}
           <Field label="Start of day">
             <Time bind:value={newValues.sod} />
@@ -66,7 +66,7 @@
         {/if}
       </div>
       <Copy as="h3" semibold variant="gradient" class="my-4 uppercase">Fiscal Year</Copy>
-      <div class="ml-4">
+      <div class="md:ml-4">
         {#if newValues?.fiscalYear}
           {#each newValues.fiscalYear as _, i}
             <Field label={`Quarter ${i + 1}`}>

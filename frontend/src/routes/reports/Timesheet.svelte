@@ -35,6 +35,7 @@
   import ActionCopy from "@/core/actions/Copy.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
+  import breakpoints from "@/lib/stores/breakpoints";
 
   type Timesheet = {
     project: Project;
@@ -135,7 +136,9 @@
       class="grid flex-1 items-center justify-items-center gap-2 pr-4"
       style="grid-template-rows: repeat({timesheet.length +
         1 +
-        $projects.length}, max-content); grid-template-columns: repeat(7, minmax(130px, 320px));"
+        $projects.length}, max-content); grid-template-columns: repeat(7, minmax(130px, ${$breakpoints.md
+        ? '320px'
+        : '1fr'}));"
     >
       {#each week as day, i}
         <Copy as="strong" variant="gradient" class="sticky top-0"
