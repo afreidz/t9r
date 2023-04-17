@@ -38,7 +38,7 @@
   import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
-  export let params: { date: string };
+  export let params: { date: string } = { date: Temporal.Now.plainDateISO().toString() };
 
   let loaded = false;
   let nowText: string;
@@ -218,7 +218,7 @@
     {/key}
   </Header>
 
-  <ActionBar>
+  <ActionBar class={view === "timeline" ? "sticky left-0" : ""}>
     <div slot="left">
       <ActionFilter />
     </div>
