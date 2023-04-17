@@ -7,6 +7,7 @@ type BreakpointValues = {
   lg: boolean;
   xl: boolean;
   xxl: boolean;
+  xxxl: boolean;
 };
 
 const queries: BreakpointValues = {
@@ -15,6 +16,7 @@ const queries: BreakpointValues = {
   lg: window.matchMedia(mediaQueries.lg).matches,
   xl: window.matchMedia(mediaQueries.xl).matches,
   xxl: window.matchMedia(mediaQueries.xxl).matches,
+  xxxl: window.matchMedia(mediaQueries.xxxl).matches,
 };
 
 const breakpoints = writable<BreakpointValues>(queries);
@@ -25,6 +27,7 @@ window.addEventListener("resize", () => {
     lg: window.matchMedia(mediaQueries.lg).matches,
     xl: window.matchMedia(mediaQueries.xl).matches,
     xxl: window.matchMedia(mediaQueries.xxl).matches,
+    xxxl: window.matchMedia(mediaQueries.xxxl).matches,
   }));
 });
 

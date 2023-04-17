@@ -16,4 +16,5 @@ export const mediaQueries = {
   lg: `(min-width: ${breakpoints.lg})`,
   xl: `(min-width: ${breakpoints.xl})`,
   xxl: `(min-width: ${breakpoints["2xl"]})`,
+  xxxl: `(min-width: ${breakpoints["3xl"]})`,
 };

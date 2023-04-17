@@ -7,10 +7,7 @@
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import { writable } from "svelte/store";
-  import { press } from "svelte-gestures";
-  import { push } from "svelte-spa-router";
   import Copy from "@/foundation/Copy.svelte";
-  import { isSelecting, selected } from "@/lib/stores/ui";
   import type { Project } from "@/backend/schema/project";
   import observeResize, { type ResizeObserverValue } from "@/lib/resize";
 
@@ -21,13 +18,13 @@
   export let id: string | undefined = undefined;
   export let tags: (string | undefined)[] = [];
   export let compact: boolean = true;
-  export let buttonFlex = false;
+  export let highlight = false;
   export let scrollto = false;
 
   let grad: string;
   let elm: HTMLAnchorElement;
 
-  $: if (elm && scrollto) {
+  $: if (elm && (scrollto || highlight)) {
     elm.scrollIntoView({ inline: "end", block: undefined, behavior: "smooth" });
   }
 
@@ -37,27 +34,12 @@
     } else if (project.color2) {
       grad = `linear-gradient(to right, ${project.color}, ${project.color2})`;
     } else {
-      grad = `linear-gradient(to right, ${project.color}80, ${project.color})`;
+      grad = `linear-gradient(to right, ${project.color}, ${project.color})`;
     }
   }
 
   $: if (elm) observeResize(elm, size);
   $: if ($size) compact = $size.width < 112;
-
-  function clickHandler() {
-    if ($isSelecting && id) {
-      if ($selected.includes(id)) return ($selected = $selected.filter((t) => t !== id));
-      return ($selected = [...new Set([...$selected, id])]);
-    }
-    if (!disableNav) return push(`/timer/${id}`);
-    return;
-  }
-
-  function holdHandler() {
-    if (disableNav) return;
-    $isSelecting = true;
-    return clickHandler();
-  }
 
   async function getTagValue(t: string) {
     if (tagCache.has(t)) return tagCache.get(t);
@@ -71,43 +53,37 @@
 
 {#if project}
   <a
+    on:focus
+    on:mouseover
+    on:mouseleave
     bind:this={elm}
+    class:pl-4={!compact}
+    class:ring-2={highlight}
+    class:ring-white={highlight}
+    class:justify-center={compact}
     href={`/#/timer/${id}`}
     inert={!disableNav ? undefined : true}
-    class={`relative mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full bg-gradient-to-r from-rose-400 via-fuchsia-700 to-sky-900 text-white shadow-2xl md:h-14 ${
+    class={`relative mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full text-white shadow-2xl md:h-14 ${
       $$props.class || ""
     }`}
     style={`background: ${grad}; ${$$props.style || ""}`}
   >
-    <button
-      class="sticky top-0 bottom-0 left-0 right-[200px] flex h-full items-center justify-center gap-1 rounded-full drop-shadow-timer"
-      on:press={holdHandler}
-      class:px-4={!compact}
-      class:flex-col={!compact}
-      class:flex-1={buttonFlex || compact}
-      style={`background: ${project.color}`}
-      on:click|preventDefault={clickHandler}
-      class:flex-none={!buttonFlex && !compact}
-      use:press={{ timeframe: 600, triggerBeforeFinished: true }}
+    <Tag class="h-8 w-8 !max-w-none flex-none justify-evenly text-2xl font-semibold"
+      >{project.name.charAt(0)}</Tag
     >
-      {#if compact}
-        <Tag class="h-8 w-8 !max-w-none flex-none justify-evenly text-2xl font-semibold"
-          >{project.name.charAt(0)}</Tag
-        >
-      {:else}
+    {#if !compact}
+      <header class="ml-2 flex flex-col">
         <Copy
           dim
           as="small"
           variant="pseudomono"
-          class="w-full flex-none text-left text-xs leading-none line-clamp-1"
-          >{project.name}</Copy
+          class="text-left text-xs leading-none line-clamp-1">{project.name}</Copy
         >
-        <strong
-          class="flex-none text-sm font-normal !leading-none line-clamp-1 md:text-lg"
+        <strong class="text-sm font-normal !leading-none line-clamp-1 md:text-lg"
           >{title || "Timer"}</strong
         >
-      {/if}
-    </button>
+      </header>
+    {/if}
     {#if $$slots.left && !compact}
       <div class="flex-none pl-2">
         <slot name="left" />

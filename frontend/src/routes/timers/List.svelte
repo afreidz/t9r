@@ -7,13 +7,13 @@
     getSunday,
     getWeekDay,
     formatTime,
-    formatForWeek,
     formatForMonth,
     formatForShortTime,
-    getDurationHoursFromString,
   } from "@/lib/dates";
   import trpc from "@/lib/trpc";
+  import { onMount } from "svelte";
   import Icon from "@iconify/svelte";
+  import { get } from "svelte/store";
   import now from "@/lib/stores/now";
   import Tag from "@/core/Tag.svelte";
   import projects from "@/stores/projects";
@@ -30,12 +30,15 @@
   import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
   import { isSelecting, selected } from "@/lib/stores/ui";
+  import TimerCard from "@/components/core/TimerCard.svelte";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
+  import ActionInfo from "@/core/actions/Info.svelte";
   import ActionFilter from "@/core/actions/Filter.svelte";
+  import ActionPicker from "@/core/actions/Picker.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
   export let params: { date: string } = { date: Temporal.Now.plainDateISO().toString() };
@@ -47,11 +50,18 @@
   let view: Views = "list";
   let timers: Timer[] = [];
   let nowIndicator: HTMLElement;
+  let showInfo: boolean = false;
+  let showFilters: boolean = false;
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
   let loader: Promise<unknown> | undefined;
+  let hovered: string | undefined = undefined;
   let key: Temporal.PlainDateTime | null = null;
   let duration: "days" | "months" | "weeks" | "all" = "days";
+
+  onMount(() => {
+    showInfo = get(breakpoints).xxxl;
+  });
 
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
@@ -213,38 +223,45 @@
       {/if}
     </div>
 
-    {#key key}
-      <HourSum hours={sumTimerHours(timers)} />
-    {/key}
+    <div slot="right">
+      {#key key}
+        <HourSum hours={sumTimerHours(timers)} />
+      {/key}
+    </div>
+
+    <ActionBar class={view === "timeline" ? "sticky left-0" : ""}>
+      <div slot="left" class="flex gap-2">
+        <ActionFilter on:click={() => (showFilters = !showFilters)} />
+        {#if duration !== "all"}
+          <ActionPicker />
+        {/if}
+      </div>
+      <ActionPrev on:click={navigatePrev} disabled={duration === "all" && page === 0} />
+      {#if duration !== "all"}
+        <ActionCurrent on:click={navigateCurrent} disabled={isToday(viewDate)} />
+      {/if}
+      <ActionNext
+        on:click={navigateNext}
+        disabled={duration === "all" ? timers.length === 0 : isToday(viewDate)}
+      />
+      <div slot="right" class="flex gap-2">
+        {#if duration === "days"}
+          <ActionView
+            bind:current={view}
+            on:click={() => {
+              viewChanged = true;
+            }}
+          />
+        {/if}
+        <ActionInfo enabled={showInfo} on:click={() => (showInfo = !showInfo)} />
+      </div>
+    </ActionBar>
   </Header>
 
-  <ActionBar class={view === "timeline" ? "sticky left-0" : ""}>
-    <div slot="left">
-      <ActionFilter />
-    </div>
-    <ActionPrev on:click={navigatePrev} disabled={duration === "all" && page === 0} />
-    {#if duration !== "all"}
-      <ActionCurrent on:click={navigateCurrent} disabled={isToday(viewDate)} />
-    {/if}
-    <ActionNext
-      on:click={navigateNext}
-      disabled={duration === "all" ? timers.length === 0 : isToday(viewDate)}
-    />
-    <div slot="right">
-      {#if duration === "days"}
-        <ActionView
-          bind:current={view}
-          on:click={() => {
-            viewChanged = true;
-          }}
-        />
-      {/if}
-    </div>
-  </ActionBar>
-
   <div
-    class="flex-1 gap-y-1"
+    class="flex flex-1 flex-col gap-y-1"
     class:grid={view === "timeline"}
+    class:max-w-7xl={view !== "timeline"}
     style={`grid-template-columns: repeat(96, ${
       $breakpoints.xxl
         ? "2%"
@@ -288,43 +305,61 @@
       {#each timers as timer, i}
         <TimerComponent
           id={timer._id}
-          tags={timer.tags}
           title={timer.title}
           scrollto={shouldScrollTo(i)}
+          highlight={hovered === timer._id}
+          on:focus={() => (hovered = timer._id)}
+          on:mouseover={() => (hovered = timer._id)}
+          on:mouseleave={() => (hovered = undefined)}
           project={$projects.find((p) => p._id === timer.project)}
           style={calculateGridPosition(timer.start, timer.end, i)}
         >
           <div slot="left">
-            {#if duration === "all"}
-              <Tag>{timer.date}</Tag>
-            {:else if duration === "months"}
-              <Tag>{formatForMonth(timer.date)}</Tag>
-            {:else if duration === "weeks"}
-              <Tag>{formatForWeek(timer.date)}</Tag>
+            {#if view !== "timeline"}
+              <Tag>{formatTime(timer.start)}</Tag>
             {/if}
-            <Tag>{formatTime(timer.start)}</Tag>
           </div>
+          {#if view !== "timeline"}
+            <Tag>{formatForMonth(timer.date)}</Tag>
+          {/if}
           <div slot="right">
-            {#if timer.start && timer.end}
-              <Tag>{getDurationHoursFromString(timer.start, timer.end)}hrs</Tag>
-            {:else if timer.start}
-              <Tag>
-                {getDurationHoursFromString(timer.start, $now.toString())}hrs
-              </Tag>
-              <Tag>running</Tag>
+            {#if view !== "timeline"}
+              <Tag>{timer.end ? formatTime(timer.end) : "running"}</Tag>
             {/if}
           </div>
         </TimerComponent>
       {/each}
     {/key}
   </div>
-
-  {#if duration === "all"}
-    <ActionBar>
-      <ActionPrev on:click={navigatePrev} disabled={page === 0} />
-      <ActionNext on:click={navigateNext} disabled={timers.length === 0} />
-    </ActionBar>
-  {/if}
+  <aside
+    class="fixed right-4 bottom-20 top-48 z-10 mx-4 mt-1 flex w-[320px] origin-right flex-col overflow-auto rounded-md border border-black/20 bg-neutral-900/80 p-2 backdrop-blur-md transition-all md:bottom-10 md:top-44 md:right-6 md:mx-6 md:p-4 {showInfo
+      ? 'flex translate-x-0 opacity-100'
+      : 'translate-x-full opacity-0'}"
+  >
+    {#each timers as timer}
+      <TimerCard
+        id={timer._id}
+        end={timer.end}
+        tags={timer.tags}
+        title={timer.title}
+        start={timer.start}
+        hours={sumTimerHours([timer])}
+        highlight={hovered === timer._id}
+        date={formatForMonth(timer.date)}
+        on:focus={() => (hovered = timer._id)}
+        on:mouseover={() => (hovered = timer._id)}
+        on:mouseleave={() => (hovered = undefined)}
+        project={$projects.find((p) => p._id === timer.project)}
+      />
+    {/each}
+  </aside>
+  <aside
+    class="fixed left-0 bottom-20 top-48 z-10 mx-4 mt-1 flex w-[320px] origin-right flex-col overflow-auto rounded-md border border-black/20 bg-neutral-900/80 p-2 backdrop-blur-md transition-all md:top-44 md:bottom-10 md:mx-6 md:p-4 {showFilters
+      ? 'translate-x-[16px] opacity-100 md:translate-x-[344px]'
+      : '-translate-x-full opacity-0'}"
+  >
+    Filters
+  </aside>
 
   <div slot="cta">
     {#if $isSelecting || ["all", "days"].includes(duration)}
