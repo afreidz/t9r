@@ -134,117 +134,127 @@
         />
       </ActionBar>
     </Header>
-    <div
-      class="grid flex-1 items-center justify-items-center gap-2 pr-4"
-      style="grid-template-rows: repeat({timesheet.length +
-        1 +
-        $projects.length}, max-content); grid-template-columns: repeat(7, minmax(130px, ${$breakpoints.md
-        ? '320px'
-        : '1fr'}));"
-    >
-      {#each week as day, i}
-        <Copy as="strong" variant="gradient" class="sticky top-0"
-          >{day} {getSunday(viewDate).add({ days: i }).day}</Copy
-        >
-      {/each}
-      {#each timesheet as entry}
-        {#if entry.days.some((day) => day.timers.length > 0)}
-          <div class="relative col-span-7 w-full">
-            <TimerComponent
-              disableNav
-              class="sticky left-0 !mb-0"
-              project={entry.project}
-              title={entry.project.name}
-            />
-          </div>
-          {#each entry.days as day}
-            {@const tasks = getTasksAndTagsFromTimers(day.timers)}
-            {@const detailsString = `details_${entry.project._id}_${day.date.toString()}`}
-            {@const details = tasks
-              .map(
-                (task) =>
-                  "• " +
-                  task.title +
-                  (task.tags.length
-                    ? "\n" + task.tags.map((tag) => `\t◦ ${tag}`).join("\n")
-                    : "")
-              )
-              .join("\n")}
-            <Field as="div" label="Hours" class="h-56 w-full max-w-[288px] md:max-w-none">
-              <section class="flex flex-1 flex-col">
-                <div class="flex flex-1 items-center justify-center gap-6">
-                  <Copy
-                    as="strong"
-                    variant="gradient"
-                    class="flex flex-none items-center justify-center text-3xl"
-                    >{sumTimerHours(day.timers)}</Copy
-                  >
-                  {#if showDetailsFor === detailsString}
-                    {#if tasks.length}
-                      <ul
-                        in:fade
-                        class="h-24 flex-1 overflow-auto border-l border-neutral-900 px-4 pr-6"
-                      >
-                        {#each tasks as task}
-                          <li class="my-1">
-                            <Copy class="whitespace-nowrap text-sm line-clamp-1"
-                              >• {task.title}</Copy
-                            >
-                            <ul class="ml-4 list-disc">
-                              {#each task.tags as tag}
-                                <li class="flex">
-                                  <span class="sr-only">•</span>
-                                  <Tag
-                                    class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
-                                    >{tag}</Tag
-                                  >
-                                </li>
-                              {/each}
-                            </ul>
-                          </li>
-                        {/each}
-                      </ul>
-                    {/if}
-                  {/if}
-                </div>
-                <div class="flex flex-none items-stretch justify-evenly">
-                  <ActionCopy
-                    title="copy hours"
-                    on:click={() => clipboard.write(`${sumTimerHours(day.timers)}`)}
-                  />
-                  {#if tasks.length}
-                    <ActionInfo
-                      on:click={() =>
-                        (showDetailsFor =
-                          showDetailsFor === detailsString ? undefined : detailsString)}
-                    />
-                  {/if}
-                  {#if showDetailsFor === detailsString}
-                    <ActionCopy
-                      title="copy details"
-                      on:click={async () => {
-                        await clipboard.write(details);
-                        showDetailsFor = undefined;
-                      }}
-                    />
-                  {/if}
-                </div>
-              </section>
-            </Field>
-          {/each}
-        {/if}
-      {/each}
-      {#each week as _, i}
-        <Field as="div" label="Total hours" class="w-full">
-          <Copy
-            as="strong"
-            variant="gradient"
-            class="my-8 flex flex-none items-center justify-center text-3xl"
-            >{sumDayHours(timesheet, i)}</Copy
+    <Container class="flex-1">
+      <div
+        slot="primary"
+        class="grid flex-1 items-center justify-items-center gap-2 pr-4"
+        style="grid-template-rows: repeat({timesheet.length +
+          1 +
+          $projects.length}, max-content); grid-template-columns: repeat(7, minmax(130px, ${$breakpoints.md
+          ? '320px'
+          : '1fr'}));"
+      >
+        {#each week as day, i}
+          <Copy as="strong" variant="gradient" class="sticky top-0"
+            >{day} {getSunday(viewDate).add({ days: i }).day}</Copy
           >
-        </Field>
-      {/each}
-    </div>
+        {/each}
+        {#each timesheet as entry}
+          {#if entry.days.some((day) => day.timers.length > 0)}
+            <div class="relative col-span-7 w-full">
+              <TimerComponent
+                disableNav
+                class="sticky left-0 !mb-0"
+                project={entry.project}
+                title={entry.project.name}
+              />
+            </div>
+            {#each entry.days as day}
+              {@const tasks = getTasksAndTagsFromTimers(day.timers)}
+              {@const detailsString = `details_${
+                entry.project._id
+              }_${day.date.toString()}`}
+              {@const details = tasks
+                .map(
+                  (task) =>
+                    "• " +
+                    task.title +
+                    (task.tags.length
+                      ? "\n" + task.tags.map((tag) => `\t◦ ${tag}`).join("\n")
+                      : "")
+                )
+                .join("\n")}
+              <Field
+                as="div"
+                label="Hours"
+                class="h-56 w-full max-w-[288px] md:max-w-none"
+              >
+                <section class="flex flex-1 flex-col">
+                  <div class="flex flex-1 items-center justify-center gap-6">
+                    <Copy
+                      as="strong"
+                      variant="gradient"
+                      class="flex flex-none items-center justify-center text-3xl"
+                      >{sumTimerHours(day.timers)}</Copy
+                    >
+                    {#if showDetailsFor === detailsString}
+                      {#if tasks.length}
+                        <ul
+                          in:fade
+                          class="h-24 flex-1 overflow-auto border-l border-neutral-900 px-4 pr-6"
+                        >
+                          {#each tasks as task}
+                            <li class="my-1">
+                              <Copy class="whitespace-nowrap text-sm line-clamp-1"
+                                >• {task.title}</Copy
+                              >
+                              <ul class="ml-4 list-disc">
+                                {#each task.tags as tag}
+                                  <li class="flex">
+                                    <span class="sr-only">•</span>
+                                    <Tag
+                                      class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
+                                      >{tag}</Tag
+                                    >
+                                  </li>
+                                {/each}
+                              </ul>
+                            </li>
+                          {/each}
+                        </ul>
+                      {/if}
+                    {/if}
+                  </div>
+                  <div class="flex flex-none items-stretch justify-evenly">
+                    <ActionCopy
+                      title="copy hours"
+                      on:click={() => clipboard.write(`${sumTimerHours(day.timers)}`)}
+                    />
+                    {#if tasks.length}
+                      <ActionInfo
+                        isStatic={true}
+                        on:click={() =>
+                          (showDetailsFor =
+                            showDetailsFor === detailsString ? undefined : detailsString)}
+                      />
+                    {/if}
+                    {#if showDetailsFor === detailsString}
+                      <ActionCopy
+                        title="copy details"
+                        on:click={async () => {
+                          await clipboard.write(details);
+                          showDetailsFor = undefined;
+                        }}
+                      />
+                    {/if}
+                  </div>
+                </section>
+              </Field>
+            {/each}
+          {/if}
+        {/each}
+        {#each week as _, i}
+          <Field as="div" label="Total hours" class="w-full">
+            <Copy
+              as="strong"
+              variant="gradient"
+              class="my-8 flex flex-none items-center justify-center text-3xl"
+              >{sumDayHours(timesheet, i)}</Copy
+            >
+          </Field>
+        {/each}
+      </div>
+    </Container>
   {/await}
   <div slot="cta">
     <DualAction as="div" label="Showing timesheet for">

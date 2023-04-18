@@ -30,8 +30,8 @@
   import { location, push } from "svelte-spa-router";
   import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
-  import { isSelecting, selected } from "@/lib/stores/ui";
   import TimerCard from "@/components/core/TimerCard.svelte";
+  import { isSelecting, selected, timelineZoom } from "@/lib/stores/ui";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
@@ -40,6 +40,8 @@
   import ActionInfo from "@/core/actions/Info.svelte";
   import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionPicker from "@/core/actions/Picker.svelte";
+  import ActionZoomIn from "@/core/actions/ZoomIn.svelte";
+  import ActionZoomOut from "@/core/actions/ZoomOut.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
   export let params: { date: string } = { date: Temporal.Now.plainDateISO().toString() };
@@ -48,11 +50,11 @@
   let nowText: string;
   let page: number = 1;
   let per: number = 100;
+  let stage: HTMLElement;
   let view: Views = "list";
   let timers: Timer[] = [];
   let nowIndicator: HTMLElement;
   let showInfo: boolean = false;
-  let showFilters: boolean = false;
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
   let loader: Promise<unknown> | undefined;
@@ -83,7 +85,6 @@
     loaded = true;
     nowIndicator.scrollIntoView({
       inline: "center",
-      block: undefined,
       behavior: "smooth",
     });
   }
@@ -177,15 +178,6 @@
 
     return formatForShortTime(pt);
   }
-
-  function shouldScrollTo(i: number) {
-    if (i !== timers.length - 1) return false;
-    if (view !== "timeline") return false;
-    if (isToday(viewDate)) return false;
-    if (!viewDate) return false;
-    if (loaded) return false;
-    return true;
-  }
 </script>
 
 <Layout {loader}>
@@ -237,6 +229,9 @@
           <ActionPicker />
         {/if}
       </div>
+      {#if view === "timeline" && $breakpoints.md}
+        <ActionZoomOut on:click={() => ($timelineZoom *= 0.95)} />
+      {/if}
       <ActionPrev on:click={navigatePrev} disabled={duration === "all" && page === 0} />
       {#if duration !== "all"}
         <ActionCurrent on:click={navigateCurrent} disabled={isToday(viewDate)} />
@@ -245,6 +240,9 @@
         on:click={navigateNext}
         disabled={duration === "all" ? timers.length === 0 : isToday(viewDate)}
       />
+      {#if view === "timeline" && $breakpoints.md}
+        <ActionZoomIn on:click={() => ($timelineZoom *= 1.05)} />
+      {/if}
       <div slot="right" class="flex gap-2">
         {#if duration === "days"}
           <ActionView
@@ -277,20 +275,11 @@
   </Header>
 
   <div
-    class="flex flex-1 flex-col gap-y-1"
+    class="flex flex-1 flex-col gap-y-1 overflow-auto"
+    bind:this={stage}
     class:grid={view === "timeline"}
     class:max-w-7xl={view !== "timeline"}
-    style={`grid-template-columns: repeat(96, ${
-      $breakpoints.xxl
-        ? "2%"
-        : $breakpoints.xl
-        ? "4%"
-        : $breakpoints.lg
-        ? "6%"
-        : $breakpoints.md
-        ? "8%"
-        : "10%"
-    }); grid-template-rows: 2rem repeat(${timers.length}, min-content) auto;`}
+    style={`grid-template-columns: repeat(96, ${$timelineZoom}%); grid-template-rows: 2rem repeat(${timers.length}, min-content) auto;`}
   >
     {#if view === "timeline"}
       {#each new Array(24) as _, hour}
@@ -309,11 +298,11 @@
     {#key key}
       {#if view === "timeline" && isToday(viewDate)}
         <div
-          class="pointer-events-none relative z-10 h-full border-l border-red-500"
+          class="pointer-events-none relative z-0 h-full border-l border-red-500"
           style={calculateNowGridPosition(timers.length)}
         >
           <span
-            class="absolute top-0 left-1 whitespace-nowrap rounded-md bg-red-500 p-2 text-xs"
+            class="absolute top-0 left-1 z-10 whitespace-nowrap rounded-md bg-red-500 p-2 text-xs"
             bind:this={nowIndicator}
           >
             {nowText}
@@ -324,15 +313,15 @@
         <TimerComponent
           id={timer._id}
           title={timer.title}
-          compact={getDurationHoursFromString(timer.start, timer.end ?? $now.toString()) <
-            1}
-          scrollto={shouldScrollTo(i)}
           highlight={hovered === timer._id}
           on:focus={() => (hovered = timer._id)}
           on:mouseover={() => (hovered = timer._id)}
           on:mouseleave={() => (hovered = undefined)}
           project={$projects.find((p) => p._id === timer.project)}
           style={calculateGridPosition(timer.start, timer.end, i)}
+          scrollto={!isToday(viewDate) && timers[i] === timers.at(-1)}
+          compact={view === "timeline" &&
+            getDurationHoursFromString(timer.start, timer.end ?? $now.toString()) < 1}
         >
           <div slot="left">
             {#if view !== "timeline"}
@@ -351,35 +340,6 @@
       {/each}
     {/key}
   </div>
-  <!-- <aside
-    class="fixed right-0 bottom-20 top-48 z-10 mx-4 mt-1 flex w-[320px] origin-right flex-col overflow-auto rounded-md border border-black/20 bg-neutral-900/80 p-2 backdrop-blur-md transition-all md:bottom-10 md:top-44 md:right-6 md:mx-6 md:p-4 {showInfo
-      ? 'flex translate-x-0 opacity-100'
-      : 'translate-x-full opacity-0'}"
-  >
-    {#each timers as timer}
-      <TimerCard
-        id={timer._id}
-        end={timer.end}
-        tags={timer.tags}
-        title={timer.title}
-        start={timer.start}
-        hours={sumTimerHours([timer])}
-        highlight={hovered === timer._id}
-        date={formatForMonth(timer.date)}
-        on:focus={() => (hovered = timer._id)}
-        on:mouseover={() => (hovered = timer._id)}
-        on:mouseleave={() => (hovered = undefined)}
-        project={$projects.find((p) => p._id === timer.project)}
-      />
-    {/each}
-  </aside>
-  <aside
-    class="fixed left-0 bottom-20 top-48 z-10 mx-4 mt-1 flex w-[320px] origin-right flex-col overflow-auto rounded-md border border-black/20 bg-neutral-900/80 p-2 backdrop-blur-md transition-all md:top-44 md:bottom-10 md:mx-6 md:p-4 {showFilters
-      ? 'translate-x-[16px] opacity-100 md:translate-x-[344px]'
-      : '-translate-x-full opacity-0'}"
-  >
-    Filters
-  </aside>-->
 
   <div slot="cta">
     {#if $isSelecting || ["all", "days"].includes(duration)}

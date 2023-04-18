@@ -1,4 +1,7 @@
+import { get } from "svelte/store";
 import { Temporal } from "temporal-polyfill";
+import settings, { getSettings } from "@/lib/stores/settings";
+
 export const locale = "en-us";
 
 export const roundDown: Temporal.RoundTo<"minute"> = {
@@ -27,6 +30,22 @@ export function getWeekDay(d: Temporal.PlainDate) {
 export function isToday(d: Temporal.PlainDate | string) {
   const pd = typeof d === "string" ? Temporal.PlainDate.from(d) : d;
   return pd.equals(getToday());
+}
+
+export async function getFiscalYearStartMonth(d: Temporal.PlainDate | string) {
+  await getSettings();
+  const pd = typeof d === "string" ? Temporal.PlainDate.from(d) : d;
+  const s = get(settings);
+
+  if (!s) throw new Error("no settings for fiscal year start");
+
+  if (pd.month === s.fiscalYearStart)
+    return new Temporal.PlainYearMonth(pd.year, pd.month);
+
+  if (pd.month < s.fiscalYearStart)
+    return new Temporal.PlainYearMonth(pd.year - 1, s.fiscalYearStart);
+
+  return new Temporal.PlainYearMonth(pd.year, s.fiscalYearStart);
 }
 
 export function getDurationHoursFromString(a: string, b: string) {

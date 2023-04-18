@@ -22,7 +22,7 @@
       class:-translate-x-full={!enabled}
       class:pointer-events-auto={enabled}
       class:pointer-events-none={!enabled}
-      class="fixed left-0 bottom-20 z-20 mt-6 flex min-w-[320px] flex-col overflow-auto rounded-md border border-black/20 bg-neutral-900/80 p-2 backdrop-blur-md transition-all md:bottom-10 md:left-[344px]"
+      class="fixed left-0 bottom-20 z-0 mt-6 flex w-full flex-col overflow-auto rounded-md border border-black/20 bg-neutral-900/80 p-2 backdrop-blur-md transition-all md:bottom-10 md:left-[344px] md:max-w-[350px]"
       style="top: {box.top}px;"
     >
       {#if enabled}

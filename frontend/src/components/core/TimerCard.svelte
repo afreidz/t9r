@@ -54,7 +54,7 @@
     on:mouseleave
     bind:this={elm}
     href={`/#/timer/${id}`}
-    class={`mb-2 max-w-[500px] rounded-md p-6 text-white shadow-lg ${
+    class={`mx-auto mb-2 block max-w-[500px] rounded-md p-6 text-left text-white shadow-lg ${
       $$props.class || ""
     }`}
     class:ring-2={highlight}
@@ -62,15 +62,17 @@
     style={`background: ${grad}; ${$$props.style || ""}`}
   >
     <header class="flex justify-between gap-2">
-      <div class="flex flex-1 flex-col items-center">
+      <div class="flex max-w-[10rem] flex-1 flex-col items-center">
         <Copy as="small" dim variant="pseudomono" class="text-sm">Hours</Copy>
         <Copy as="strong" variant="gradient" class="text-4xl">
           {hours}
         </Copy>
       </div>
-      <div class="flex flex-col">
-        <Copy as="small" dim variant="pseudomono" class="text-sm">{project.name}</Copy>
-        <span class="line-clamp-1">{title}</span>
+      <div class="flex flex-1 flex-col items-center">
+        <div class="text-left">
+          <Copy as="small" dim variant="pseudomono" class="text-sm">{project.name}</Copy>
+          <span class="line-clamp-1">{title}</span>
+        </div>
       </div>
     </header>
     {#if date}

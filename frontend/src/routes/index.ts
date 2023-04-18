@@ -6,6 +6,7 @@ import TimesheetReport from "./reports/Timesheet.svelte";
 import ForecastList from "@/routes/forecasts/List.svelte";
 import TimerDetails from "@/routes/timers/Details.svelte";
 import ProjectDetails from "@/routes/project/Details.svelte";
+import UtilizationReport from "./reports/Utilization.svelte";
 
 export default {
   "/": Main,
@@ -25,5 +26,6 @@ export default {
   "/forecasts/:num": ForecastList,
   "/reports/week": TimesheetReport,
   "/reports/week/:date": TimesheetReport,
+  "/reports/utilization": UtilizationReport,
   "*": NotFound,
 };

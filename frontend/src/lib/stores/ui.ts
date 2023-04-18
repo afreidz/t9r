@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
 import type { ResizeObserverValue } from "@/lib/resize";
 
+export const timelineZoom = writable(2);
 export const showTimers = writable(true);
 export const showReports = writable(true);
 export const showAccount = writable(false);

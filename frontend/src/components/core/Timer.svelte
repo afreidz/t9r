@@ -21,8 +21,8 @@
   let grad: string;
   let elm: HTMLAnchorElement;
 
-  $: if (elm && (scrollto || highlight)) {
-    elm.scrollIntoView({ inline: "end", block: undefined, behavior: "smooth" });
+  $: if (elm && (highlight || scrollto)) {
+    elm.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
   }
 
   $: if (project) {
@@ -51,13 +51,14 @@
     on:mouseover
     on:mouseleave
     bind:this={elm}
+    class:pr-2={!compact}
+    href={`/#/timer/${id}`}
     class:md:pl-4={!compact}
     class:ring-2={highlight}
     class:ring-white={highlight}
     class:justify-center={compact}
-    href={`/#/timer/${id}`}
     inert={!disableNav ? undefined : true}
-    class={`relative mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full pr-2 text-white shadow-md md:h-14 ${
+    class={`relative mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full text-white shadow-md md:h-14 ${
       $$props.class || ""
     }`}
     style={`background: ${grad}; ${$$props.style || ""}`}
