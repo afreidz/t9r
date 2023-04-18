@@ -6,18 +6,15 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
-  import { writable } from "svelte/store";
   import Copy from "@/foundation/Copy.svelte";
   import type { Project } from "@/backend/schema/project";
-  import observeResize, { type ResizeObserverValue } from "@/lib/resize";
 
   export let project: Project | undefined = undefined;
   export let disableNav: boolean | undefined = false;
-  export let size = writable<ResizeObserverValue>();
   export let title: string | undefined = undefined;
   export let id: string | undefined = undefined;
   export let tags: (string | undefined)[] = [];
-  export let compact: boolean = true;
+  export let compact: boolean = false;
   export let highlight = false;
   export let scrollto = false;
 
@@ -38,9 +35,6 @@
     }
   }
 
-  $: if (elm) observeResize(elm, size);
-  $: if ($size) compact = $size.width < 112;
-
   async function getTagValue(t: string) {
     if (tagCache.has(t)) return tagCache.get(t);
 
@@ -57,13 +51,13 @@
     on:mouseover
     on:mouseleave
     bind:this={elm}
-    class:pl-4={!compact}
+    class:md:pl-4={!compact}
     class:ring-2={highlight}
     class:ring-white={highlight}
     class:justify-center={compact}
     href={`/#/timer/${id}`}
     inert={!disableNav ? undefined : true}
-    class={`relative mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full text-white shadow-2xl md:h-14 ${
+    class={`relative mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full pr-2 text-white shadow-md md:h-14 ${
       $$props.class || ""
     }`}
     style={`background: ${grad}; ${$$props.style || ""}`}

@@ -9,6 +9,7 @@
     formatTime,
     formatForMonth,
     formatForShortTime,
+    getDurationHoursFromString,
   } from "@/lib/dates";
   import trpc from "@/lib/trpc";
   import { onMount } from "svelte";
@@ -231,7 +232,7 @@
 
     <ActionBar class={view === "timeline" ? "sticky left-0" : ""}>
       <div slot="left" class="flex gap-2">
-        <ActionFilter on:click={() => (showFilters = !showFilters)} />
+        <ActionFilter>Filters</ActionFilter>
         {#if duration !== "all"}
           <ActionPicker />
         {/if}
@@ -253,7 +254,24 @@
             }}
           />
         {/if}
-        <ActionInfo enabled={showInfo} on:click={() => (showInfo = !showInfo)} />
+        <ActionInfo enabled={showInfo}>
+          {#each timers as timer}
+            <TimerCard
+              id={timer._id}
+              end={timer.end}
+              tags={timer.tags}
+              title={timer.title}
+              start={timer.start}
+              hours={sumTimerHours([timer])}
+              highlight={hovered === timer._id}
+              date={formatForMonth(timer.date)}
+              on:focus={() => (hovered = timer._id)}
+              on:mouseover={() => (hovered = timer._id)}
+              on:mouseleave={() => (hovered = undefined)}
+              project={$projects.find((p) => p._id === timer.project)}
+            />
+          {/each}
+        </ActionInfo>
       </div>
     </ActionBar>
   </Header>
@@ -306,6 +324,8 @@
         <TimerComponent
           id={timer._id}
           title={timer.title}
+          compact={getDurationHoursFromString(timer.start, timer.end ?? $now.toString()) <
+            1}
           scrollto={shouldScrollTo(i)}
           highlight={hovered === timer._id}
           on:focus={() => (hovered = timer._id)}
@@ -331,8 +351,8 @@
       {/each}
     {/key}
   </div>
-  <aside
-    class="fixed right-4 bottom-20 top-48 z-10 mx-4 mt-1 flex w-[320px] origin-right flex-col overflow-auto rounded-md border border-black/20 bg-neutral-900/80 p-2 backdrop-blur-md transition-all md:bottom-10 md:top-44 md:right-6 md:mx-6 md:p-4 {showInfo
+  <!-- <aside
+    class="fixed right-0 bottom-20 top-48 z-10 mx-4 mt-1 flex w-[320px] origin-right flex-col overflow-auto rounded-md border border-black/20 bg-neutral-900/80 p-2 backdrop-blur-md transition-all md:bottom-10 md:top-44 md:right-6 md:mx-6 md:p-4 {showInfo
       ? 'flex translate-x-0 opacity-100'
       : 'translate-x-full opacity-0'}"
   >
@@ -359,7 +379,7 @@
       : '-translate-x-full opacity-0'}"
   >
     Filters
-  </aside>
+  </aside>-->
 
   <div slot="cta">
     {#if $isSelecting || ["all", "days"].includes(duration)}

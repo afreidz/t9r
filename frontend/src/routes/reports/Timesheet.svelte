@@ -117,21 +117,23 @@
       main={`${getSunday(viewDate).day} ${getMonth(viewDate)} ${viewDate.year}`}
       class="mb-1"
     >
-      {#key $now}
-        <HourSum hours={sumTimerHours(getAllTimersFromTimesheet(timesheet))} />
-      {/key}
+      <div slot="right">
+        {#key $now}
+          <HourSum hours={sumTimerHours(getAllTimersFromTimesheet(timesheet))} />
+        {/key}
+      </div>
+      <ActionBar>
+        <ActionPrev on:click={() => (viewDate = viewDate.subtract({ weeks: 1 }))} />
+        <ActionCurrent
+          on:click={() => (viewDate = getToday())}
+          disabled={isToday(viewDate)}
+        />
+        <ActionNext
+          on:click={() => (viewDate = viewDate.add({ weeks: 1 }))}
+          disabled={isToday(viewDate)}
+        />
+      </ActionBar>
     </Header>
-    <ActionBar>
-      <ActionPrev on:click={() => (viewDate = viewDate.subtract({ weeks: 1 }))} />
-      <ActionCurrent
-        on:click={() => (viewDate = getToday())}
-        disabled={isToday(viewDate)}
-      />
-      <ActionNext
-        on:click={() => (viewDate = viewDate.add({ weeks: 1 }))}
-        disabled={isToday(viewDate)}
-      />
-    </ActionBar>
     <div
       class="grid flex-1 items-center justify-items-center gap-2 pr-4"
       style="grid-template-rows: repeat({timesheet.length +

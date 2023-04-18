@@ -129,7 +129,7 @@
     {#each $projects as project, i}
       <div
         style="grid-row-start: {i + 2}"
-        class="sticky left-0 z-[1] col-start-1 flex min-w-[150px] items-center bg-neutral-800 py-1 pr-2 shadow-2xl"
+        class="sticky left-0 z-[1] col-start-1 flex min-w-[150px] max-w-[180px] items-center bg-neutral-800 py-1 pr-2 md:max-w-none"
       >
         <TimerComponent
           class="!mb-0 !flex-1"
