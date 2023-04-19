@@ -116,3 +116,11 @@ export function formatForShortTime(d: Temporal.PlainDateTime) {
   const date = plainDateToLegacy(d);
   return date.toLocaleString(locale, { timeStyle: "short" });
 }
+
+export function isBeforeDate(d1: Temporal.PlainDate, d2: Temporal.PlainDate) {
+  return Temporal.PlainDate.compare(d1, d2) <= 0;
+}
+
+export function isAfterDate(d1: Temporal.PlainDate, d2: Temporal.PlainDate) {
+  return !isBeforeDate(d1, d2);
+}

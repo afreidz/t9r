@@ -175,13 +175,3 @@
     {/if}
   </div>
 </Layout>
-
-<style>
-  div::-webkit-scrollbar {
-    display: none;
-  }
-  div {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-</style>

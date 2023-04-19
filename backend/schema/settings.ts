@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PlainTime } from "./timer";
+import { PlainTime, PlainDate } from "./timer";
 
 const SettingsSchema = z.object({
   _id: z.string().optional(),
@@ -12,6 +12,7 @@ const SettingsSchema = z.object({
     .nullable()
     .default(Temporal.PlainTime.from({ hour: 17, minute: 0 }).toString()),
   fiscalYearStart: z.number().min(1).max(12).default(4),
+  trackingStart: PlainDate.default(Temporal.Now.plainDateISO().toString()),
 });
 
 export default SettingsSchema;

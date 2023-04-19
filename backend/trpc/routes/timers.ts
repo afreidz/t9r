@@ -1,11 +1,15 @@
 import "temporal-polyfill/global";
-
 import { z } from "zod";
+import TimerSchema, {
+  type Timer,
+  PlainDate,
+  PlainYearMonth,
+  type YearlyUtilizationReport,
+} from "../../schema/timer";
 import type { Sort } from "mongodb";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "../lib";
 import getDBClient, { DBError, ObjectId } from "../../database";
-import TimerSchema, { type Timer, PlainDate } from "../../schema/timer";
 
 const timerSort: Sort = { date: 1, start: 1 };
 
@@ -22,6 +26,35 @@ type RegExFilter = {
 export function getSunday(d: Temporal.PlainDate = Temporal.Now.plainDateISO()) {
   if (d.dayOfWeek === 7) return d;
   return d.subtract({ days: d.dayOfWeek });
+}
+
+export function isToday(d: Temporal.PlainDate | string) {
+  const pd = typeof d === "string" ? Temporal.PlainDate.from(d) : d;
+  return pd.equals(Temporal.Now.plainDateISO());
+}
+
+export function sumTimerHours(timers: Timer[] = []) {
+  return timers.reduce((hours, timer) => {
+    const d = Temporal.PlainDate.from(timer.date);
+    const start = Temporal.PlainTime.from(timer.start);
+    const end = timer.end
+      ? Temporal.PlainTime.from(timer.end)
+      : isToday(d)
+      ? Temporal.Now.plainTimeISO().round({
+          smallestUnit: "minute",
+          roundingIncrement: 15,
+          roundingMode: "ceil",
+        })
+      : Temporal.PlainTime.from({ hour: 17, minute: 0 });
+    const dur = end.since(start, {
+      largestUnit: "hour",
+      smallestUnit: "minute",
+      roundingIncrement: 0.25,
+      roundingMode: "ceil",
+    });
+
+    return (hours += dur.total("hours"));
+  }, 0);
 }
 
 const timersRouter = router({
@@ -102,14 +135,21 @@ const timersRouter = router({
       const { userId } = ctx.user;
       const db = await getDBClient();
       const collection = db.collection("timers");
-      const date = Temporal.PlainDate.from(input);
-
-      const year = date.year;
-      const month = `${date.month}`.padStart(2, "0");
-      const $regex = new RegExp(`^${year}-${month}-\\d{2}`);
+      const inputDate = Temporal.PlainDate.from(input);
+      const date = Temporal.PlainDate.from({
+        year: inputDate.year,
+        month: inputDate.month,
+        day: 1,
+      });
 
       return collection
-        .find<Timer>({ owner: userId, date: { $regex } })
+        .find<Timer>({
+          owner: userId,
+          date: {
+            $gte: date.toString(),
+            $lt: date.add({ months: 1 }).toString(),
+          },
+        })
         .sort(timerSort)
         .toArray();
     }),
@@ -122,29 +162,72 @@ const timersRouter = router({
       const date = Temporal.PlainDate.from(input.week);
 
       const Sunday = getSunday(date);
-      const Saturday = Sunday.add({ days: 6 });
-
-      const year = date.year;
-      const month = `${date.month}`.padStart(2, "0");
-      const $regex = new RegExp(`^${year}-${month}-\\d{2}`);
-      const query: Query = { owner: userId, date: { $regex } };
-
-      if (input.project) {
-        query.project = input.project;
-      }
-
-      const monthly = await collection
-        .find<Timer>(query)
+      return await collection
+        .find<Timer>(
+          input.project
+            ? {
+                owner: userId,
+                project: input.project,
+                date: {
+                  $gte: Sunday.toString(),
+                  $lt: Sunday.add({ weeks: 1 }).toString(),
+                },
+              }
+            : {
+                owner: userId,
+                date: {
+                  $gte: Sunday.toString(),
+                  $lt: Sunday.add({ weeks: 1 }).toString(),
+                },
+              }
+        )
         .sort(timerSort)
         .toArray();
+    }),
+  getUtilizationForYear: protectedProcedure
+    .input(z.object({ date: PlainYearMonth }))
+    .query(async ({ ctx, input }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("timers");
+      const date = Temporal.PlainYearMonth.from(input.date);
+      const months = new Array(12).fill(null);
 
-      return monthly.filter((t) => {
-        const date = Temporal.PlainDate.from(t.date);
-        return (
-          Temporal.PlainDate.compare(date, Sunday) >= 0 &&
-          Temporal.PlainDate.compare(date, Saturday) <= 0
-        );
+      const yearlyTimers = await collection
+        .find<Timer>({
+          owner: userId,
+          date: {
+            $gte: date.toString(),
+            $lte: date.add({ years: 1 }).toString(),
+          },
+        })
+        .toArray();
+
+      months.forEach((_, m) => {
+        const pd = date.add({ months: m });
+        months[m] = {
+          year: pd.year,
+          date: pd.toString(),
+          month: pd.toLocaleString("en", { month: "short" }),
+          days: new Array(pd.daysInMonth).fill(null).map((_, d) => {
+            const day = Temporal.PlainDate.from({
+              year: pd.year,
+              month: pd.month,
+              day: d + 1,
+            });
+            const timers = yearlyTimers.filter(
+              (t) => t.date === day.toString() && t.utilized
+            );
+            return {
+              date: day.toString(),
+              day: day.toLocaleString("en", { weekday: "short" }),
+              hours: sumTimerHours(timers),
+            };
+          }),
+        };
       });
+
+      return months as YearlyUtilizationReport;
     }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const { userId } = ctx.user;

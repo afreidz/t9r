@@ -52,3 +52,28 @@ const TimerSchema = z
 
 export default TimerSchema;
 export type Timer = z.infer<typeof TimerSchema>;
+
+export type MonthlyUtilizationReport = {
+  year: number;
+  month: string;
+  date: string;
+  days: {
+    day: string;
+    date: string;
+    hours: number;
+  }[];
+};
+export type YearlyUtilizationReport = [
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport,
+  MonthlyUtilizationReport
+];

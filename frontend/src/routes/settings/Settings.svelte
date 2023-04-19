@@ -54,6 +54,11 @@
             </select>
           </Field>
         {/if}
+        {#if newValues?.trackingStart}
+          <Field label="Track utilization as of">
+            <input type="date" bind:value={newValues.trackingStart} />
+          </Field>
+        {/if}
         {#if newValues?.sod}
           <Field label="Start of day">
             <Time bind:value={newValues.sod} />

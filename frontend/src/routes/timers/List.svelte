@@ -275,7 +275,7 @@
   </Header>
 
   <div
-    class="flex flex-1 flex-col gap-y-1 overflow-auto"
+    class="flex flex-1 flex-col gap-y-1"
     bind:this={stage}
     class:grid={view === "timeline"}
     class:max-w-7xl={view !== "timeline"}
