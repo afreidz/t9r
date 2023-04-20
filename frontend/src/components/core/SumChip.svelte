@@ -1,7 +1,10 @@
 <script lang="ts">
   import Copy from "@/foundation/Copy.svelte";
+
+  export let value: number = 0;
+  export let unit: string = "";
+  export let label: string = "hours";
   export let as: keyof HTMLElementTagNameMap = "div";
-  export let hours: number = 0;
 </script>
 
 <svelte:element
@@ -10,8 +13,8 @@
 >
   <div class="flex flex-1 flex-col text-black">
     <Copy dim as="span" variant="pseudomono" class="text-center text-xs text-black"
-      >Hours</Copy
+      >{label}</Copy
     >
-    <Copy bold as="strong" class="flex justify-center md:text-2xl">{hours}</Copy>
+    <Copy bold as="strong" class="flex justify-center md:text-2xl">{value}{unit}</Copy>
   </div>
 </svelte:element>

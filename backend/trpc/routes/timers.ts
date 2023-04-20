@@ -205,6 +205,7 @@ const timersRouter = router({
 
       months.forEach((_, m) => {
         const pd = date.add({ months: m });
+
         months[m] = {
           year: pd.year,
           date: pd.toString(),

@@ -1,9 +1,10 @@
 <script lang="ts">
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
-  import { isToday, roundDown } from "@/lib/dates";
+  import { pop } from "svelte-spa-router";
   import { createEventDispatcher } from "svelte";
   import Button from "@/foundation/Button.svelte";
+  import { isToday, roundDown } from "@/lib/dates";
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
   import settings, { getSettings } from "@/lib/stores/settings";
@@ -40,7 +41,14 @@
 </script>
 
 <DualAction label="Start new timer for">
-  <span slot="secondary" />
+  <Button
+    slot="primary"
+    title="Navigate back"
+    on:click={pop}
+    class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
+  >
+    <Icon icon="ic:outline-arrow-back" />
+  </Button>
   <select
     slot="content"
     class="appearance-none !bg-transparent text-black outline-none"
@@ -54,7 +62,7 @@
     {/each}
   </select>
   <Button
-    slot="primary"
+    slot="secondary"
     on:click={newTimer}
     class="flex h-10 w-10 items-center justify-center !rounded-full text-white !ring-offset-white"
     style={`background-color: ${$mostRecentProject.color}`}

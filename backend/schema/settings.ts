@@ -12,6 +12,7 @@ const SettingsSchema = z.object({
     .nullable()
     .default(Temporal.PlainTime.from({ hour: 17, minute: 0 }).toString()),
   fiscalYearStart: z.number().min(1).max(12).default(4),
+  defaultUtilization: z.number().min(0).max(100).default(100),
   trackingStart: PlainDate.default(Temporal.Now.plainDateISO().toString()),
 });
 

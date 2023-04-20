@@ -74,9 +74,29 @@
       <div class="md:ml-4">
         <Field label="Default Timeline Zoom">
           {#if newValues?.zoom}
-            <input type="number" step={0.1} bind:value={newValues.zoom} />
+            <input
+              type="number"
+              step={0.1}
+              bind:value={newValues.zoom}
+              class="my-2 w-full text-center text-3xl"
+            />
           {:else}
-            <input type="number" step={0.1} bind:value={$timelineZoom} />
+            <input
+              type="number"
+              step={0.1}
+              bind:value={$timelineZoom}
+              class="my-2 w-full text-center text-3xl"
+            />
+          {/if}
+        </Field>
+        <Field label="Default Utilization Target %">
+          {#if newValues?.defaultUtilization}
+            <input
+              type="number"
+              max={100}
+              bind:value={newValues.defaultUtilization}
+              class="my-2 w-full text-center text-3xl"
+            />
           {/if}
         </Field>
       </div>

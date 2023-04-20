@@ -20,7 +20,7 @@
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
-  import HourSum from "@/core/HourSum.svelte";
+  import HourSum from "@/core/SumChip.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import { fetchTags } from "@/lib/stores/tags";
   import NewTimer from "@/core/NewTimer.svelte";
@@ -218,7 +218,7 @@
 
     <div slot="right">
       {#key key}
-        <HourSum hours={sumTimerHours(timers)} />
+        <HourSum value={sumTimerHours(timers)} />
       {/key}
     </div>
 

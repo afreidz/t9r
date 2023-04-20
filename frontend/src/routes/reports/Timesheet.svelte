@@ -15,7 +15,7 @@
   import { fade } from "svelte/transition";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
-  import HourSum from "@/core/HourSum.svelte";
+  import HourSum from "@/core/SumChip.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import projects from "@/lib/stores/projects";
@@ -30,12 +30,12 @@
   import type { Project } from "@/backend/schema/project";
 
   import ActionBar from "@/core/actions/Bar.svelte";
+  import breakpoints from "@/lib/stores/breakpoints";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionCopy from "@/core/actions/Copy.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
-  import breakpoints from "@/lib/stores/breakpoints";
 
   type Timesheet = {
     project: Project;
@@ -119,7 +119,7 @@
     >
       <div slot="right">
         {#key $now}
-          <HourSum hours={sumTimerHours(getAllTimersFromTimesheet(timesheet))} />
+          <HourSum value={sumTimerHours(getAllTimersFromTimesheet(timesheet))} />
         {/key}
       </div>
       <ActionBar>
@@ -141,7 +141,7 @@
         style="grid-template-rows: repeat({timesheet.length +
           1 +
           $projects.length}, max-content); grid-template-columns: repeat(7, minmax(130px, ${$breakpoints.md
-          ? '320px'
+          ? '16rem'
           : '1fr'}));"
       >
         {#each week as day, i}
