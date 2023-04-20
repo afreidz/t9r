@@ -74,7 +74,7 @@ const targetsRouter = router({
       const db = await getDBClient();
       const collection = db.collection("targets");
 
-      const query = { year: input.year };
+      const query = { year: input.year, owner: userId };
       const update = {
         $set: {
           owner: userId,

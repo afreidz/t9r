@@ -1,21 +1,15 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
   import Header from "@/core/Header.svelte";
 
-  type $$Props = {
-    sub?: string;
-    open?: boolean;
-    title?: string;
-  };
-
   let dialog: HTMLDialogElement;
-  let { open, title, sub }: $$Props = $$props;
+
+  export let sub: string = "";
+  export let title: string = "";
+  export let open: boolean = false;
 
   $: if (open) {
     dialog?.showModal();
   }
-
-  export { open, title, sub };
 </script>
 
 <dialog
@@ -24,7 +18,7 @@
 >
   <form method="dialog">
     <Header main={title} {sub}>
-      <slot name="close" />
+      <slot name="close" slot="right" />
     </Header>
     <slot />
   </form>
