@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import twconfig from "../../tailwind.config.cjs";
 import resolveConfig from "tailwindcss/resolveConfig";
 
-const config = resolveConfig(twconfig as Config);
+export const config = resolveConfig(twconfig as Config);
 
 const colorsArray = JSON.stringify(config.theme?.colors || {}).match(
   /#(([0-9a-fA-F]{2}){3,4}|([0-9a-fA-F]){3,4})/g

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { press } from "svelte-gestures";
+  import hold from "@/lib/hold";
   import { fade } from "svelte/transition";
 
   let as: "div" | "a" = "div";
@@ -18,13 +18,14 @@
   <svelte:element
     this={as}
     {href}
-    on:press={() => (active = true)}
+    use:hold
+    on:hold={() => (active = true)}
     on:focus={() => (active = true)}
     on:blur={() => (active = false)}
+    on:release={() => (active = false)}
     on:mouseover={() => (active = true)}
     on:mouseout={() => (active = false)}
     on:touchend={() => (active = false)}
-    use:press={{ timeframe: 600, triggerBeforeFinished: true }}
     class="block h-full w-full rounded-sm ring-blue-500 {color} {highlight
       ? 'ring-2 ring-offset-4 ring-offset-neutral-800'
       : 'ring-0'}"
