@@ -4,27 +4,27 @@
   import { fly } from "svelte/transition";
   import Nav from "@/core/nav/Nav.svelte";
   import observeResize from "@/lib/resize";
+  import PageLoad from "@/core/PageLoad.svelte";
   import MenuTrigger from "./MenuTrigger.svelte";
   import { fetchProjects } from "@/stores/projects";
   import breakpoints from "@/lib/stores/breakpoints";
-  import { mainResizeObserver } from "@/lib/stores/ui";
+  import { getSettings } from "@/lib/stores/settings";
+  import { mainResizeObserver, showLoader } from "@/lib/stores/ui";
 
   let menuOpen = false;
   let main: HTMLElement;
+  let fullLoader: Promise<unknown> | undefined = undefined;
   export let loader: Promise<unknown> | undefined = undefined;
 
   $: if (main) observeResize(main, mainResizeObserver);
+  $: if (loader) fullLoader = Promise.all([fetchProjects(), getSettings(), loader]);
 </script>
 
-{#await fetchProjects()}
-  <div class="flex h-screen flex-1 items-center justify-center">
-    <Icon icon="eos-icons:loading" class="h-20 w-20 text-white" />
-  </div>
-{:then}
-  {#await loader}
-    <div class="flex h-screen flex-1 items-center justify-center">
-      <Icon icon="eos-icons:loading" class="h-20 w-20 text-white" />
-    </div>
+{#if $showLoader}
+  <PageLoad />
+{:else}
+  {#await fullLoader}
+    <PageLoad />
   {:then}
     <div
       class="grid h-screen min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_3rem] bg-neutral-900 p-4 pt-0 text-text-light md:grid-cols-[320px_auto] md:p-6 md:pt-4"
@@ -64,7 +64,7 @@
       </footer>
     </div>
   {/await}
-{/await}
+{/if}
 
 <style>
   aside::-webkit-scrollbar {

@@ -2,6 +2,7 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import Colors from "@/core/Colors.svelte";
+  import { showLoader } from "@/lib/stores/ui";
   import { createEventDispatcher } from "svelte";
   import { fetchProjects } from "@/stores/projects";
   import DualAction from "@/core/DualAction.svelte";
@@ -14,15 +15,22 @@
   const dispatch = createEventDispatcher<{ created: undefined }>();
 
   async function submit() {
-    const result = await trpc.projects.create.mutate({
-      name,
-      color,
-    });
+    $showLoader = true;
+    const result = await trpc.projects.create
+      .mutate({
+        name,
+        color,
+      })
+      .catch(() => {
+        $showLoader = false;
+        return { acknowledged: false };
+      });
 
     if (result.acknowledged) {
       await fetchProjects();
       dispatch("created");
     }
+    $showLoader = false;
   }
 </script>
 
@@ -58,6 +66,7 @@
       bind:value={name}
     />
     <Button
+      type="submit"
       slot="primary"
       class="flex aspect-square h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
     >

@@ -1,4 +1,5 @@
 import trpc from "@/lib/trpc";
+import { timelineZoom } from "./ui";
 import { writable } from "svelte/store";
 import type { Settings } from "@/backend/schema/settings";
 
@@ -16,6 +17,7 @@ export async function getSettings() {
 
   delete current?._id;
   settings.update(() => current);
+  timelineZoom.update(() => current?.zoom || 2);
 }
 
 export default settings;

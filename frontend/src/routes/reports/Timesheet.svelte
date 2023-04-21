@@ -12,7 +12,6 @@
   import clipboard from "clipboardy";
   import Tag from "@/core/Tag.svelte";
   import { pop } from "svelte-spa-router";
-  import { fade } from "svelte/transition";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
   import HourSum from "@/core/SumChip.svelte";
@@ -25,7 +24,6 @@
   import DualAction from "@/core/DualAction.svelte";
   import tags, { fetchTags } from "@/lib/stores/tags";
   import type { Timer } from "@/backend/schema/timer";
-  import { mainResizeObserver } from "@/lib/stores/ui";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
 
@@ -35,6 +33,7 @@
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionCopy from "@/core/actions/Copy.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
+  import ActionClose from "@/core/actions/Close.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
   type Timesheet = {
@@ -52,9 +51,10 @@
 
   export let params: { date: string } = { date: getToday().toString() };
 
+  let details: Tasks | undefined;
   let loader: Promise<Timesheet>;
+  let headerLocation: HTMLElement;
   let viewDate: Temporal.PlainDate;
-  let showDetailsFor: string | undefined;
   let week = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   $: if (params.date) viewDate = Temporal.PlainDate.from(params.date);
@@ -104,6 +104,17 @@
     const mapped = timesheet.map((entry) => entry.days.map((d) => d.timers));
     return mapped.flat(Infinity) as Timer[];
   }
+
+  function getCopyTextFromTasks(t: Tasks) {
+    return t
+      .map(
+        (task) =>
+          "• " +
+          task.title +
+          (task.tags.length ? "\n" + task.tags.map((tag) => `\t◦ ${tag}`).join("\n") : "")
+      )
+      .join("\n");
+  }
 </script>
 
 <Layout loader={fetchTags()}>
@@ -133,6 +144,7 @@
           disabled={isToday(viewDate)}
         />
       </ActionBar>
+      <span class="sr-only" bind:this={headerLocation}>Actions</span>
     </Header>
     <Container class="flex-1">
       <div
@@ -160,20 +172,6 @@
               />
             </div>
             {#each entry.days as day}
-              {@const tasks = getTasksAndTagsFromTimers(day.timers)}
-              {@const detailsString = `details_${
-                entry.project._id
-              }_${day.date.toString()}`}
-              {@const details = tasks
-                .map(
-                  (task) =>
-                    "• " +
-                    task.title +
-                    (task.tags.length
-                      ? "\n" + task.tags.map((tag) => `\t◦ ${tag}`).join("\n")
-                      : "")
-                )
-                .join("\n")}
               <Field
                 as="div"
                 label="Hours"
@@ -187,55 +185,56 @@
                       class="flex flex-none items-center justify-center text-3xl"
                       >{sumTimerHours(day.timers)}</Copy
                     >
-                    {#if showDetailsFor === detailsString}
-                      {#if tasks.length}
-                        <ul
-                          in:fade
-                          class="h-24 flex-1 overflow-auto border-l border-neutral-900 px-4 pr-6"
-                        >
-                          {#each tasks as task}
-                            <li class="my-1">
-                              <Copy class="whitespace-nowrap text-sm line-clamp-1"
-                                >• {task.title}</Copy
-                              >
-                              <ul class="ml-4 list-disc">
-                                {#each task.tags as tag}
-                                  <li class="flex">
-                                    <span class="sr-only">•</span>
-                                    <Tag
-                                      class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
-                                      >{tag}</Tag
-                                    >
-                                  </li>
-                                {/each}
-                              </ul>
-                            </li>
-                          {/each}
-                        </ul>
-                      {/if}
-                    {/if}
                   </div>
                   <div class="flex flex-none items-stretch justify-evenly">
                     <ActionCopy
                       title="copy hours"
                       on:click={() => clipboard.write(`${sumTimerHours(day.timers)}`)}
                     />
-                    {#if tasks.length}
+                    {#if day.timers.length > 0}
                       <ActionInfo
                         isStatic={true}
-                        on:click={() =>
-                          (showDetailsFor =
-                            showDetailsFor === detailsString ? undefined : detailsString)}
-                      />
-                    {/if}
-                    {#if showDetailsFor === detailsString}
-                      <ActionCopy
-                        title="copy details"
-                        on:click={async () => {
-                          await clipboard.write(details);
-                          showDetailsFor = undefined;
-                        }}
-                      />
+                        enabled={!!details}
+                        direction={$breakpoints.xxxl ? "left" : "right"}
+                        top={headerLocation?.getBoundingClientRect().top}
+                        on:click={() => (details = getTasksAndTagsFromTimers(day.timers))}
+                      >
+                        {#if details}
+                          {@const text = getCopyTextFromTasks(details)}
+                          <header class="flex justify-between px-2">
+                            <ActionCopy
+                              title="copy details"
+                              on:click={async () => {
+                                await clipboard.write(text);
+                                details = undefined;
+                              }}
+                            />
+                            <ActionClose on:click={() => (details = undefined)} />
+                          </header>
+                          <ul
+                            class="my-4 rounded-md bg-gradient-to-br from-violet-600 to-cyan-600 p-6 shadow-xl"
+                          >
+                            {#each details as task}
+                              <li class="my-1">
+                                <Copy class="whitespace-nowrap text-sm line-clamp-1"
+                                  >• {task.title}</Copy
+                                >
+                                <ul class="ml-4 list-disc">
+                                  {#each task.tags as tag}
+                                    <li class="flex">
+                                      <span class="sr-only">•</span>
+                                      <Tag
+                                        class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
+                                        >{tag}</Tag
+                                      >
+                                    </li>
+                                  {/each}
+                                </ul>
+                              </li>
+                            {/each}
+                          </ul>
+                        {/if}
+                      </ActionInfo>
                     {/if}
                   </div>
                 </section>

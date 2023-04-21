@@ -51,6 +51,7 @@
   let page: number = 1;
   let per: number = 100;
   let stage: HTMLElement;
+  let showFilters = false;
   let view: Views = "list";
   let timers: Timer[] = [];
   let nowIndicator: HTMLElement;
@@ -224,7 +225,12 @@
 
     <ActionBar class={view === "timeline" ? "sticky left-0" : ""}>
       <div slot="left" class="flex gap-2">
-        <ActionFilter>Filters</ActionFilter>
+        <ActionFilter
+          direction="left"
+          sideBarClass="mt-6"
+          enabled={showFilters}
+          on:click={() => (showFilters = !showFilters)}>Filters</ActionFilter
+        >
         {#if duration !== "all"}
           <ActionPicker />
         {/if}
@@ -252,7 +258,12 @@
             }}
           />
         {/if}
-        <ActionInfo enabled={showInfo}>
+        <ActionInfo
+          direction="right"
+          enabled={showInfo}
+          sideBarClass="mt-6"
+          on:click={() => (showInfo = !showInfo)}
+        >
           {#each timers as timer}
             <TimerCard
               id={timer._id}

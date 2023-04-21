@@ -107,7 +107,7 @@
     </ActionBar>
   </Header>
   {#if report}
-    <div class="my-10 flex flex-wrap gap-6">
+    <div class="my-10 flex flex-wrap justify-center gap-6 md:justify-start">
       {#each report as item}
         <div class="relative w-64">
           <Copy
