@@ -11,7 +11,6 @@
   import Time from "@/foundation/Time.svelte";
   import settings from "@/lib/stores/settings";
   import Field from "@/foundation/Field.svelte";
-  import { timelineZoom } from "@/lib/stores/ui";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import Container from "@/foundation/Container.svelte";
@@ -25,9 +24,6 @@
 
   async function update() {
     if (!newValues) return;
-    if (newValues.zoom) {
-      $timelineZoom = newValues.zoom;
-    }
     await trpc.settings.updateOrCreate.mutate(newValues);
     $settings = await trpc.settings.get.query();
     pop();
@@ -72,23 +68,6 @@
       </div>
       <Copy as="h3" semibold variant="gradient" class="my-4 uppercase">Miscelaneous</Copy>
       <div class="md:ml-4">
-        <Field label="Default Timeline Zoom">
-          {#if newValues?.zoom}
-            <input
-              type="number"
-              step={0.1}
-              bind:value={newValues.zoom}
-              class="my-2 w-full text-center text-3xl"
-            />
-          {:else}
-            <input
-              type="number"
-              step={0.1}
-              bind:value={$timelineZoom}
-              class="my-2 w-full text-center text-3xl"
-            />
-          {/if}
-        </Field>
         <Field label="Default Utilization Target %">
           {#if newValues?.defaultUtilization}
             <input

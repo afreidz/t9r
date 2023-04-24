@@ -4,7 +4,6 @@ import { PlainTime, PlainDate } from "./timer";
 const SettingsSchema = z.object({
   _id: z.string().optional(),
   owner: z.string().optional(),
-  zoom: z.number().optional().default(2),
   sod: PlainTime.optional()
     .nullable()
     .default(Temporal.PlainTime.from({ hour: 9, minute: 0 }).toString()),

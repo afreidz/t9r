@@ -34,13 +34,13 @@
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
+  import Copy from "@/components/foundation/Copy.svelte";
   import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionPicker from "@/core/actions/Picker.svelte";
   import ActionZoomIn from "@/core/actions/ZoomIn.svelte";
+  import Field from "@/components/foundation/Field.svelte";
   import ActionZoomOut from "@/core/actions/ZoomOut.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
-  import Copy from "@/components/foundation/Copy.svelte";
-  import Field from "@/components/foundation/Field.svelte";
 
   export let params: { date: string } = { date: Temporal.Now.plainDateISO().toString() };
 
@@ -348,32 +348,6 @@
   </div>
 
   <div slot="cta">
-    <!-- {#if $isSelecting || ["all", "days"].includes(duration)}
-      {#if $isSelecting}
-        <DualAction>
-          <Button
-            slot="secondary"
-            on:click={() => {
-              $selected = [];
-              $isSelecting = false;
-            }}
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
-          >
-            <Icon icon="teenyicons:x-small-outline" />
-          </Button>
-          <span slot="content">Edit {$selected.length} timers</span>
-          <Button
-            on:click={() => {
-              push("/timer/selected");
-              $isSelecting = false;
-            }}
-            slot="primary"
-            class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
-          >
-            <Icon icon="ri:pencil-line" />
-          </Button>
-        </DualAction>
-      {:else if duration === "all" || duration === "days"} -->
     <NewTimer
       lastTimer={timers.at(-1)}
       date={viewDate}
@@ -382,7 +356,5 @@
         loader = updateTimers();
       }}
     />
-    <!-- {/if}
-    {/if} -->
   </div>
 </Layout>
