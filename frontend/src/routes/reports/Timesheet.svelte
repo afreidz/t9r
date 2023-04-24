@@ -13,6 +13,7 @@
   import Tag from "@/core/Tag.svelte";
   import { config } from "@/lib/theme";
   import tags from "@/lib/stores/tags";
+  import { main } from "@/lib/stores/ui";
   import { pop } from "svelte-spa-router";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
@@ -192,6 +193,7 @@
                       />
                       {#if day.timers.length > 0}
                         <ActionInfo
+                          location={$main}
                           isStatic={true}
                           enabled={!!details}
                           direction={$breakpoints.xxxl ? "left" : "right"}

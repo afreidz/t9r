@@ -7,14 +7,14 @@
   import observeResize from "@/lib/resize";
   import PageLoad from "@/core/PageLoad.svelte";
   import MenuTrigger from "./MenuTrigger.svelte";
+  import { main, pinRight } from "@/lib/stores/ui";
   import breakpoints from "@/lib/stores/breakpoints";
   import { mainResizeObserver, showLoader } from "@/lib/stores/ui";
 
   let menuOpen = false;
-  let main: HTMLElement;
   onMount(updateStores);
 
-  $: if (main) observeResize(main, mainResizeObserver);
+  $: if ($main) observeResize($main, mainResizeObserver);
 </script>
 
 <div
@@ -44,19 +44,23 @@
     <Nav on:navigate={() => (menuOpen = false)} />
   </aside>
   <main
-    bind:this={main}
+    bind:this={$main}
     in:fly={{ x: 500, opacity: 0 }}
-    class="relative z-[1] col-start-2 mb-4 flex flex-col overflow-hidden rounded-xl bg-neutral-800 md:row-span-3 md:mb-0"
+    class="relative z-[1] col-start-2 mb-4 flex flex-col overflow-hidden rounded-xl border border-black/20 bg-neutral-800 md:row-span-3 md:mb-0"
   >
     <div class="bg-neutral-800">
       <slot name="header" />
     </div>
-    <div class="flex flex-1 flex-col overflow-auto px-4 md:px-6">
-      {#if $showLoader}
-        <PageLoad />
-      {:else}
-        <slot />
-      {/if}
+    <div class="grid flex-1 grid-cols-[min-content_auto_min-content] px-4 md:px-6">
+      <div />
+      <div class="flex flex-1 flex-col overflow-auto">
+        {#if $showLoader}
+          <PageLoad />
+        {:else}
+          <slot />
+        {/if}
+      </div>
+      <div bind:this={$pinRight} />
     </div>
   </main>
   {#if !$showLoader}

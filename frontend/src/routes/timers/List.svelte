@@ -22,23 +22,25 @@
   import HourSum from "@/core/SumChip.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import NewTimer from "@/core/NewTimer.svelte";
-  import { timelineZoom } from "@/lib/stores/ui";
   import TimerComponent from "@/core/Timer.svelte";
   import { location, push } from "svelte-spa-router";
   import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
+  import Copy from "@/components/foundation/Copy.svelte";
+  import Field from "@/components/foundation/Field.svelte";
   import TimerCard from "@/components/core/TimerCard.svelte";
+  import { timelineZoom, pinRight, main } from "@/lib/stores/ui";
 
   import ActionBar from "@/core/actions/Bar.svelte";
+  import ActionPin from "@/core/actions/Pin.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
-  import Copy from "@/components/foundation/Copy.svelte";
+  import ActionClose from "@/core/actions/Close.svelte";
   import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionPicker from "@/core/actions/Picker.svelte";
   import ActionZoomIn from "@/core/actions/ZoomIn.svelte";
-  import Field from "@/components/foundation/Field.svelte";
   import ActionZoomOut from "@/core/actions/ZoomOut.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
@@ -49,20 +51,21 @@
   let page: number = 1;
   let per: number = 100;
   let stage: HTMLElement;
+  let infoPinned = false;
   let showFilters = false;
   let view: Views = "list";
   let timers: Timer[] = [];
+  let loader: Promise<void>;
   let nowIndicator: HTMLElement;
   let showInfo: boolean = false;
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
-  let loader: Promise<unknown> | undefined;
   let hovered: string | undefined = undefined;
   let key: Temporal.PlainDateTime | null = null;
   let duration: "days" | "months" | "weeks" | "all" = "days";
 
   onMount(() => {
-    showInfo = get(breakpoints).xxxl;
+    infoPinned = get(breakpoints).xxxl;
   });
 
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
@@ -203,14 +206,16 @@
       <div slot="left" class="flex gap-2">
         <ActionFilter
           direction="left"
-          sideBarClass="mt-6"
           enabled={showFilters}
           on:click={() => (showFilters = !showFilters)}
         >
           <div class="p-2">
-            <Copy as="h3" semibold variant="gradient" class="text-lg uppercase"
-              >Filter Timers</Copy
-            >
+            <header class="flex items-center justify-between px-2">
+              <Copy as="h3" semibold variant="gradient" class="text-lg uppercase"
+                >Filter Timers</Copy
+              >
+              <ActionClose on:click={() => (showFilters = false)} />
+            </header>
             <section>
               <Field label="Criteria">
                 <select>
@@ -255,10 +260,23 @@
         {/if}
         <ActionInfo
           direction="right"
-          enabled={showInfo}
-          sideBarClass="mt-6"
-          on:click={() => (showInfo = !showInfo)}
+          docked={infoPinned}
+          enabled={showInfo || infoPinned}
+          location={infoPinned ? $pinRight : $main}
+          on:click={() => {
+            if (!infoPinned) showInfo = !showInfo;
+          }}
         >
+          <header class="flex items-center justify-between px-2">
+            <ActionPin on:click={() => (infoPinned = !infoPinned)} />
+            <Copy
+              as="h3"
+              semibold
+              variant="gradient"
+              class="flex-1 text-center text-lg uppercase">Timer Info</Copy
+            >
+            <ActionClose on:click={() => (showInfo = false)} />
+          </header>
           {#each timers as timer}
             <TimerCard
               id={timer._id}
@@ -290,7 +308,7 @@
     {#if view === "timeline"}
       {#each new Array(24) as _, hour}
         <div
-          class="relative h-full border-l border-dotted border-white/10 opacity-50"
+          class="relative z-10 h-full border-l border-dotted border-white/10 opacity-50"
           style={calculateHourGridPosition(hour, timers.length)}
         >
           <span

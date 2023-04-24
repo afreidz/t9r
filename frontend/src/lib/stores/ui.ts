@@ -8,6 +8,8 @@ export const showAccount = writable(false);
 export const showProjects = writable(true);
 export const showArchived = writable(false);
 export const showForecasts = writable(true);
+export const main = writable<HTMLElement>();
+export const pinRight = writable<HTMLElement>();
 export const defaultTimerView = writable<Views>("timeline");
 export const mainResizeObserver = writable<ResizeObserverValue>(null);
 

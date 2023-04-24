@@ -5,7 +5,6 @@
   import { mainResizeObserver } from "@/lib/stores/ui";
 
   export let enabled = false;
-  export let sideBarClass: string = "";
   export let direction: "left" | "right" = "left";
 
   let elm: HTMLElement;
@@ -18,8 +17,7 @@
 
 {#key $mainResizeObserver}
   {#if elm}
-    {@const box = elm.getBoundingClientRect()}
-    <Sidebar {enabled} {direction} class={sideBarClass}>
+    <Sidebar {enabled} {direction}>
       <slot />
     </Sidebar>
   {/if}
