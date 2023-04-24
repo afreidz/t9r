@@ -78,7 +78,7 @@
 </script>
 
 <Layout>
-  <Header sub="Forecasted hours for" main="All Projects" class="mb-1" />
+  <Header slot="header" sub="Forecasted hours for" main="All Projects" class="mb-1" />
   <div
     style="grid-template-rows: 2rem repeat({$projects.length}, minmax(40px, 1fr)); grid-template-columns: max-content repeat({params.num}, 1fr);"
     class="relative grid overflow-auto"

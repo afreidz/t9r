@@ -3,6 +3,7 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import { pop } from "svelte-spa-router";
+  import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
   import Colors from "@/core/Colors.svelte";
@@ -20,7 +21,6 @@
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
   import type { Tag as TagType } from "@/backend/schema/tag";
-  import projects, { fetchProjects } from "@/stores/projects";
   import { formatForForecastWeek, getWeeksArray } from "@/lib/dates";
   import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
 
@@ -75,7 +75,6 @@
         _id: undefined,
       },
     });
-    await fetchProjects();
     pop();
   }
 
@@ -84,7 +83,6 @@
     const result = await trpc.projects.delete.mutate({ id: project._id });
 
     if (result.acknowledged) {
-      await fetchProjects();
       pop();
     }
   }
@@ -111,7 +109,7 @@
 </script>
 
 <Layout>
-  <Header sub="Details For" main={project?.name} class="mb-1" />
+  <Header slot="header" sub="Details For" main={project?.name} class="mb-1" />
   <Container class="flex-1">
     <section slot="primary" class="xl:flex-1">
       {#if newValues}

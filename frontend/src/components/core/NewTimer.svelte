@@ -2,12 +2,12 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import { pop } from "svelte-spa-router";
+  import settings from "@/lib/stores/settings";
   import { createEventDispatcher } from "svelte";
   import Button from "@/foundation/Button.svelte";
   import { isToday, roundDown } from "@/lib/dates";
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
-  import settings, { getSettings } from "@/lib/stores/settings";
   import projects, { mostRecentProject } from "@/stores/projects";
 
   let dispatch = createEventDispatcher();
@@ -21,7 +21,6 @@
 
   async function newTimer() {
     if (!$mostRecentProject._id) return;
-    await getSettings();
     await trpc.timers.create.mutate({
       date: date.toString(),
       project: $mostRecentProject._id,

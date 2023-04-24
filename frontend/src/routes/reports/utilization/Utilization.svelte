@@ -13,6 +13,7 @@
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import Copy from "@/components/foundation/Copy.svelte";
+  import Field from "@/components/foundation/Field.svelte";
   import { isBeforeDate, isToday, getToday } from "@/lib/dates";
   import { getFiscalYearStartMonth, isAfterDate } from "@/lib/dates";
   import type { YearlyUtilizationReport } from "@/backend/schema/timer";
@@ -21,23 +22,23 @@
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
-  import Field from "@/components/foundation/Field.svelte";
 
+  let startMonth: Temporal.PlainYearMonth;
   let view = Temporal.Now.plainDateISO();
   let report: YearlyUtilizationReport;
   let newTarget: HTMLInputElement;
-  let loader: Promise<void>;
   let target: number;
   let modify = false;
 
-  $: if (view)
-    loader = getFiscalYearStartMonth(view).then(async (pd) => {
-      target =
-        (await trpc.targets.getByYear.query({ year: view.year }))?.percent ||
-        get(settings)?.defaultUtilization ||
-        100;
-      report = await trpc.timers.getUtilizationForYear.query({ date: pd.toString() });
+  $: if (view) {
+    startMonth = getFiscalYearStartMonth(view);
+    trpc.targets.getByYear.query({ year: view.year }).then((result) => {
+      target = result?.percent || get(settings)?.defaultUtilization || 100;
     });
+    trpc.timers.getUtilizationForYear
+      .query({ date: startMonth.toString() })
+      .then((result) => (report = result));
+  }
 
   function pad(days: YearlyUtilizationReport[number]["days"]) {
     const firstOfMonth = Temporal.PlainDate.from(days[0].date);
@@ -92,10 +93,12 @@
   }
 </script>
 
-<Layout {loader}>
-  <Header main="Utilization" sub="Fiscal Year {view.year}">
+<Layout>
+  <Header slot="header" main="Utilization" sub="Fiscal Year {view.year}">
     <div slot="right">
-      <SumChip value={target} unit="%" label="Target" />
+      {#if target}
+        <SumChip value={target} unit="%" label="Target" />
+      {/if}
     </div>
     <ActionBar>
       <ActionPrev on:click={() => (view = view.subtract({ years: 1 }))} />

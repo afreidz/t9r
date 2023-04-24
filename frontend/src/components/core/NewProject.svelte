@@ -4,8 +4,8 @@
   import Colors from "@/core/Colors.svelte";
   import { showLoader } from "@/lib/stores/ui";
   import { createEventDispatcher } from "svelte";
-  import { fetchProjects } from "@/stores/projects";
   import DualAction from "@/core/DualAction.svelte";
+  import { updateProjects } from "@/lib/stores/projects";
   import type { Project } from "@/backend/schema/project";
   import Button from "@/components/foundation/Button.svelte";
 
@@ -27,9 +27,9 @@
       });
 
     if (result.acknowledged) {
-      await fetchProjects();
       dispatch("created");
     }
+    await updateProjects();
     $showLoader = false;
   }
 </script>

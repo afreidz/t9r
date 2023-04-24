@@ -7,11 +7,9 @@ export type User = {
 
 export const user = writable<User | undefined>();
 
-export async function update() {
+export async function updateUser() {
   const resp = await fetch("/.auth/me");
   const { userDetails, userId } = (await resp.json()).clientPrincipal;
 
   user.update(() => ({ id: userId, email: userDetails }));
 }
-
-update();

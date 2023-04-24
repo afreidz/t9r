@@ -1,4 +1,12 @@
 <script lang="ts">
+  import {
+    showTimers,
+    showReports,
+    showAccount,
+    showProjects,
+    showArchived,
+    showForecasts,
+  } from "@/stores/ui";
   import SubNav from "./Sub.svelte";
   import Icon from "@iconify/svelte";
   import SubItem from "./SubItem.svelte";
@@ -9,14 +17,6 @@
   import { location } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
   import NewProject from "@/core/NewProject.svelte";
-  import {
-    showTimers,
-    showReports,
-    showAccount,
-    showProjects,
-    showArchived,
-    showForecasts,
-  } from "@/stores/ui";
 
   let newProject = false;
 </script>

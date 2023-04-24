@@ -9,16 +9,16 @@
   import Layout from "@/core/Layout.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
+  import settings from "@/lib/stores/settings";
   import Field from "@/foundation/Field.svelte";
   import { timelineZoom } from "@/lib/stores/ui";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import Container from "@/foundation/Container.svelte";
   import type { Settings } from "@/backend/schema/settings";
-  import settings, { getSettings, type SettingsStore } from "@/lib/stores/settings";
 
   let dirty = false;
-  let newValues: SettingsStore = get(settings);
+  let newValues: Settings | null = get(settings);
 
   $: if (!newValues && $settings) newValues = JSON.parse(JSON.stringify($settings));
   $: if (newValues && $settings) dirty = !same<Settings>(newValues, $settings);
@@ -39,8 +39,8 @@
   }
 </script>
 
-<Layout loader={getSettings()}>
-  <Header main="Settings" sub="Account" />
+<Layout>
+  <Header slot="header" main="Settings" sub="Account" />
   <Container>
     <section slot="primary" class="max-w-xs xl:flex-1">
       <Copy as="h3" semibold variant="gradient" class="my-4 uppercase"

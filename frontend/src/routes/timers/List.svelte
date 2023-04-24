@@ -13,7 +13,6 @@
   } from "@/lib/dates";
   import trpc from "@/lib/trpc";
   import { onMount } from "svelte";
-  import Icon from "@iconify/svelte";
   import { get } from "svelte/store";
   import now from "@/lib/stores/now";
   import Tag from "@/core/Tag.svelte";
@@ -22,16 +21,13 @@
   import Header from "@/core/Header.svelte";
   import HourSum from "@/core/SumChip.svelte";
   import { sumTimerHours } from "@/lib/timers";
-  import { fetchTags } from "@/lib/stores/tags";
   import NewTimer from "@/core/NewTimer.svelte";
-  import Button from "@/foundation/Button.svelte";
+  import { timelineZoom } from "@/lib/stores/ui";
   import TimerComponent from "@/core/Timer.svelte";
-  import DualAction from "@/core/DualAction.svelte";
   import { location, push } from "svelte-spa-router";
   import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
   import TimerCard from "@/components/core/TimerCard.svelte";
-  import { isSelecting, selected, timelineZoom } from "@/lib/stores/ui";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
@@ -43,6 +39,8 @@
   import ActionZoomIn from "@/core/actions/ZoomIn.svelte";
   import ActionZoomOut from "@/core/actions/ZoomOut.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
+  import Copy from "@/components/foundation/Copy.svelte";
+  import Field from "@/components/foundation/Field.svelte";
 
   export let params: { date: string } = { date: Temporal.Now.plainDateISO().toString() };
 
@@ -131,7 +129,6 @@
         });
         break;
     }
-    await fetchTags();
   }
 
   function calculateGridPosition(s: string, e: string | null | undefined, i: number) {
@@ -181,42 +178,21 @@
   }
 </script>
 
-<Layout {loader}>
-  <Header as="h2">
-    <div slot="sub" class="flex flex-1 items-center gap-2">
-      {#if duration === "all"}
-        <Icon icon="mdi:hamburger-menu" />
-      {:else if duration === "months"}
-        <Icon icon="mdi:calendar-month-outline" class="text-neutral-light" />
-      {:else if duration === "weeks"}
-        <Icon icon="mdi:calendar-minus-outline" class="text-neutral-light" />
-      {:else if isToday(viewDate)}
-        <Icon icon="ic:round-arrow-circle-down" class="text-neutral-light" />
-      {:else}
-        <Icon icon="mdi:calendar-today-outline" class="text-neutral-light" />
-      {/if}
-      <span>
-        Timers
-        {#if duration === "days"}
-          for {getWeekDay(viewDate)}
-        {:else if duration === "weeks"}
-          for week of
-        {:else if duration === "months"}
-          for
-        {/if}
-      </span>
-    </div>
-    <div slot="main">
-      {#if duration === "months"}
-        {getMonth(viewDate)}
-        {viewDate.year}
-      {:else if duration !== "all"}
-        {getSunday(viewDate).day} {getMonth(viewDate)} {viewDate.year}
-      {:else}
-        All Timers
-      {/if}
-    </div>
-
+<Layout>
+  <Header
+    as="h2"
+    slot="header"
+    main={duration === "months"
+      ? `${getMonth(viewDate)} ${viewDate.year}`
+      : duration !== "all"
+      ? `${getSunday(viewDate).day} ${getMonth(viewDate)} ${viewDate.year}`
+      : "All Timers"}
+    sub={duration === "days"
+      ? `Timers for ${getWeekDay(viewDate)}`
+      : duration === "weeks"
+      ? `Timers for week of`
+      : "Timers for"}
+  >
     <div slot="right">
       {#key key}
         <HourSum value={sumTimerHours(timers)} />
@@ -229,8 +205,27 @@
           direction="left"
           sideBarClass="mt-6"
           enabled={showFilters}
-          on:click={() => (showFilters = !showFilters)}>Filters</ActionFilter
+          on:click={() => (showFilters = !showFilters)}
         >
+          <div class="p-2">
+            <Copy as="h3" semibold variant="gradient" class="text-lg uppercase"
+              >Filter Timers</Copy
+            >
+            <section>
+              <Field label="Criteria">
+                <select>
+                  <option>Choose...</option>
+                  <option>Date</option>
+                  <option>Project</option>
+                  <option>Title</option>
+                  <option>Utilized</option>
+                  <option>Tags</option>
+                  <option>Duration</option>
+                </select>
+              </Field>
+            </section>
+          </div>
+        </ActionFilter>
         {#if duration !== "all"}
           <ActionPicker />
         {/if}
@@ -290,7 +285,7 @@
     bind:this={stage}
     class:grid={view === "timeline"}
     class:max-w-7xl={view !== "timeline"}
-    style={`grid-template-columns: repeat(96, ${$timelineZoom}%); grid-template-rows: 2rem repeat(${timers.length}, min-content) auto;`}
+    style={`grid-template-columns: repeat(96, ${$timelineZoom}vw); grid-template-rows: 2rem repeat(${timers.length}, min-content) auto;`}
   >
     {#if view === "timeline"}
       {#each new Array(24) as _, hour}
@@ -353,7 +348,7 @@
   </div>
 
   <div slot="cta">
-    {#if $isSelecting || ["all", "days"].includes(duration)}
+    <!-- {#if $isSelecting || ["all", "days"].includes(duration)}
       {#if $isSelecting}
         <DualAction>
           <Button
@@ -378,16 +373,16 @@
             <Icon icon="ri:pencil-line" />
           </Button>
         </DualAction>
-      {:else if duration === "all" || duration === "days"}
-        <NewTimer
-          lastTimer={timers.at(-1)}
-          date={viewDate}
-          on:timer-update={() => {
-            loaded = false;
-            loader = updateTimers();
-          }}
-        />
-      {/if}
-    {/if}
+      {:else if duration === "all" || duration === "days"} -->
+    <NewTimer
+      lastTimer={timers.at(-1)}
+      date={viewDate}
+      on:timer-update={() => {
+        loaded = false;
+        loader = updateTimers();
+      }}
+    />
+    <!-- {/if}
+    {/if} -->
   </div>
 </Layout>

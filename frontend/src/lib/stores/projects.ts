@@ -5,13 +5,13 @@ import type { Project } from "@/backend/schema/project";
 const projects = writable<Project[]>([]);
 export const mostRecentProject = writable<Project>();
 
-export async function fetchProjects() {
-  const data = await trpc.projects.list.query();
-  projects.set(data);
+export async function updateProjects() {
+  const p = await trpc.projects.list.query();
+  projects.update(() => p);
 
-  mostRecentProject.update((mr) => {
-    const match = data.find((p) => p._id === mr?._id);
-    return match || data[0] || undefined;
+  mostRecentProject.update((mrp) => {
+    const existing = p.find((p) => mrp && p._id === mrp._id);
+    return existing || p[0];
   });
 }
 

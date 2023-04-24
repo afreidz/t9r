@@ -1,6 +1,7 @@
 <script lang="ts">
   import same from "@/lib/same";
   import trpc from "@/lib/trpc";
+  import { onMount } from "svelte";
   import now from "@/lib/stores/now";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
@@ -11,6 +12,7 @@
   import Header from "@/core/Header.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
+  import { showLoader } from "@/lib/stores/ui";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import Switch from "@/foundation/Switch.svelte";
@@ -18,7 +20,6 @@
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
   import Container from "@/foundation/Container.svelte";
-  import { isSelecting, selected } from "@/lib/stores/ui";
   import type { Project } from "@/backend/schema/project";
   import { getDurationHoursFromString } from "@/lib/dates";
   import type { Tag as TagType } from "@/backend/schema/tag";
@@ -30,58 +31,32 @@
   let dirty: boolean = false;
   let picker: HTMLInputElement;
   let timer: Timer | null = null;
-  let loader: () => Promise<void>;
   let project: Project | undefined;
   let confirmDelete: boolean = false;
   let timers: Timer[] | undefined = undefined;
   let newValues: Partial<Timer> | undefined = undefined;
   let emptyTimer: Partial<Timer> = { project: undefined };
 
+  onMount(async () => {
+    $showLoader = true;
+    timer = await trpc.timers.get.query(params.id);
+
+    if (timer) newValues = { ...timer };
+    if (timer) project = $projects.find((p) => p._id === timer?.project);
+    if (timer) tags = await trpc.tags.getAllByProject.query(timer.project);
+    $showLoader = false;
+  });
+
   export let params: { id: string };
 
-  if (params.id !== "selected") {
-    loader = async () => {
-      timer = await trpc.timers.get.query(params.id);
-
-      if (timer) newValues = { ...timer };
-      if (timer) project = $projects.find((p) => p._id === timer?.project);
-      if (timer) tags = await trpc.tags.getAllByProject.query(timer.project);
-      return;
-    };
-  } else {
-    loader = async () => {
-      timers = await trpc.timers.bulkGet.query($selected);
-
-      if (timers) newValues = { ...emptyTimer };
-      if (timers) tags = await trpc.tags.getAllByProject.query(timers[0].project);
-    };
-  }
-
-  $: multiple = params.id === "selected";
-
-  $: if (multiple && newValues && timers) {
-    dirty = !same<Partial<Timer>>(newValues, { ...emptyTimer });
-  } else if (!multiple && newValues && timer) {
-    dirty = !same<Partial<Timer>>(newValues, { ...timer });
-  }
+  $: if (newValues) dirty = !same<Partial<Timer>>(newValues, { ...timer });
 
   function reset() {
     newValues = multiple ? { ...emptyTimer } : { ...timer };
   }
 
   async function update() {
-    if (multiple && timers && newValues) {
-      await trpc.timers.bulkUpdate.mutate({
-        ids: $selected,
-        details: {
-          ...newValues,
-          _id: undefined,
-        },
-      });
-
-      timers = await trpc.timers.bulkGet.query($selected);
-      if (timers.length > 0) newValues = { ...emptyTimer };
-    } else if (!multiple && timer && timer._id) {
+    if (timer?._id) {
       await trpc.timers.update.mutate({
         id: timer._id,
         details: {
@@ -93,15 +68,11 @@
       if (timer) newValues = { ...timer };
     }
 
-    $selected = [];
-    $isSelecting = false;
     return pop();
   }
 
   async function handleDelete() {
-    if (multiple && $selected.length) {
-      await trpc.timers.bulkDelete.mutate($selected);
-    } else if (!multiple && timer && timer._id) {
+    if (timer?._id) {
       await trpc.timers.delete.mutate({ id: timer._id });
     }
     return pop();
@@ -176,13 +147,9 @@
   }
 </script>
 
-<Layout loader={loader()}>
+<Layout>
   {#if newValues}
-    <Header
-      class="mb-1"
-      sub="Timer details For"
-      main={multiple ? $selected.length + " Timers" : newValues.title}
-    />
+    <Header slot="header" class="mb-1" main={newValues.title} sub="Timer details For" />
     <Container class="flex-1">
       <section slot="primary" class="xl:flex-1">
         <Field label="Title">
@@ -339,9 +306,7 @@
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
-        <span slot="content"
-          >{multiple ? $selected.length + " Timers" : timer?.title}</span
-        >
+        <span slot="content">{timer?.title}</span>
         <Button
           on:click={update}
           slot="primary"
@@ -360,9 +325,7 @@
         >
           <Icon icon="material-symbols:skull-outline-sharp" />
         </Button>
-        <span slot="content"
-          >{multiple ? $selected.length + " Timers" : timer?.title}</span
-        >
+        <span slot="content">{timer?.title}</span>
         <Button
           slot="primary"
           title="Navigate back"
