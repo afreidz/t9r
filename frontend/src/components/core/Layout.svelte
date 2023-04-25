@@ -1,20 +1,30 @@
 <script lang="ts">
+  import {
+    main,
+    showLoader,
+    showRightSidebar,
+    showLeftSidebar,
+    mainResizeObserver,
+  } from "@/lib/stores/ui";
   import { onMount } from "svelte";
   import Logo from "./Logo.svelte";
   import { fly } from "svelte/transition";
   import Nav from "@/core/nav/Nav.svelte";
   import updateStores from "@/lib/stores";
   import observeResize from "@/lib/resize";
+  import Sidebar from "@/core/Sidebar.svelte";
   import PageLoad from "@/core/PageLoad.svelte";
-  import MenuTrigger from "./MenuTrigger.svelte";
-  import { main, pinRight } from "@/lib/stores/ui";
   import breakpoints from "@/lib/stores/breakpoints";
-  import { mainResizeObserver, showLoader } from "@/lib/stores/ui";
+  import MenuTrigger from "@/core/MenuTrigger.svelte";
 
   let menuOpen = false;
   onMount(updateStores);
 
   $: if ($main) observeResize($main, mainResizeObserver);
+  $: if ($main) {
+    $showLeftSidebar = false;
+    $showRightSidebar = false;
+  }
 </script>
 
 <div
@@ -51,17 +61,19 @@
     <div class="bg-neutral-800">
       <slot name="header" />
     </div>
-    <div class="grid flex-1 grid-cols-[min-content_auto_min-content] px-4 md:px-6">
-      <div />
-      <div class="flex flex-1 flex-col overflow-auto">
-        {#if $showLoader}
-          <PageLoad />
-        {:else}
-          <slot />
-        {/if}
-      </div>
-      <div bind:this={$pinRight} />
+    <div class="relative flex flex-1 flex-col overflow-auto px-4 md:px-6">
+      {#if $showLoader}
+        <PageLoad />
+      {:else}
+        <slot />
+      {/if}
     </div>
+    <Sidebar direction="right" enabled={$showRightSidebar}>
+      <slot name="right" />
+    </Sidebar>
+    <Sidebar direction="left" enabled={$showLeftSidebar}>
+      <slot name="left" />
+    </Sidebar>
   </main>
   {#if !$showLoader}
     <footer class="col-span-2 flex w-full items-center justify-center md:col-span-1">

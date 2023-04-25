@@ -9,7 +9,6 @@
     formatTime,
     formatForMonth,
     formatForShortTime,
-    getDurationHoursFromString,
   } from "@/lib/dates";
   import trpc from "@/lib/trpc";
   import { onMount } from "svelte";
@@ -19,20 +18,21 @@
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
+  import Copy from "@/foundation/Copy.svelte";
   import HourSum from "@/core/SumChip.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import NewTimer from "@/core/NewTimer.svelte";
+  import Button from "@/foundation/Button.svelte";
+  import TimerCard from "@/core/TimerCard.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import { location, push } from "svelte-spa-router";
   import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
-  import Copy from "@/components/foundation/Copy.svelte";
-  import Field from "@/components/foundation/Field.svelte";
-  import TimerCard from "@/components/core/TimerCard.svelte";
-  import { timelineZoom, pinRight, main } from "@/lib/stores/ui";
+  import Filters from "@/core/filters/Filters.svelte";
+  import { showLeftSidebar, showRightSidebar, timelineZoom } from "@/lib/stores/ui";
 
   import ActionBar from "@/core/actions/Bar.svelte";
-  import ActionPin from "@/core/actions/Pin.svelte";
+  import ActionAdd from "@/core/actions/Add.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
@@ -51,21 +51,20 @@
   let page: number = 1;
   let per: number = 100;
   let stage: HTMLElement;
-  let infoPinned = false;
-  let showFilters = false;
   let view: Views = "list";
   let timers: Timer[] = [];
   let loader: Promise<void>;
   let nowIndicator: HTMLElement;
-  let showInfo: boolean = false;
+  let filters: Filter.Set = [{}];
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
+  let combinator: Filter.Combinator = "and";
   let hovered: string | undefined = undefined;
   let key: Temporal.PlainDateTime | null = null;
   let duration: "days" | "months" | "weeks" | "all" = "days";
 
   onMount(() => {
-    infoPinned = get(breakpoints).xxxl;
+    $showRightSidebar = get(breakpoints).xxxl;
   });
 
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
@@ -74,6 +73,7 @@
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
   $: if ($now) nowText = formatForShortTime($now);
   $: if (view) loaded = false;
+  $: console.log(filters);
 
   $: duration = $location.includes("/timers/month")
     ? "months"
@@ -206,31 +206,9 @@
       <div slot="left" class="flex gap-2">
         <ActionFilter
           direction="left"
-          enabled={showFilters}
-          on:click={() => (showFilters = !showFilters)}
-        >
-          <div class="p-2">
-            <header class="flex items-center justify-between px-2">
-              <Copy as="h3" semibold variant="gradient" class="text-lg uppercase"
-                >Filter Timers</Copy
-              >
-              <ActionClose on:click={() => (showFilters = false)} />
-            </header>
-            <section>
-              <Field label="Criteria">
-                <select>
-                  <option>Choose...</option>
-                  <option>Date</option>
-                  <option>Project</option>
-                  <option>Title</option>
-                  <option>Utilized</option>
-                  <option>Tags</option>
-                  <option>Duration</option>
-                </select>
-              </Field>
-            </section>
-          </div>
-        </ActionFilter>
+          enabled={$showLeftSidebar}
+          on:click={() => ($showLeftSidebar = !$showLeftSidebar)}
+        />
         {#if duration !== "all"}
           <ActionPicker />
         {/if}
@@ -260,40 +238,11 @@
         {/if}
         <ActionInfo
           direction="right"
-          docked={infoPinned}
-          enabled={showInfo || infoPinned}
-          location={infoPinned ? $pinRight : $main}
+          enabled={$showRightSidebar}
           on:click={() => {
-            if (!infoPinned) showInfo = !showInfo;
+            $showRightSidebar = !$showRightSidebar;
           }}
-        >
-          <header class="flex items-center justify-between px-2">
-            <ActionPin on:click={() => (infoPinned = !infoPinned)} />
-            <Copy
-              as="h3"
-              semibold
-              variant="gradient"
-              class="flex-1 text-center text-lg uppercase">Timer Info</Copy
-            >
-            <ActionClose on:click={() => (showInfo = false)} />
-          </header>
-          {#each timers as timer}
-            <TimerCard
-              id={timer._id}
-              end={timer.end}
-              tags={timer.tags}
-              title={timer.title}
-              start={timer.start}
-              hours={sumTimerHours([timer])}
-              highlight={hovered === timer._id}
-              date={formatForMonth(timer.date)}
-              on:focus={() => (hovered = timer._id)}
-              on:mouseover={() => (hovered = timer._id)}
-              on:mouseleave={() => (hovered = undefined)}
-              project={$projects.find((p) => p._id === timer.project)}
-            />
-          {/each}
-        </ActionInfo>
+        />
       </div>
     </ActionBar>
   </Header>
@@ -344,8 +293,6 @@
           project={$projects.find((p) => p._id === timer.project)}
           style={calculateGridPosition(timer.start, timer.end, i)}
           scrollto={!isToday(viewDate) && timers[i] === timers.at(-1)}
-          compact={view === "timeline" &&
-            getDurationHoursFromString(timer.start, timer.end ?? $now.toString()) < 1}
         >
           <div slot="left">
             {#if view !== "timeline"}
@@ -363,6 +310,58 @@
         </TimerComponent>
       {/each}
     {/key}
+  </div>
+
+  <div slot="right" class="overflow-auto md:min-w-[320px]">
+    <header class="flex items-center justify-between px-2">
+      <Copy as="h3" semibold variant="gradient" class="text-lg uppercase">Timer Info</Copy
+      >
+      <ActionClose on:click={() => ($showRightSidebar = false)} />
+    </header>
+    {#if $showRightSidebar}
+      {#each timers as timer}
+        <TimerCard
+          id={timer._id}
+          end={timer.end}
+          tags={timer.tags}
+          title={timer.title}
+          start={timer.start}
+          hours={sumTimerHours([timer])}
+          highlight={hovered === timer._id}
+          date={formatForMonth(timer.date)}
+          on:focus={() => (hovered = timer._id)}
+          on:mouseover={() => (hovered = timer._id)}
+          on:mouseleave={() => (hovered = undefined)}
+          project={$projects.find((p) => p._id === timer.project)}
+        />
+      {/each}
+    {/if}
+  </div>
+
+  <div slot="left" class="flex flex-1 flex-col overflow-auto md:min-w-[320px]">
+    {#if $showLeftSidebar}
+      <header
+        class="sticky top-0 z-10 flex flex-none items-center justify-between border-b border-black/20 bg-neutral-900 py-2 px-4"
+      >
+        <Copy as="h3" semibold variant="gradient" class="text-lg uppercase"
+          >Filter Timers</Copy
+        >
+        <div class="flex gap-2">
+          <ActionAdd on:click={() => (filters = [...filters, {}])} />
+          <ActionClose on:click={() => ($showLeftSidebar = false)} />
+        </div>
+      </header>
+      <Filters bind:filters bind:combinator class="mx-4 flex-1" />
+      <footer
+        class="sticky bottom-0 z-10 flex flex-none border-t border-black/20 bg-neutral-900 py-2 px-4"
+      >
+        <Button
+          class="flex-1 bg-gradient-to-br from-violet-600 to-cyan-600 py-4 text-center"
+        >
+          <Copy as="span" variant="gradient" bold class="uppercase">Apply Filters</Copy>
+        </Button>
+      </footer>
+    {/if}
   </div>
 
   <div slot="cta">

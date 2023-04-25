@@ -9,9 +9,14 @@ export const showProjects = writable(true);
 export const showArchived = writable(false);
 export const showForecasts = writable(true);
 export const main = writable<HTMLElement>();
-export const pinRight = writable<HTMLElement>();
-export const defaultTimerView = writable<Views>("timeline");
+export const showLeftSidebar = writable(false);
+export const showRightSidebar = writable(false);
 export const mainResizeObserver = writable<ResizeObserverValue>(null);
 
 export const timelineZoom = writable(Number(localStorage.getItem("zoom")) || 2);
 timelineZoom.subscribe((zoom) => localStorage.setItem("zoom", `${zoom}`));
+
+export const defaultTimerView = writable<Views>(
+  (localStorage.getItem("view") as Views) || "timeline"
+);
+defaultTimerView.subscribe((view) => localStorage.setItem("view", view));

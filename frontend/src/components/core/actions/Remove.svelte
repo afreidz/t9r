@@ -4,6 +4,5 @@
 </script>
 
 <Base {...$$restProps} on:click>
-  <span class="sr-only">Filter items</span>
-  <Icon icon="material-symbols:filter-alt-outline-sharp" />
+  <Icon icon="ic:baseline-minus" />
 </Base>
