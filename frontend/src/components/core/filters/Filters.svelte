@@ -10,7 +10,10 @@
   {#each filters as filter, i}
     {#if i !== 0}
       <div class="flex w-full items-center justify-between">
-        <select bind:value={combinator} class="my-2 h-8 rounded-md bg-neutral-700 px-4">
+        <select
+          bind:value={combinator}
+          class="my-2 h-8 rounded-md bg-neutral-light/5 px-4"
+        >
           <option value="and">and</option>
           <option value="or">or</option>
         </select>

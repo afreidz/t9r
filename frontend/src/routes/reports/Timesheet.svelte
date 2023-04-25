@@ -13,7 +13,6 @@
   import Tag from "@/core/Tag.svelte";
   import { config } from "@/lib/theme";
   import tags from "@/lib/stores/tags";
-  import { main } from "@/lib/stores/ui";
   import { pop } from "svelte-spa-router";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
@@ -25,11 +24,11 @@
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
+  import { showRightSidebar } from "@/lib/stores/ui";
   import type { Timer } from "@/backend/schema/timer";
   import type { Project } from "@/backend/schema/project";
 
   import ActionBar from "@/core/actions/Bar.svelte";
-  import breakpoints from "@/lib/stores/breakpoints";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionCopy from "@/core/actions/Copy.svelte";
@@ -58,6 +57,7 @@
   let viewDate: Temporal.PlainDate;
   let sections: HTMLElement[] = [];
   let detailsDate: Temporal.PlainDate | undefined;
+  let detailsEntry: Timesheet[number] | undefined;
   let week = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   let totalColor = (config.theme?.colors?.neutral as any)["900"];
 
@@ -193,110 +193,15 @@
                       />
                       {#if day.timers.length > 0}
                         <ActionInfo
-                          location={$main}
                           isStatic={true}
-                          enabled={!!details}
-                          direction={$breakpoints.xxxl ? "left" : "right"}
                           on:click={() => {
+                            $showRightSidebar = true;
                             details = getTasksAndTagsFromTimers(day.timers);
+                            detailsEntry = entry;
                             detailsDate = day.date;
                             detailsProject = entry.project;
                           }}
-                        >
-                          {#if details}
-                            {@const text = getCopyTextFromTasks(details)}
-                            <header class="flex items-center justify-between px-2">
-                              <ActionCopy
-                                title="copy details"
-                                disabled={details.length === 0}
-                                on:click={async () => {
-                                  await clipboard.write(text);
-                                }}
-                              />
-                              <div class="flex flex-none items-center gap-2">
-                                <ActionPrev
-                                  on:click={() => {
-                                    if (!detailsDate) return;
-                                    const prevDate = detailsDate.subtract({ days: 1 });
-                                    const prev = entry.days.find((d) =>
-                                      d.date.equals(prevDate)
-                                    );
-                                    details = prev
-                                      ? getTasksAndTagsFromTimers(prev.timers)
-                                      : undefined;
-                                    detailsDate = prev?.date;
-                                    detailsProject = entry.project;
-                                  }}
-                                  disabled={detailsDate &&
-                                    entry.days.at(0)?.date.equals(detailsDate)}
-                                />
-                                <Copy
-                                  as="strong"
-                                  variant="gradient"
-                                  class="flex-none py-4 uppercase"
-                                >
-                                  {#if detailsDate}
-                                    {detailsDate.toLocaleString("en", {
-                                      weekday: "short",
-                                      month: "short",
-                                      day: "numeric",
-                                    })}
-                                  {/if}
-                                </Copy>
-                                <ActionNext
-                                  on:click={() => {
-                                    if (!detailsDate) return;
-                                    const nextDate = detailsDate.add({ days: 1 });
-                                    const next = entry.days.find((d) =>
-                                      d.date.equals(nextDate)
-                                    );
-                                    details = next
-                                      ? getTasksAndTagsFromTimers(next.timers)
-                                      : undefined;
-                                    detailsDate = next?.date;
-                                    detailsProject = entry.project;
-                                  }}
-                                  disabled={detailsDate &&
-                                    entry.days.at(-1)?.date.equals(detailsDate)}
-                                />
-                              </div>
-                              <ActionClose on:click={() => (details = undefined)} />
-                            </header>
-                            {#if details.length}
-                              <ul
-                                class="my-4 rounded-md p-6 shadow-xl"
-                                style="background-color: {detailsProject.color}"
-                              >
-                                {#each details as task}
-                                  <li class="my-1">
-                                    <Copy class="whitespace-nowrap text-sm line-clamp-1"
-                                      >• {task.title}</Copy
-                                    >
-                                    <ul class="ml-4 list-disc">
-                                      {#each task.tags as tag}
-                                        <li class="flex">
-                                          <span class="sr-only">•</span>
-                                          <Tag
-                                            class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
-                                            >{tag}</Tag
-                                          >
-                                        </li>
-                                      {/each}
-                                    </ul>
-                                  </li>
-                                {/each}
-                              </ul>
-                            {:else}
-                              <Copy
-                                as="div"
-                                semibold
-                                variant="gradient"
-                                class="my-10 text-center uppercase"
-                                >No timers recorded for this day</Copy
-                              >
-                            {/if}
-                          {/if}
-                        </ActionInfo>
+                        />
                       {/if}
                     </footer>
                   </Field>
@@ -338,6 +243,92 @@
       </li>
     </ul>
   {/if}
+
+  <div slot="right" class="flex flex-1 flex-col overflow-auto md:min-w-[320px]">
+    {#if details && $showRightSidebar}
+      {@const text = getCopyTextFromTasks(details)}
+      <header class="flex items-center justify-between px-2">
+        <ActionCopy
+          title="copy details"
+          disabled={details.length === 0}
+          on:click={async () => {
+            await clipboard.write(text);
+          }}
+        />
+        <div class="flex flex-none items-center gap-2">
+          <ActionPrev
+            on:click={() => {
+              if (!detailsDate || !detailsEntry) return;
+              const prevDate = detailsDate.subtract({ days: 1 });
+              const prev = detailsEntry.days.find((d) => d.date.equals(prevDate));
+              details = prev ? getTasksAndTagsFromTimers(prev.timers) : undefined;
+              detailsDate = prev?.date;
+              detailsProject = detailsEntry.project;
+            }}
+            disabled={detailsDate &&
+              detailsEntry &&
+              detailsEntry.days.at(0)?.date.equals(detailsDate)}
+          />
+          <Copy as="strong" variant="gradient" class="flex-none py-4 uppercase">
+            {#if detailsDate}
+              {detailsDate.toLocaleString("en", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })}
+            {/if}
+          </Copy>
+          <ActionNext
+            on:click={() => {
+              if (!detailsDate || !detailsEntry) return;
+              const nextDate = detailsDate.add({ days: 1 });
+              const next = detailsEntry.days.find((d) => d.date.equals(nextDate));
+              details = next ? getTasksAndTagsFromTimers(next.timers) : undefined;
+              detailsDate = next?.date;
+              detailsProject = detailsEntry.project;
+            }}
+            disabled={detailsDate &&
+              detailsEntry &&
+              detailsEntry.days.at(-1)?.date.equals(detailsDate)}
+          />
+        </div>
+        <ActionClose
+          on:click={() => {
+            details = undefined;
+            $showRightSidebar = false;
+          }}
+        />
+      </header>
+      {#if details.length}
+        <ul
+          class="m-4 rounded-md p-6 shadow-xl"
+          style="background-color: {detailsProject.color}"
+        >
+          {#each details as task}
+            <li class="my-1">
+              <Copy class="whitespace-nowrap text-sm line-clamp-1">• {task.title}</Copy>
+              <ul class="ml-4 list-disc">
+                {#each task.tags as tag}
+                  <li class="flex">
+                    <span class="sr-only">•</span>
+                    <Tag
+                      class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
+                      >{tag}</Tag
+                    >
+                  </li>
+                {/each}
+              </ul>
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <Copy as="div" semibold variant="gradient" class="my-10 text-center uppercase"
+          >No timers recorded for this project + day</Copy
+        >
+      {/if}
+    {/if}
+  </div>
+
   <div slot="cta">
     <DualAction as="div" label="Showing timesheet for">
       <span slot="content"
