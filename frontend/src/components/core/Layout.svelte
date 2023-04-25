@@ -18,13 +18,13 @@
   import MenuTrigger from "@/core/MenuTrigger.svelte";
 
   let menuOpen = false;
-  onMount(updateStores);
-
-  $: if ($main) observeResize($main, mainResizeObserver);
-  $: if ($main) {
+  onMount(() => {
+    updateStores();
     $showLeftSidebar = false;
     $showRightSidebar = false;
-  }
+  });
+
+  $: if ($main) observeResize($main, mainResizeObserver);
 </script>
 
 <div

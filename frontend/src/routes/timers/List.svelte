@@ -318,24 +318,26 @@
       >
       <ActionClose on:click={() => ($showRightSidebar = false)} />
     </header>
-    {#if $showRightSidebar}
-      {#each timers as timer}
-        <TimerCard
-          id={timer._id}
-          end={timer.end}
-          tags={timer.tags}
-          title={timer.title}
-          start={timer.start}
-          hours={sumTimerHours([timer])}
-          highlight={hovered === timer._id}
-          date={formatForMonth(timer.date)}
-          on:focus={() => (hovered = timer._id)}
-          on:mouseover={() => (hovered = timer._id)}
-          on:mouseleave={() => (hovered = undefined)}
-          project={$projects.find((p) => p._id === timer.project)}
-        />
-      {/each}
-    {/if}
+    <div class="m-4">
+      {#if $showRightSidebar}
+        {#each timers as timer}
+          <TimerCard
+            id={timer._id}
+            end={timer.end}
+            tags={timer.tags}
+            title={timer.title}
+            start={timer.start}
+            hours={sumTimerHours([timer])}
+            highlight={hovered === timer._id}
+            date={formatForMonth(timer.date)}
+            on:focus={() => (hovered = timer._id)}
+            on:mouseover={() => (hovered = timer._id)}
+            on:mouseleave={() => (hovered = undefined)}
+            project={$projects.find((p) => p._id === timer.project)}
+          />
+        {/each}
+      {/if}
+    </div>
   </div>
 
   <div slot="left" class="flex flex-1 flex-col overflow-auto md:min-w-[320px]">
