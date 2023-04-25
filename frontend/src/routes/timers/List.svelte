@@ -59,8 +59,8 @@
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
   let combinator: Filter.Combinator = "and";
-  let hovered: string | undefined = undefined;
-  let key: Temporal.PlainDateTime | null = null;
+  let highlightCard: string | undefined = undefined;
+  let highlightTimer: string | undefined = undefined;
   let duration: "days" | "months" | "weeks" | "all" = "days";
 
   onMount(() => {
@@ -69,7 +69,6 @@
 
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
-  $: if (viewDate && view === "timeline" && isToday(viewDate)) key = $now;
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
   $: if ($now) nowText = formatForShortTime($now);
   $: if (view) loaded = false;
@@ -197,7 +196,7 @@
       : "Timers for"}
   >
     <div slot="right">
-      {#key key}
+      {#key $now}
         <HourSum value={sumTimerHours(timers)} />
       {/key}
     </div>
@@ -268,7 +267,7 @@
         </div>
       {/each}
     {/if}
-    {#key key}
+    {#key $now}
       {#if view === "timeline" && isToday(viewDate)}
         <div
           class="pointer-events-none relative z-0 h-full border-l border-red-500"
@@ -286,10 +285,11 @@
         <TimerComponent
           id={timer._id}
           title={timer.title}
-          highlight={hovered === timer._id}
-          on:focus={() => (hovered = timer._id)}
-          on:mouseover={() => (hovered = timer._id)}
-          on:mouseleave={() => (hovered = undefined)}
+          highlight={highlightCard === timer._id}
+          on:blur={() => (highlightTimer = undefined)}
+          on:focus={() => (highlightTimer = timer._id)}
+          on:mouseover={() => (highlightTimer = timer._id)}
+          on:mouseleave={() => (highlightTimer = undefined)}
           project={$projects.find((p) => p._id === timer.project)}
           style={calculateGridPosition(timer.start, timer.end, i)}
           scrollto={!isToday(viewDate) && timers[i] === timers.at(-1)}
@@ -328,11 +328,12 @@
             title={timer.title}
             start={timer.start}
             hours={sumTimerHours([timer])}
-            highlight={hovered === timer._id}
             date={formatForMonth(timer.date)}
-            on:focus={() => (hovered = timer._id)}
-            on:mouseover={() => (hovered = timer._id)}
-            on:mouseleave={() => (hovered = undefined)}
+            highlight={highlightTimer === timer._id}
+            on:blur={() => (highlightCard = undefined)}
+            on:focus={() => (highlightCard = timer._id)}
+            on:mouseover={() => (highlightCard = timer._id)}
+            on:mouseleave={() => (highlightCard = undefined)}
             project={$projects.find((p) => p._id === timer.project)}
           />
         {/each}

@@ -33,9 +33,13 @@
     }
   }
 
-  $: if (elm && highlight) {
-    elm.scrollIntoView({ block: "center", behavior: "smooth" });
+  $: if (highlight) {
+    setTimeout(() => {
+      elm.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
+    }, 1);
   }
+
+  $: if (highlight) console.log("Card highlighted");
 
   async function getTagValue(t: string) {
     if (tagCache.has(t)) return tagCache.get(t);
