@@ -90,6 +90,10 @@
     });
   }
 
+  $: if (!timers.length) {
+    $showRightSidebar = false;
+  }
+
   function navigateNext() {
     if (duration === "all") return page++;
     push(`/timers/${duration}/${viewDate.add({ [duration]: 1 })}`);
@@ -142,7 +146,7 @@
     const startRow = i + 2;
     const endRow = startRow + 1;
     const startCol = start.hour * 4 + start.minute / 15;
-    const endCol = Math.max(end.hour * 4 + end.minute / 15, startCol);
+    const endCol = Math.max(end.hour * 4 + end.minute / 15, startCol + 2);
 
     return `grid-column-start: ${startCol}; grid-column-end: ${endCol}; grid-row-start: ${startRow}; grid-row-end: ${endRow};`;
   }
@@ -237,6 +241,7 @@
         {/if}
         <ActionInfo
           direction="right"
+          disabled={!timers.length}
           enabled={$showRightSidebar}
           on:click={() => {
             $showRightSidebar = !$showRightSidebar;
@@ -256,7 +261,7 @@
     {#if view === "timeline"}
       {#each new Array(24) as _, hour}
         <div
-          class="relative z-10 h-full border-l border-dotted border-white/10 opacity-50"
+          class="relative h-full border-l border-dotted border-white/10 opacity-50"
           style={calculateHourGridPosition(hour, timers.length)}
         >
           <span
@@ -319,7 +324,7 @@
       <ActionClose on:click={() => ($showRightSidebar = false)} />
     </header>
     <div class="m-4">
-      {#if $showRightSidebar}
+      {#if $showRightSidebar && timers.length}
         {#each timers as timer}
           <TimerCard
             id={timer._id}

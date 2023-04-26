@@ -68,7 +68,7 @@
   class:ring-white={highlight}
   class:justify-center={compact}
   inert={!disableNav ? undefined : true}
-  class={`relative mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full text-white shadow-md md:h-14 ${
+  class={`relative z-10 mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full text-white shadow-md md:h-14 ${
     $$props.class || ""
   }`}
   style={`background: ${grad}; ${$$props.style || ""}`}

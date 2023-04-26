@@ -39,8 +39,6 @@
     }, 1);
   }
 
-  $: if (highlight) console.log("Card highlighted");
-
   async function getTagValue(t: string) {
     if (tagCache.has(t)) return tagCache.get(t);
 
