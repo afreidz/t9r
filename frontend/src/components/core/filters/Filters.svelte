@@ -1,12 +1,28 @@
 <script lang="ts">
   import Criteria from "./Criteria.svelte";
+  import { createEventDispatcher } from "svelte";
+  import ActionAdd from "@/core/actions/Add.svelte";
   import ActionRemove from "@/core/actions/Remove.svelte";
 
-  export let filters: Filter.Set = [{}];
+  let isFiltered = false;
+  let dispatch = createEventDispatcher();
+
+  export let filters: Filter.Set = [{ value: "" }];
   export let combinator: Filter.Combinator = "and";
+
+  function clear() {
+    filters = [{ value: "" }];
+    dispatch("clear");
+  }
+
+  $: isFiltered = filters.some((f) => !!f.criteria && !!f.predicate && !!f.value);
 </script>
 
 <div class={$$props.class}>
+  <header class="flex items-center justify-between">
+    <span>clear all</span>
+    <ActionRemove on:click={clear} />
+  </header>
   {#each filters as filter, i}
     {#if i !== 0}
       <div class="flex w-full items-center justify-between">
@@ -26,4 +42,8 @@
       bind:predicate={filter.predicate}
     />
   {/each}
+  <footer class="flex items-center justify-between">
+    <span>add filter</span>
+    <ActionAdd on:click={() => (filters = [...filters, { value: "" }])} />
+  </footer>
 </div>

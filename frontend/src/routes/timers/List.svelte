@@ -20,7 +20,6 @@
   import Header from "@/core/Header.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import HourSum from "@/core/SumChip.svelte";
-  import { sumTimerHours } from "@/lib/timers";
   import NewTimer from "@/core/NewTimer.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerCard from "@/core/TimerCard.svelte";
@@ -29,6 +28,7 @@
   import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
   import Filters from "@/core/filters/Filters.svelte";
+  import { filterTimers, sumTimerHours } from "@/lib/timers";
   import { showLeftSidebar, showRightSidebar, timelineZoom } from "@/lib/stores/ui";
 
   import ActionBar from "@/core/actions/Bar.svelte";
@@ -54,10 +54,12 @@
   let view: Views = "list";
   let timers: Timer[] = [];
   let loader: Promise<void>;
+  let viewTimers: Timer[] = [];
   let nowIndicator: HTMLElement;
-  let filters: Filter.Set = [{}];
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
+  let filteredTimers: Timer[] | undefined;
+  let filters: Filter.Set = [{ value: "" }];
   let combinator: Filter.Combinator = "and";
   let highlightCard: string | undefined = undefined;
   let highlightTimer: string | undefined = undefined;
@@ -70,9 +72,10 @@
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
+  $: if (filteredTimers) viewTimers = filteredTimers;
   $: if ($now) nowText = formatForShortTime($now);
+  $: if (!filteredTimers) viewTimers = timers;
   $: if (view) loaded = false;
-  $: console.log(filters);
 
   $: duration = $location.includes("/timers/month")
     ? "months"
@@ -182,6 +185,12 @@
 
     return formatForShortTime(pt);
   }
+
+  function handleFilter() {
+    if (duration !== "all") {
+      filteredTimers = filterTimers(filters, timers, combinator);
+    }
+  }
 </script>
 
 <Layout>
@@ -201,7 +210,7 @@
   >
     <div slot="right">
       {#key $now}
-        <HourSum value={sumTimerHours(timers)} />
+        <HourSum value={sumTimerHours(viewTimers)} />
       {/key}
     </div>
 
@@ -211,6 +220,7 @@
           direction="left"
           enabled={$showLeftSidebar}
           on:click={() => ($showLeftSidebar = !$showLeftSidebar)}
+          class="from-violet-600 to-cyan-600 {filteredTimers && 'bg-gradient-to-br'}"
         />
         {#if duration !== "all"}
           <ActionPicker />
@@ -286,7 +296,7 @@
           </span>
         </div>
       {/if}
-      {#each timers as timer, i}
+      {#each viewTimers as timer, i}
         <TimerComponent
           id={timer._id}
           title={timer.title}
@@ -325,7 +335,7 @@
     </header>
     <div class="m-4">
       {#if $showRightSidebar && timers.length}
-        {#each timers as timer}
+        {#each viewTimers as timer}
           <TimerCard
             id={timer._id}
             end={timer.end}
@@ -354,17 +364,22 @@
         <Copy as="h3" semibold variant="gradient" class="text-lg uppercase"
           >Filter Timers</Copy
         >
-        <div class="flex gap-2">
-          <ActionAdd on:click={() => (filters = [...filters, {}])} />
-          <ActionClose on:click={() => ($showLeftSidebar = false)} />
-        </div>
+        <ActionClose on:click={() => ($showLeftSidebar = false)} />
       </header>
-      <Filters bind:filters bind:combinator class="mx-4 flex-1" />
+      <Filters
+        class="mx-4 flex-1"
+        bind:filters
+        bind:combinator
+        on:clear={() => (viewTimers = timers)}
+        on:clear={() => ($showLeftSidebar = false)}
+        on:clear={() => (filteredTimers = undefined)}
+      />
       <footer
         class="sticky bottom-0 z-10 flex flex-none border-t border-black/20 bg-neutral-900 py-2 px-4"
       >
         <Button
           class="flex-1 bg-gradient-to-br from-violet-600 to-cyan-600 py-4 text-center"
+          on:click={handleFilter}
         >
           <Copy as="span" variant="gradient" bold class="uppercase">Apply Filters</Copy>
         </Button>
