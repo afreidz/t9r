@@ -10,6 +10,12 @@
     formatForMonth,
     formatForShortTime,
   } from "@/lib/dates";
+  import {
+    showLoader,
+    timelineZoom,
+    showLeftSidebar,
+    showRightSidebar,
+  } from "@/lib/stores/ui";
   import trpc from "@/lib/trpc";
   import { onMount } from "svelte";
   import { get } from "svelte/store";
@@ -24,20 +30,20 @@
   import Button from "@/foundation/Button.svelte";
   import TimerCard from "@/core/TimerCard.svelte";
   import TimerComponent from "@/core/Timer.svelte";
-  import { location, push } from "svelte-spa-router";
   import breakpoints from "@/lib/stores/breakpoints";
   import type { Timer } from "@/backend/schema/timer";
   import Filters from "@/core/filters/Filters.svelte";
   import { filterTimers, sumTimerHours } from "@/lib/timers";
-  import { showLeftSidebar, showRightSidebar, timelineZoom } from "@/lib/stores/ui";
+  import { location, push, querystring } from "svelte-spa-router";
+  import { addToSelected, removeFromSelected } from "@/lib/stores/selected";
 
   import ActionBar from "@/core/actions/Bar.svelte";
-  import ActionAdd from "@/core/actions/Add.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
   import ActionClose from "@/core/actions/Close.svelte";
+  import ActionSelect from "@/core/actions/Select.svelte";
   import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionPicker from "@/core/actions/Picker.svelte";
   import ActionZoomIn from "@/core/actions/ZoomIn.svelte";
@@ -51,6 +57,7 @@
   let page: number = 1;
   let per: number = 100;
   let stage: HTMLElement;
+  let isSelecting = false;
   let view: Views = "list";
   let timers: Timer[] = [];
   let loader: Promise<void>;
@@ -76,6 +83,13 @@
   $: if ($now) nowText = formatForShortTime($now);
   $: if (!filteredTimers) viewTimers = timers;
   $: if (view) loaded = false;
+
+  $: if ($querystring) {
+    const qs = new URLSearchParams($querystring);
+    if (qs.has("filters")) {
+      filters = JSON.parse(qs.get("filters") || "");
+    }
+  }
 
   $: duration = $location.includes("/timers/month")
     ? "months"
@@ -114,6 +128,7 @@
 
   async function updateTimers() {
     loaded = false;
+    $showLoader = true;
     switch (duration) {
       case "all":
         timers = await trpc.timers.getByPage.query({
@@ -138,6 +153,9 @@
         });
         break;
     }
+
+    if (timers && filters) handleFilter(false);
+    $showLoader = false;
   }
 
   function calculateGridPosition(s: string, e: string | null | undefined, i: number) {
@@ -186,10 +204,31 @@
     return formatForShortTime(pt);
   }
 
-  function handleFilter() {
-    if (duration !== "all") {
+  function handleFilter(updateNav = true) {
+    if (duration !== "all" && filters.some((f) => f.criteria)) {
       filteredTimers = filterTimers(filters, timers, combinator);
+      viewTimers = filteredTimers;
+      if (updateNav) {
+        const filterQS = JSON.stringify(filters);
+        const existingQS = new URLSearchParams($querystring);
+        existingQS.set("filters", filterQS);
+        push(`${$location}?${existingQS.toString()}`);
+      }
     }
+  }
+
+  function handleClearFilters() {
+    viewTimers = timers;
+    $showLeftSidebar = false;
+    filteredTimers = undefined;
+    push($location);
+  }
+
+  function toggleSelected(e: { currentTarget: EventTarget | null }, id?: string) {
+    if (!id) return;
+    const target = e.currentTarget as HTMLInputElement;
+    if (target.checked) addToSelected(id);
+    if (!target.checked) removeFromSelected(id);
   }
 </script>
 
@@ -220,13 +259,13 @@
           direction="left"
           enabled={$showLeftSidebar}
           on:click={() => ($showLeftSidebar = !$showLeftSidebar)}
-          class="from-violet-600 to-cyan-600 {filteredTimers && 'bg-gradient-to-br'}"
+          class={`from-violet-600 to-cyan-600 ${filteredTimers && "bg-gradient-to-br"}`}
         />
         {#if duration !== "all"}
           <ActionPicker />
         {/if}
       </div>
-      {#if view === "timeline" && $breakpoints.md}
+      {#if view === "timeline"}
         <ActionZoomOut on:click={() => ($timelineZoom *= 0.95)} />
       {/if}
       <ActionPrev on:click={navigatePrev} disabled={duration === "all" && page === 0} />
@@ -237,11 +276,21 @@
         on:click={navigateNext}
         disabled={duration === "all" ? timers.length === 0 : isToday(viewDate)}
       />
-      {#if view === "timeline" && $breakpoints.md}
+      {#if view === "timeline"}
         <ActionZoomIn on:click={() => ($timelineZoom *= 1.05)} />
       {/if}
       <div slot="right" class="flex gap-2">
-        {#if duration === "days"}
+        <ActionSelect
+          enabled={isSelecting}
+          on:click={() => (isSelecting = !isSelecting)}
+          on:all={() => {
+            viewTimers.forEach((t) => t._id && addToSelected(t._id));
+          }}
+          on:none={() => {
+            viewTimers.forEach((t) => t._id && removeFromSelected(t._id));
+          }}
+        />
+        {#if duration === "days" && $breakpoints.md}
           <ActionView
             bind:current={view}
             on:click={() => {
@@ -300,9 +349,11 @@
         <TimerComponent
           id={timer._id}
           title={timer.title}
+          selectMode={isSelecting}
           highlight={highlightCard === timer._id}
           on:blur={() => (highlightTimer = undefined)}
           on:focus={() => (highlightTimer = timer._id)}
+          on:change={(e) => toggleSelected(e, timer._id)}
           on:mouseover={() => (highlightTimer = timer._id)}
           on:mouseleave={() => (highlightTimer = undefined)}
           project={$projects.find((p) => p._id === timer.project)}
@@ -370,16 +421,14 @@
         class="mx-4 flex-1"
         bind:filters
         bind:combinator
-        on:clear={() => (viewTimers = timers)}
-        on:clear={() => ($showLeftSidebar = false)}
-        on:clear={() => (filteredTimers = undefined)}
+        on:clear={() => handleClearFilters()}
       />
       <footer
         class="sticky bottom-0 z-10 flex flex-none border-t border-black/20 bg-neutral-900 py-2 px-4"
       >
         <Button
           class="flex-1 bg-gradient-to-br from-violet-600 to-cyan-600 py-4 text-center"
-          on:click={handleFilter}
+          on:click={() => handleFilter(true)}
         >
           <Copy as="span" variant="gradient" bold class="uppercase">Apply Filters</Copy>
         </Button>

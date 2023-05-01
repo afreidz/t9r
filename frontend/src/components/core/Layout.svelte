@@ -8,18 +8,23 @@
   } from "@/lib/stores/ui";
   import { onMount } from "svelte";
   import Logo from "./Logo.svelte";
+  import Icon from "@iconify/svelte";
   import { fly } from "svelte/transition";
   import Nav from "@/core/nav/Nav.svelte";
   import updateStores from "@/lib/stores";
   import observeResize from "@/lib/resize";
   import Sidebar from "@/core/Sidebar.svelte";
+  import DualAction from "./DualAction.svelte";
   import PageLoad from "@/core/PageLoad.svelte";
+  import Button from "@/foundation/Button.svelte";
   import breakpoints from "@/lib/stores/breakpoints";
+  import selectedTimers, { clearSelected } from "@/lib/stores/selected";
   import MenuTrigger from "@/core/MenuTrigger.svelte";
 
   let menuOpen = false;
-  onMount(() => {
-    updateStores();
+
+  onMount(async () => {
+    await updateStores();
     $showLeftSidebar = false;
     $showRightSidebar = false;
   });
@@ -77,7 +82,30 @@
   </main>
   {#if !$showLoader}
     <footer class="col-span-2 flex w-full items-center justify-center md:col-span-1">
-      <slot name="cta" />
+      {#if $selectedTimers.length}
+        <DualAction label="Bulk edit">
+          <Button
+            slot="secondary"
+            title="Clear selected"
+            on:click={clearSelected}
+            class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+          >
+            <Icon icon="ic:outline-clear" />
+          </Button>
+          <div slot="content">
+            {$selectedTimers.length} Timers
+          </div>
+          <Button
+            slot="primary"
+            title="Edit selected"
+            class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
+          >
+            <Icon icon="ri:pencil-line" />
+          </Button>
+        </DualAction>
+      {:else}
+        <slot name="cta" />
+      {/if}
     </footer>
   {/if}
 </div>

@@ -7,6 +7,7 @@
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import Copy from "@/foundation/Copy.svelte";
+  import selectedTimers from "@/lib/stores/selected";
   import type { Project } from "@/backend/schema/project";
 
   export let project: Project | undefined = undefined;
@@ -16,11 +17,17 @@
   export let tags: (string | undefined)[] = [];
   export let compact: boolean = false;
   export let color: string = "black";
+  export let selectMode = false;
   export let highlight = false;
   export let scrollto = false;
 
   let grad: string;
-  let elm: HTMLAnchorElement;
+  let elm: HTMLElement;
+  let as: keyof HTMLElementTagNameMap = "a";
+
+  $: if (disableNav || selectMode) {
+    as = selectMode ? "label" : "div";
+  }
 
   $: if (elm && scrollto) {
     elm.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
@@ -56,26 +63,31 @@
   }
 </script>
 
-<a
+<svelte:element
+  this={as}
   on:focus
   on:mouseover
   on:mouseleave
   bind:this={elm}
   class:pr-2={!compact}
-  href={`/#/timer/${id}`}
   class:md:pl-4={!compact}
   class:ring-2={highlight}
   class:ring-white={highlight}
   class:justify-center={compact}
   inert={!disableNav ? undefined : true}
+  href={disableNav || selectMode ? `/#/timer/${id}` : undefined}
   class={`relative z-10 mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full text-white shadow-md md:h-14 ${
     $$props.class || ""
   }`}
   style={`background: ${grad}; ${$$props.style || ""}`}
 >
-  <Tag class="h-8 w-8 !max-w-none flex-none justify-evenly text-2xl font-semibold"
-    >{project?.name.charAt(0) || title?.charAt(0)}</Tag
-  >
+  {#if selectMode}
+    <input type="checkbox" checked={!!id && $selectedTimers.includes(id)} on:change />
+  {:else}
+    <Tag class="h-8 w-8 !max-w-none flex-none justify-evenly text-2xl font-semibold"
+      >{project?.name.charAt(0) || title?.charAt(0)}</Tag
+    >
+  {/if}
   {#if !compact}
     <header class="ml-2 flex flex-col">
       <Copy
@@ -118,14 +130,14 @@
       <slot name="right" />
     </div>
   {/if}
-</a>
+</svelte:element>
 
 <style>
-  a::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     display: none;
   }
 
-  a {
+  * {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }

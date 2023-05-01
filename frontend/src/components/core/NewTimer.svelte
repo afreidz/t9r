@@ -39,33 +39,35 @@
   }
 </script>
 
-<DualAction label="Start new timer for">
-  <Button
-    slot="primary"
-    title="Navigate back"
-    on:click={pop}
-    class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
-  >
-    <Icon icon="ic:outline-arrow-back" />
-  </Button>
-  <select
-    slot="content"
-    class="appearance-none !bg-transparent text-black outline-none"
-    on:change={handleChange}
-    value={$mostRecentProject._id}
-  >
-    {#each $projects.filter((p) => !p.archived) as project}
-      <option selected={project === $mostRecentProject} value={project._id}
-        >{project.name}</option
-      >
-    {/each}
-  </select>
-  <Button
-    slot="secondary"
-    on:click={newTimer}
-    class="flex h-10 w-10 items-center justify-center !rounded-full text-white !ring-offset-white"
-    style={`background-color: ${$mostRecentProject.color}`}
-  >
-    <Icon icon="ic:baseline-plus" />
-  </Button>
-</DualAction>
+{#if $mostRecentProject}
+  <DualAction label="Start new timer for">
+    <Button
+      slot="primary"
+      title="Navigate back"
+      on:click={pop}
+      class="flex h-10 w-10 items-center justify-center !rounded-full bg-blue-500 text-white !ring-offset-white"
+    >
+      <Icon icon="ic:outline-arrow-back" />
+    </Button>
+    <select
+      slot="content"
+      class="appearance-none !bg-transparent text-black outline-none"
+      on:change={handleChange}
+      value={$projects[0]._id}
+    >
+      {#each $projects.filter((p) => !p.archived) as project}
+        <option selected={project === $mostRecentProject} value={project._id}
+          >{project.name}</option
+        >
+      {/each}
+    </select>
+    <Button
+      slot="secondary"
+      on:click={newTimer}
+      class="flex h-10 w-10 items-center justify-center !rounded-full text-white !ring-offset-white"
+      style={`background-color: ${$mostRecentProject.color}`}
+    >
+      <Icon icon="ic:baseline-plus" />
+    </Button>
+  </DualAction>
+{/if}
