@@ -5,6 +5,7 @@
   import now from "@/lib/stores/now";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
+  import tags from "@/lib/stores/tags";
   import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
   import Dialog from "@/core/Dialog.svelte";
@@ -18,6 +19,7 @@
   import Switch from "@/foundation/Switch.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
+  import selectedTimers from "@/lib/stores/selected";
   import type { Timer } from "@/backend/schema/timer";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
@@ -27,9 +29,9 @@
 
   let newTag: string;
   let multiple = false;
-  let tags: TagType[] = [];
   let dirty: boolean = false;
   let picker: HTMLInputElement;
+  let localTags: TagType[] = [];
   let timer: Timer | null = null;
   let project: Project | undefined;
   let confirmDelete: boolean = false;
@@ -39,24 +41,40 @@
 
   onMount(async () => {
     $showLoader = true;
-    timer = await trpc.timers.get.query(params.id);
 
-    if (timer) newValues = { ...timer };
-    if (timer) project = $projects.find((p) => p._id === timer?.project);
-    if (timer) tags = await trpc.tags.getAllByProject.query(timer.project);
+    if (multiple) {
+      localTags = $tags;
+      timers = await trpc.timers.bulkGet.query($selectedTimers);
+      if (timers) newValues = { ...emptyTimer };
+    } else {
+      timer = await trpc.timers.get.query(params.id);
+      if (timer) newValues = { ...timer };
+      if (timer) project = $projects.find((p) => p._id === timer?.project);
+      if (timer) localTags = await trpc.tags.getAllByProject.query(timer.project);
+    }
+
     $showLoader = false;
   });
 
   export let params: { id: string };
 
   $: if (newValues) dirty = !same<Partial<Timer>>(newValues, { ...timer });
+  $: multiple = params?.id === "selected";
 
   function reset() {
     newValues = multiple ? { ...emptyTimer } : { ...timer };
   }
 
   async function update() {
-    if (timer?._id) {
+    if (multiple && timers) {
+      await trpc.timers.bulkUpdate.mutate({
+        ids: $selectedTimers,
+        details: {
+          ...newValues,
+          _id: undefined,
+        },
+      });
+    } else if (!multiple && timer?._id) {
       await trpc.timers.update.mutate({
         id: timer._id,
         details: {
@@ -64,8 +82,6 @@
           _id: undefined,
         },
       });
-      timer = await trpc.timers.get.query(timer._id);
-      if (timer) newValues = { ...timer };
     }
 
     return pop();
@@ -86,14 +102,15 @@
     const val = (e as { currentTarget: EventTarget & HTMLInputElement }).currentTarget
       .value;
 
-    let existing = tags.find((t) => t._id === val) || (await trpc.tags.get.query(val));
+    let existing =
+      localTags.find((t) => t._id === val) || (await trpc.tags.get.query(val));
 
     if (!existing && newValues && project && project._id) {
       const result = await trpc.tags.create.mutate({ value: val, project: project._id });
 
       if (result.acknowledged && result.insertedId) {
         existing = await trpc.tags.get.query(result.insertedId);
-        tags = await trpc.tags.getAllByProject.query(project._id);
+        localTags = await trpc.tags.getAllByProject.query(project._id);
       }
     }
 
@@ -178,33 +195,35 @@
             class="text-neutral-light"
           />
         </Field>
-        <Field label="Tags">
-          <input
-            min={2}
-            max={30}
-            list="tags"
-            class="mb-2 appearance-none"
-            type="search"
-            autocomplete="on"
-            on:change={addTag}
-            bind:value={newTag}
-          />
-          <Icon slot="icon" icon="material-symbols:search" class="text-neutral-light" />
-          <datalist id="tags">
-            {#each tags as tag}
-              <option value={tag._id}>{tag.value}</option>
-            {/each}
-          </datalist>
-          <div class="flex flex-wrap border-t border-neutral-900/50 pb-1 pt-5">
-            {#if newValues.tags}
-              {#each newValues.tags as tag}
-                <Tag closeable on:close={() => removeTag(tag)}>
-                  {tags.find((t) => t._id === tag)?.value || tag}
-                </Tag>
+        {#if !multiple}
+          <Field label="Tags">
+            <input
+              min={2}
+              max={30}
+              list="tags"
+              class="mb-2 appearance-none"
+              type="search"
+              autocomplete="on"
+              on:change={addTag}
+              bind:value={newTag}
+            />
+            <Icon slot="icon" icon="material-symbols:search" class="text-neutral-light" />
+            <datalist id="tags">
+              {#each localTags as tag}
+                <option value={tag._id}>{tag.value}</option>
               {/each}
-            {/if}
-          </div>
-        </Field>
+            </datalist>
+            <div class="flex flex-wrap border-t border-neutral-900/50 pb-1 pt-5">
+              {#if newValues.tags}
+                {#each newValues.tags as tag}
+                  <Tag closeable on:close={() => removeTag(tag)}>
+                    {localTags.find((t) => t._id === tag)?.value || tag}
+                  </Tag>
+                {/each}
+              {/if}
+            </div>
+          </Field>
+        {/if}
         <Field>
           <Switch
             class="justify-between"
@@ -298,15 +317,23 @@
   {/if}
   <div slot="cta">
     {#if dirty}
-      <DualAction as="div" label="Update Timer?">
+      <DualAction as="div" label="Update Timer{timers ? 's' : ''}?">
         <Button
-          on:click={reset}
           slot="secondary"
-          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+          title="Navigate back"
+          on:click={() => (multiple ? pop() : reset())}
+          class="flex h-10 w-10 items-center justify-center !rounded-full {multiple
+            ? 'bg-blue-500'
+            : 'bg-red-500'} text-white !ring-offset-white"
         >
-          <Icon icon="teenyicons:x-small-outline" />
+          {#if multiple}
+            <Icon icon="ic:outline-arrow-back" />
+          {:else}
+            <Icon icon="teenyicons:x-small-outline" />
+          {/if}
         </Button>
-        <span slot="content">{timer?.title}</span>
+
+        <span slot="content">{timers ? timers.length + " selected" : timer?.title}</span>
         <Button
           on:click={update}
           slot="primary"

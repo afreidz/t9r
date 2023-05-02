@@ -1,6 +1,5 @@
-import { get } from "svelte/store";
 import { Temporal } from "temporal-polyfill";
-import settings from "@/lib/stores/settings";
+import { updateSettings } from "@/lib/stores/settings";
 
 export const locale = "en-us";
 
@@ -32,9 +31,9 @@ export function isToday(d: Temporal.PlainDate | string) {
   return pd.equals(getToday());
 }
 
-export function getFiscalYearStartMonth(d: Temporal.PlainDate | string) {
+export async function getFiscalYearStartMonth(d: Temporal.PlainDate | string) {
   const pd = typeof d === "string" ? Temporal.PlainDate.from(d) : d;
-  const s = get(settings);
+  const s = await updateSettings();
 
   if (!s) throw new Error("no settings for fiscal year start");
 

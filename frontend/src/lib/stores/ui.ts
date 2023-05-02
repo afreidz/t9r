@@ -5,6 +5,7 @@ const gi = localStorage.getItem.bind(localStorage);
 const si = localStorage.setItem.bind(localStorage);
 
 export const showLoader = writable(true);
+export const isSelecting = writable(false);
 export const main = writable<HTMLElement>();
 export const showLeftSidebar = writable(false);
 export const showRightSidebar = writable(false);

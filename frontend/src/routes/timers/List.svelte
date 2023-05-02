@@ -12,6 +12,7 @@
   } from "@/lib/dates";
   import {
     showLoader,
+    isSelecting,
     timelineZoom,
     showLeftSidebar,
     showRightSidebar,
@@ -52,12 +53,12 @@
 
   export let params: { date: string } = { date: Temporal.Now.plainDateISO().toString() };
 
+  let key: unknown;
   let loaded = false;
   let nowText: string;
   let page: number = 1;
   let per: number = 100;
   let stage: HTMLElement;
-  let isSelecting = false;
   let view: Views = "list";
   let timers: Timer[] = [];
   let loader: Promise<void>;
@@ -82,6 +83,7 @@
   $: if (filteredTimers) viewTimers = filteredTimers;
   $: if ($now) nowText = formatForShortTime($now);
   $: if (!filteredTimers) viewTimers = timers;
+  $: if (isToday(viewDate)) key = $now;
   $: if (view) loaded = false;
 
   $: if ($querystring) {
@@ -205,7 +207,7 @@
   }
 
   function handleFilter(updateNav = true) {
-    if (duration !== "all" && filters.some((f) => f.criteria)) {
+    if (filters.some((f) => f.criteria)) {
       filteredTimers = filterTimers(filters, timers, combinator);
       viewTimers = filteredTimers;
       if (updateNav) {
@@ -281,8 +283,8 @@
       {/if}
       <div slot="right" class="flex gap-2">
         <ActionSelect
-          enabled={isSelecting}
-          on:click={() => (isSelecting = !isSelecting)}
+          enabled={$isSelecting}
+          on:click={() => ($isSelecting = !$isSelecting)}
           on:all={() => {
             viewTimers.forEach((t) => t._id && addToSelected(t._id));
           }}
@@ -331,7 +333,7 @@
         </div>
       {/each}
     {/if}
-    {#key $now}
+    {#key key}
       {#if view === "timeline" && isToday(viewDate)}
         <div
           class="pointer-events-none relative z-0 h-full border-l border-red-500"
@@ -349,7 +351,7 @@
         <TimerComponent
           id={timer._id}
           title={timer.title}
-          selectMode={isSelecting}
+          selectMode={$isSelecting}
           highlight={highlightCard === timer._id}
           on:blur={() => (highlightTimer = undefined)}
           on:focus={() => (highlightTimer = timer._id)}
@@ -370,7 +372,7 @@
           {/if}
           <div slot="right">
             {#if view !== "timeline"}
-              <Tag>{timer.end ? formatTime(timer.end) : "running"}</Tag>
+              <Tag>{timer.end ? sumTimerHours([timer]) : "running"}hrs</Tag>
             {/if}
           </div>
         </TimerComponent>
@@ -379,7 +381,9 @@
   </div>
 
   <div slot="right" class="overflow-auto md:min-w-[320px]">
-    <header class="flex items-center justify-between px-2">
+    <header
+      class="sticky top-0 z-10 flex flex-none items-center justify-between border-b border-black/20 bg-neutral-900 py-2 px-4"
+    >
       <Copy as="h3" semibold variant="gradient" class="text-lg uppercase">Timer Info</Copy
       >
       <ActionClose on:click={() => ($showRightSidebar = false)} />

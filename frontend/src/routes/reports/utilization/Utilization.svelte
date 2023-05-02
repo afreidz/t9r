@@ -23,7 +23,6 @@
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
-  let startMonth: Temporal.PlainYearMonth;
   let view = Temporal.Now.plainDateISO();
   let report: YearlyUtilizationReport;
   let newTarget: HTMLInputElement;
@@ -31,13 +30,14 @@
   let modify = false;
 
   $: if (view) {
-    startMonth = getFiscalYearStartMonth(view);
-    trpc.targets.getByYear.query({ year: view.year }).then((result) => {
-      target = result?.percent || get(settings)?.defaultUtilization || 100;
+    getFiscalYearStartMonth(view).then((startMonth) => {
+      trpc.targets.getByYear.query({ year: view.year }).then((result) => {
+        target = result?.percent || get(settings)?.defaultUtilization || 100;
+      });
+      trpc.timers.getUtilizationForYear
+        .query({ date: startMonth.toString() })
+        .then((result) => (report = result));
     });
-    trpc.timers.getUtilizationForYear
-      .query({ date: startMonth.toString() })
-      .then((result) => (report = result));
   }
 
   function pad(days: YearlyUtilizationReport[number]["days"]) {

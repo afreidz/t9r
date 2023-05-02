@@ -9,4 +9,5 @@ export async function updateSettings() {
   const s = await trpc.settings.get.query();
 
   settings.update(() => s);
+  return s;
 }
