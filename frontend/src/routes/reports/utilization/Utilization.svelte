@@ -4,6 +4,7 @@
   import Icon from "@iconify/svelte";
   import { get } from "svelte/store";
   import { pop } from "svelte-spa-router";
+  import { fade } from "svelte/transition";
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
@@ -32,6 +33,8 @@
   let fyStart: Temporal.PlainYearMonth;
   let report: YearlyUtilizationReport;
   let newTarget: HTMLInputElement;
+  let showQTD = false;
+  let showYTD = false;
   let target: number;
   let modify = false;
 
@@ -82,10 +85,11 @@
       return (hours += day.hours);
     }, 0);
 
-    ytd.percent = (yearActualHours / yearTotalHours) * 100;
-    if (ytd.percent <= average) ytd.color = "stroke-red-400";
-    if (ytd.percent > average && ytd.percent < target) ytd.color = "stroke-amber-400";
-    if (ytd.percent >= target) ytd.color = "stroke-emerald-400";
+    const ytdPercent = (yearActualHours / yearTotalHours) * 100;
+    if (ytdPercent <= average) ytd.color = "stroke-red-400";
+    if (ytdPercent > average && ytdPercent < target) ytd.color = "stroke-amber-400";
+    if (ytdPercent >= target) ytd.color = "stroke-emerald-400";
+    ytd.percent = ytdPercent;
 
     const qtr = fy.find((q, i) => {
       if (q.equals(viewMonth)) return true;
@@ -114,10 +118,11 @@
       return (hours += day.hours);
     }, 0);
 
-    qtd.percent = (qtrActualHours / qtrTotalHours) * 100;
-    if (qtd.percent <= average) qtd.color = "stroke-red-400";
-    if (qtd.percent > average && qtd.percent < target) qtd.color = "stroke-amber-400";
-    if (qtd.percent >= target) qtd.color = "stroke-emerald-400";
+    const qtdPercent = (qtrActualHours / qtrTotalHours) * 100;
+    if (qtdPercent <= average) qtd.color = "stroke-red-400";
+    if (qtdPercent > average && qtdPercent < target) qtd.color = "stroke-amber-400";
+    if (qtdPercent >= target) qtd.color = "stroke-emerald-400";
+    qtd.percent = qtdPercent;
   }
 
   function pad(days: YearlyUtilizationReport[number]["days"]) {
@@ -198,32 +203,82 @@
           class="my-4 flex justify-center text-lg uppercase">Average</Copy
         >
         <figure class="relative p-4">
-          <svg viewBox="0 0 120 120" class="h-44 -rotate-90 -scale-y-100 scale-x-100">
-            <circle
+          <svg viewBox="0 0 120 120" class="h-44">
+            <path
+              class="stroke-neutral-700"
+              d="M60 10
+                a 50 50 0 0 1 0 100
+                a 50 50 0 0 1 0 -100"
+              fill="none"
+              stroke-width="10"
+            />
+            <path
               class={ytd.color}
-              cx="60"
-              cy="60"
-              r="54"
+              d="M60 10
+                a 50 50 0 0 1 0 100
+                a 50 50 0 0 1 0 -100"
               fill="none"
-              stroke-linecap="round"
-              stroke-dashoffset={100 - ytd.percent}
-              stroke-dasharray="100"
-              stroke-width="12"
               pathLength="100"
+              stroke-width="10"
+              on:blur={() => (showYTD = false)}
+              on:focus={() => (showYTD = true)}
+              on:mouseout={() => (showYTD = false)}
+              on:mouseover={() => (showYTD = true)}
+              stroke-dasharray="{ytd.percent}, 100"
             />
-            <circle
+            <path
+              class="stroke-neutral-700"
+              d="M60 25
+                a 35 35 0 0 1 0 70
+                a 35 35 0 0 1 0 -70"
+              fill="none"
+              stroke-width="10"
+            />
+            <path
               class={qtd.color}
-              cx="60"
-              cy="60"
-              r="35"
+              d="M60 25
+                a 35 35 0 0 1 0 70
+                a 35 35 0 0 1 0 -70"
               fill="none"
-              stroke-linecap="round"
-              stroke-dashoffset={100 - qtd.percent}
-              stroke-dasharray="100"
-              stroke-width="12"
               pathLength="100"
+              stroke-width="10"
+              on:blur={() => (showQTD = false)}
+              on:focus={() => (showQTD = true)}
+              on:mouseout={() => (showQTD = false)}
+              on:mouseover={() => (showQTD = true)}
+              stroke-dasharray="{qtd.percent}, 100"
             />
+            <text
+              x="60"
+              y="50"
+              text-anchor="middle"
+              class="fill-white/50 font-pseudoMono text-[0.5em] italic">Target</text
+            >
+            <text
+              x="60"
+              y="70"
+              text-anchor="middle"
+              class="fill-white font-sans font-semibold">{target}%</text
+            >
           </svg>
+          {#if showQTD}
+            <div
+              in:fade={{ duration: 100, delay: 300 }}
+              out:fade={{ duration: 100, delay: 300 }}
+              class="absolute top-0 left-0 -mt-10 w-full rounded-md bg-neutral-700 p-3 text-sm shadow-lg before:absolute before:left-1/2 before:top-[100%] before:-translate-x-1/2 before:border-8 before:border-x-transparent before:border-b-transparent before:border-t-neutral-700 before:content-['']"
+            >
+              QTD: {qtd.percent}%
+            </div>
+          {/if}
+          {#if showYTD}
+            <div
+              in:fade={{ duration: 100, delay: 300 }}
+              out:fade={{ duration: 100, delay: 300 }}
+              class="absolute top-0 left-0 -mt-10 w-full rounded-md bg-neutral-700 p-3 text-sm shadow-lg before:absolute before:left-1/2 before:top-[100%] before:-translate-x-1/2 before:border-8 before:border-x-transparent before:border-b-transparent before:border-t-neutral-700 before:content-['']"
+            >
+              YTD: {ytd.percent}%
+            </div>
+          {/if}
         </figure>
       </div>
       {#each report as item}
