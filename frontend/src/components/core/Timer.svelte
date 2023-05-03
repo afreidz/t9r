@@ -22,6 +22,7 @@
 
   let grad: string;
   let elm: HTMLElement;
+  let timer: ReturnType<typeof setTimeout>;
   let as: keyof HTMLElementTagNameMap = "a";
 
   $: if (disableNav || selectMode) {
@@ -29,9 +30,11 @@
   }
 
   $: if (highlight) {
-    setTimeout(() => {
+    timer = setTimeout(() => {
       elm?.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
-    }, 1);
+    }, 600);
+  } else {
+    clearTimeout(timer);
   }
 
   $: if (project) {

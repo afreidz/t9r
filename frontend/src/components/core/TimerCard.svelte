@@ -22,6 +22,7 @@
 
   let grad: string;
   let elm: HTMLAnchorElement;
+  let timer: ReturnType<typeof setTimeout>;
 
   $: if (project) {
     if (project.color2 && project.color3) {
@@ -34,9 +35,11 @@
   }
 
   $: if (highlight) {
-    setTimeout(() => {
+    timer = setTimeout(() => {
       elm?.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
-    }, 1);
+    }, 600);
+  } else {
+    clearTimeout(timer);
   }
 
   async function getTagValue(t: string) {

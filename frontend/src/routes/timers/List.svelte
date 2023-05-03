@@ -116,6 +116,15 @@
     }, 1);
   }
 
+  $: if (!highlightCard && hourIndicators[sod?.hour]) {
+    setTimeout(() => {
+      hourIndicators[sod.hour]?.scrollIntoView({
+        inline: "start",
+        behavior: "smooth",
+      });
+    }, 300);
+  }
+
   $: if (!timers.length) {
     $showRightSidebar = false;
   }
