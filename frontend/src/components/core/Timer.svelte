@@ -19,7 +19,6 @@
   export let color: string = "black";
   export let selectMode = false;
   export let highlight = false;
-  export let scrollto = false;
 
   let grad: string;
   let elm: HTMLElement;
@@ -29,13 +28,9 @@
     as = selectMode ? "label" : "div";
   }
 
-  $: if (elm && scrollto) {
-    elm.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
-  }
-
   $: if (highlight) {
     setTimeout(() => {
-      elm.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
+      elm?.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
     }, 1);
   }
 

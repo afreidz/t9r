@@ -27,6 +27,7 @@
   import Header from "@/core/Header.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import HourSum from "@/core/SumChip.svelte";
+  import settings from "@/lib/stores/settings";
   import NewTimer from "@/core/NewTimer.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerCard from "@/core/TimerCard.svelte";
@@ -62,10 +63,11 @@
   let view: Views = "list";
   let timers: Timer[] = [];
   let loader: Promise<void>;
+  let sod: Temporal.PlainTime;
   let viewTimers: Timer[] = [];
-  let nowIndicator: HTMLElement;
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
+  let hourIndicators: HTMLElement[] = [];
   let filteredTimers: Timer[] | undefined;
   let filters: Filter.Set = [{ value: "" }];
   let combinator: Filter.Combinator = "and";
@@ -80,6 +82,7 @@
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
   $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
+  $: if ($settings?.sod) sod = Temporal.PlainTime.from($settings.sod);
   $: if (filteredTimers) viewTimers = filteredTimers;
   $: if ($now) nowText = formatForShortTime($now);
   $: if (!filteredTimers) viewTimers = timers;
@@ -101,12 +104,16 @@
     ? "all"
     : "days";
 
-  $: if (nowIndicator && !loaded) {
-    loaded = true;
-    nowIndicator.scrollIntoView({
-      inline: "center",
-      behavior: "smooth",
-    });
+  $: if (hourIndicators[sod?.hour]) {
+    setTimeout(() => {
+      if (loaded) return;
+      if (!hourIndicators[sod.hour]) return (loaded = false);
+      loaded = true;
+      hourIndicators[sod.hour]?.scrollIntoView({
+        inline: "start",
+        behavior: "smooth",
+      });
+    }, 1);
   }
 
   $: if (!timers.length) {
@@ -326,6 +333,7 @@
     {#if view === "timeline"}
       {#each new Array(24) as _, hour}
         <div
+          bind:this={hourIndicators[hour]}
           class="relative h-full border-l border-dotted border-white/10 opacity-50"
           style={calculateHourGridPosition(hour, timers.length)}
         >
@@ -345,7 +353,6 @@
         >
           <span
             class="absolute top-0 left-1 z-10 whitespace-nowrap rounded-md bg-red-500 p-2 text-xs"
-            bind:this={nowIndicator}
           >
             {nowText}
           </span>
@@ -364,7 +371,6 @@
           on:mouseleave={() => (highlightTimer = undefined)}
           project={$projects.find((p) => p._id === timer.project)}
           style={calculateGridPosition(timer.start, timer.end, i)}
-          scrollto={!isToday(viewDate) && timers[i] === timers.at(-1)}
         >
           <div slot="left">
             {#if view !== "timeline"}

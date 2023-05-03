@@ -35,7 +35,7 @@
 
   $: if (highlight) {
     setTimeout(() => {
-      elm.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
+      elm?.scrollIntoView({ inline: "center", block: "center", behavior: "smooth" });
     }, 1);
   }
 
