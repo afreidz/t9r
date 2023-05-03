@@ -240,8 +240,12 @@
     slot="header"
     main={duration === "months"
       ? `${getMonth(viewDate)} ${viewDate.year}`
-      : duration !== "all"
-      ? `${getSunday(viewDate).day} ${getMonth(viewDate)} ${viewDate.year}`
+      : duration === "weeks"
+      ? `${getSunday(viewDate).day} ${getMonth(getSunday(viewDate))} ${
+          getSunday(viewDate).year
+        }`
+      : duration === "days"
+      ? `${viewDate.day} ${getMonth(viewDate)} ${viewDate.year}`
       : "All Timers"}
     sub={duration === "days"
       ? `Timers for ${getWeekDay(viewDate)}`

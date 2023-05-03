@@ -14,9 +14,14 @@
   import DualAction from "@/core/DualAction.svelte";
   import Copy from "@/components/foundation/Copy.svelte";
   import Field from "@/components/foundation/Field.svelte";
-  import { isBeforeDate, isToday, getToday } from "@/lib/dates";
   import { getFiscalYearStartMonth, isAfterDate } from "@/lib/dates";
   import type { YearlyUtilizationReport } from "@/backend/schema/timer";
+  import { isBeforeDate, isToday, getToday, isAfterPYM, isBeforePYM } from "@/lib/dates";
+
+  type DonutChartData = {
+    percent: number;
+    color: "stroke-red-400" | "stroke-amber-400" | "stroke-emerald-400";
+  };
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
@@ -24,13 +29,25 @@
   import ActionCurrent from "@/core/actions/Current.svelte";
 
   let view = Temporal.Now.plainDateISO();
+  let fyStart: Temporal.PlainYearMonth;
   let report: YearlyUtilizationReport;
   let newTarget: HTMLInputElement;
   let target: number;
   let modify = false;
 
+  let qtd: DonutChartData = {
+    percent: 0,
+    color: "stroke-red-400",
+  };
+
+  let ytd: DonutChartData = {
+    percent: 0,
+    color: "stroke-red-400",
+  };
+
   $: if (view) {
     getFiscalYearStartMonth(view).then((startMonth) => {
+      fyStart = startMonth;
       trpc.targets.getByYear.query({ year: view.year }).then((result) => {
         target = result?.percent || get(settings)?.defaultUtilization || 100;
       });
@@ -38,6 +55,69 @@
         .query({ date: startMonth.toString() })
         .then((result) => (report = result));
     });
+  }
+
+  $: if (report && target) {
+    const fy = [
+      fyStart,
+      fyStart.add({ months: 3 }),
+      fyStart.add({ months: 6 }),
+      fyStart.add({ months: 9 }),
+    ];
+    const viewMonth = Temporal.PlainYearMonth.from(view);
+    const average = (target / 3) * 2;
+
+    const yearDays = report
+      .map((r) => r.days)
+      .flat()
+      .filter((d) => {
+        const day = Temporal.PlainDate.from(d.date);
+        if (day.equals(view)) return true;
+        return isBeforeDate(day, view);
+      });
+
+    const yearWeekDays = yearDays.filter((d) => !["Sat", "Sun"].includes(d.day));
+    const yearTotalHours = yearWeekDays.length * 8;
+    const yearActualHours = yearDays.reduce((hours, day) => {
+      return (hours += day.hours);
+    }, 0);
+
+    ytd.percent = (yearActualHours / yearTotalHours) * 100;
+    if (ytd.percent <= average) ytd.color = "stroke-red-400";
+    if (ytd.percent > average && ytd.percent < target) ytd.color = "stroke-amber-400";
+    if (ytd.percent >= target) ytd.color = "stroke-emerald-400";
+
+    const qtr = fy.find((q, i) => {
+      if (q.equals(viewMonth)) return true;
+      return isAfterPYM(viewMonth, q) && fy[i + 1] && isBeforePYM(viewMonth, fy[i + 1]);
+    });
+
+    const qtrMonths = report.filter((r) => {
+      if (!qtr) return false;
+      const month = Temporal.PlainYearMonth.from(r.date);
+      if (month.equals(qtr)) return true;
+      return isAfterPYM(month, qtr) && isBeforePYM(month, qtr.add({ months: 3 }));
+    });
+
+    const qtrDays = qtrMonths
+      .map((m) => m.days)
+      .flat()
+      .filter((d) => {
+        const day = Temporal.PlainDate.from(d.date);
+        if (day.equals(view)) return true;
+        return isBeforeDate(day, view);
+      });
+
+    const qtrWeekDays = qtrDays.filter((d) => !["Sat", "Sun"].includes(d.day));
+    const qtrTotalHours = qtrWeekDays.length * 8;
+    const qtrActualHours = qtrDays.reduce((hours, day) => {
+      return (hours += day.hours);
+    }, 0);
+
+    qtd.percent = (qtrActualHours / qtrTotalHours) * 100;
+    if (qtd.percent <= average) qtd.color = "stroke-red-400";
+    if (qtd.percent > average && qtd.percent < target) qtd.color = "stroke-amber-400";
+    if (qtd.percent >= target) qtd.color = "stroke-emerald-400";
   }
 
   function pad(days: YearlyUtilizationReport[number]["days"]) {
@@ -110,7 +190,42 @@
     </ActionBar>
   </Header>
   {#if report}
-    <div class="my-10 flex flex-wrap justify-center gap-6 md:justify-start">
+    <div class="my-10 flex flex-wrap justify-evenly gap-6">
+      <div class="relative flex w-64 flex-col items-center">
+        <Copy
+          semibold
+          variant="gradient"
+          class="my-4 flex justify-center text-lg uppercase">Average</Copy
+        >
+        <figure class="relative p-4">
+          <svg viewBox="0 0 120 120" class="h-44 -rotate-90 -scale-y-100 scale-x-100">
+            <circle
+              class={ytd.color}
+              cx="60"
+              cy="60"
+              r="54"
+              fill="none"
+              stroke-linecap="round"
+              stroke-dashoffset={100 - ytd.percent}
+              stroke-dasharray="100"
+              stroke-width="12"
+              pathLength="100"
+            />
+            <circle
+              class={qtd.color}
+              cx="60"
+              cy="60"
+              r="35"
+              fill="none"
+              stroke-linecap="round"
+              stroke-dashoffset={100 - qtd.percent}
+              stroke-dasharray="100"
+              stroke-width="12"
+              pathLength="100"
+            />
+          </svg>
+        </figure>
+      </div>
       {#each report as item}
         <div class="relative w-64">
           <Copy

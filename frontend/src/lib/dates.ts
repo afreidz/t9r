@@ -122,3 +122,13 @@ export function isBeforeDate(d1: Temporal.PlainDate, d2: Temporal.PlainDate) {
 export function isAfterDate(d1: Temporal.PlainDate, d2: Temporal.PlainDate) {
   return !isBeforeDate(d1, d2);
 }
+
+export function isBeforePYM(
+  pym1: Temporal.PlainYearMonth,
+  pym2: Temporal.PlainYearMonth
+) {
+  return Temporal.PlainYearMonth.compare(pym1, pym2) < 0;
+}
+export function isAfterPYM(pym1: Temporal.PlainYearMonth, pym2: Temporal.PlainYearMonth) {
+  return Temporal.PlainYearMonth.compare(pym1, pym2) > 0;
+}
