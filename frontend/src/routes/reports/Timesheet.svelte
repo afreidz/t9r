@@ -166,7 +166,6 @@
         {#if entry.days.some((day) => day.timers.length > 0)}
           {@const hours = sumTimerHours(entry.days.map((d) => d.timers).flat())}
           {@const percent = entry.forecast ? (hours / entry.forecast.hours) * 100 : 100}
-
           {@const variance = (percent - 100).toFixed(2)}
           <li class="mb-6">
             <div class="sticky left-0 flex items-center gap-4">
@@ -175,7 +174,7 @@
               >
                 <TimerComponent
                   disableNav
-                  class="mb-0"
+                  class="mb-0 h-full"
                   style="width: {Math.min(percent, 100)}%;"
                   project={entry.project}
                   title={entry.project.name}
