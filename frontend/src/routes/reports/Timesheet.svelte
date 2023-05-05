@@ -26,7 +26,9 @@
   import DualAction from "@/core/DualAction.svelte";
   import { showRightSidebar } from "@/lib/stores/ui";
   import type { Timer } from "@/backend/schema/timer";
+  import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
+  import type { Forecast } from "@/backend/schema/forecast";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
@@ -38,6 +40,7 @@
 
   type Timesheet = {
     project: Project;
+    forecast?: Forecast | null;
     days: {
       date: Temporal.PlainDate;
       timers: Timer[];
@@ -75,7 +78,11 @@
             return { date, timers };
           })
         );
-        return { project, days };
+        const forecast = await trpc.forecast.getByWeekAndProject.query({
+          project: project._id || "",
+          week: getSunday(viewDate).toString(),
+        });
+        return { project, days, forecast };
       })
     ).then((result: Timesheet) => (timesheet = result));
 
@@ -157,13 +164,40 @@
     <ul class="flex-1">
       {#each timesheet as entry, e}
         {#if entry.days.some((day) => day.timers.length > 0)}
+          {@const hours = sumTimerHours(entry.days.map((d) => d.timers).flat())}
+          {@const percent = entry.forecast ? (hours / entry.forecast.hours) * 100 : 100}
+
+          {@const variance = (percent - 100).toFixed(2)}
           <li class="mb-6">
-            <TimerComponent
-              disableNav
-              class="sticky left-0 !mb-0"
-              project={entry.project}
-              title={entry.project.name}
-            />
+            <div class="sticky left-0 flex items-center gap-4">
+              <div
+                class="relative flex flex-1 items-center overflow-hidden rounded-full bg-neutral-900"
+              >
+                <TimerComponent
+                  disableNav
+                  class="mb-0"
+                  style="width: {Math.min(percent, 100)}%;"
+                  project={entry.project}
+                  title={entry.project.name}
+                >
+                  <div slot="right">
+                    <Tag>{hours}hrs</Tag>
+                  </div>
+                </TimerComponent>
+                {#if entry.forecast}
+                  <div class="absolute right-0 mx-4">
+                    <Tag>{entry.forecast.hours}hrs</Tag>
+                  </div>
+                {/if}
+              </div>
+              {#if entry.forecast}
+                <div>
+                  <Tag class={Number(variance) > 0 ? "!bg-emerald-500" : "!bg-red-500"}
+                    >{Number(variance) > 0 ? "+" : ""}{variance}%</Tag
+                  >
+                </div>
+              {/if}
+            </div>
             <ul
               on:scroll={syncScroll}
               bind:this={sections[e + 1]}
