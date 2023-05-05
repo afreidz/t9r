@@ -179,19 +179,21 @@
                   project={entry.project}
                   title={entry.project.name}
                 >
+                  <div slot="left">
+                    {#if entry.forecast}
+                      <Tag>Forecasted: {entry.forecast.hours}hrs</Tag>
+                    {/if}
+                  </div>
                   <div slot="right">
-                    <Tag>{hours}hrs</Tag>
+                    <Tag
+                      >{#if entry.forecast}Actual: {/if}{hours}hrs</Tag
+                    >
                   </div>
                 </TimerComponent>
-                {#if entry.forecast}
-                  <div class="absolute right-0 mx-4">
-                    <Tag>{entry.forecast.hours}hrs</Tag>
-                  </div>
-                {/if}
               </div>
               {#if entry.forecast}
                 <div>
-                  <Tag class={Number(variance) > 0 ? "!bg-emerald-500" : "!bg-red-500"}
+                  <Tag class={Number(variance) >= 0 ? "!bg-emerald-500" : "!bg-red-500"}
                     >{Number(variance) > 0 ? "+" : ""}{variance}%</Tag
                   >
                 </div>
