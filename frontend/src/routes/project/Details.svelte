@@ -12,7 +12,6 @@
   import { sumTimerHours } from "@/lib/timers";
   import Field from "@/foundation/Field.svelte";
   import Chart from "@/core/chart/Chart.svelte";
-  import Tag from "@/components/core/Tag.svelte";
   import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -20,7 +19,6 @@
   import ChartItem from "@/core/chart/ChartItem.svelte";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
-  import type { Tag as TagType } from "@/backend/schema/tag";
   import { formatForForecastWeek, getWeeksArray } from "@/lib/dates";
   import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
 
@@ -31,9 +29,7 @@
   let showGradientStops = false;
   let project: Project | undefined;
   let newValues: Project | undefined;
-  let deletedTag: TagType | undefined;
   let forecastWeeks = getWeeksArray(5, false);
-  let projectTags: Promise<TagType[]> | undefined;
   let projectTimers: Promise<Timer[]> | undefined;
   let forecasts: Promise<(ForecastAndActual | undefined)[]> | undefined;
 
@@ -42,7 +38,6 @@
     projectTimers = undefined;
     project = $projects.find((p: Project) => p._id === params.id);
     if (project) newValues = { ...project, budget: project.budget || null };
-    if (project?._id) projectTags = trpc.tags.getAllByProject.query(project._id);
   }
 
   $: if (newValues && project) dirty = !same<Project>(newValues, project);
@@ -94,16 +89,6 @@
     if (!showGradientStops) {
       newValues.color2 = null;
       newValues.color3 = null;
-    }
-  }
-
-  async function handleDeleteTag() {
-    if (!deletedTag?._id || !project?._id) return;
-    const result = await trpc.tags.deleteTag.mutate({ id: deletedTag._id });
-
-    if (result.acknowledged) {
-      deletedTag = undefined;
-      projectTags = trpc.tags.getAllByProject.query(project._id);
     }
   }
 </script>
@@ -273,22 +258,6 @@
           {/if}
         </div>
       {/key}
-      {#if projectTags}
-        <Copy as="h3" semibold variant="gradient" class="my-4 uppercase"
-          >Project Tags</Copy
-        >
-        <div>
-          {#await projectTags}
-            <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
-          {:then tags}
-            {#each tags as tag}
-              <Tag closeable on:close={() => (deletedTag = tag)}>
-                {tag.value}
-              </Tag>
-            {/each}
-          {/await}
-        </div>
-      {/if}
     </section>
   </Container>
   <div slot="cta">
@@ -351,37 +320,6 @@
         <span slot="content">Are you sure?</span>
         <Button
           on:click={handleDelete}
-          slot="primary"
-          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
-        >
-          <Icon icon="material-symbols:fitbit-check-small-sharp" />
-        </Button>
-      </DualAction>
-    </section>
-  </Dialog>
-{/if}
-
-{#if deletedTag}
-  <Dialog
-    open={true}
-    title="Permanently delete tag {deletedTag.value}"
-    sub="You are about to..."
-  >
-    <Button slot="close" value="cancel" on:click={() => (deletedTag = undefined)}>
-      <Icon icon="material-symbols:close" class="h-7 w-7" />
-    </Button>
-    <section class="flex flex-1 flex-col items-center justify-center py-4">
-      <DualAction>
-        <Button
-          slot="secondary"
-          on:click={() => (deletedTag = undefined)}
-          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
-        >
-          <Icon icon="teenyicons:x-small-outline" />
-        </Button>
-        <span slot="content">Are you sure?</span>
-        <Button
-          on:click={handleDeleteTag}
           slot="primary"
           class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
         >

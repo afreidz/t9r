@@ -58,7 +58,6 @@
   let detailsProject: Project;
   let details: Tasks | undefined;
   let viewDate: Temporal.PlainDate;
-  let sections: HTMLElement[] = [];
   let detailsDate: Temporal.PlainDate | undefined;
   let detailsEntry: Timesheet[number] | undefined;
   let week = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -126,14 +125,6 @@
       )
       .join("\n");
   }
-
-  function syncScroll(e: { currentTarget: EventTarget & HTMLElement }) {
-    sections.forEach((section) => {
-      if (section !== e.currentTarget && section) {
-        section.scrollLeft = e.currentTarget.scrollLeft;
-      }
-    });
-  }
 </script>
 
 <Layout>
@@ -163,7 +154,10 @@
     </Header>
     <div class="mt-8 flex flex-1 justify-center">
       <Container class="flex-1">
-        <div slot="primary" class="grid w-full auto-rows-min grid-cols-1 overflow-auto">
+        <div
+          slot="primary"
+          class="grid w-full snap-x snap-mandatory auto-rows-min grid-cols-1 overflow-auto"
+        >
           {#each timesheet as entry, e}
             {#if entry.days.some((day) => day.timers.length > 0)}
               {@const hours = sumTimerHours(entry.days.map((d) => d.timers).flat())}
@@ -173,11 +167,11 @@
               {@const variance = (percent - 100).toFixed(2)}
               <header class="sticky left-0 right-0 col-span-full">
                 <div
-                  class="flex flex-1 items-center overflow-hidden rounded-full bg-neutral-900"
+                  class="flex h-10 flex-1 items-center overflow-hidden rounded-full bg-neutral-900 md:h-14"
                 >
                   <TimerComponent
                     disableNav
-                    class="mb-0 h-full"
+                    class="mb-0"
                     style="width: {Math.max(50, Math.min(percent, 100))}%;"
                     project={entry.project}
                     title={entry.project.name}
@@ -201,9 +195,11 @@
                   </TimerComponent>
                 </div>
               </header>
-              <ul class="grid grid-cols-[repeat(7,_minmax(10rem,_16rem))] gap-4">
+              <ul
+                class="grid grid-cols-[repeat(7,16rem)] gap-4 md:grid-cols-[repeat(7,_minmax(10rem,_16rem))]"
+              >
                 {#each entry.days as day, i}
-                  <li class="mb-6 flex flex-col items-center">
+                  <li class="mb-6 flex snap-center flex-col items-center">
                     <Copy as="strong" variant="gradient" class="flex-none py-4 uppercase">
                       {day.date.toLocaleString("en", { weekday: "short" })}
                       {getSunday(viewDate).add({ days: i }).day}

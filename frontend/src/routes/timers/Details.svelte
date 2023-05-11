@@ -5,7 +5,6 @@
   import now from "@/lib/stores/now";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
-  import tags from "@/lib/stores/tags";
   import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
   import Dialog from "@/core/Dialog.svelte";
@@ -21,17 +20,16 @@
   import DualAction from "@/core/DualAction.svelte";
   import selectedTimers from "@/lib/stores/selected";
   import type { Timer } from "@/backend/schema/timer";
+  import tags, { updateTags } from "@/lib/stores/tags";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
   import { getDurationHoursFromString } from "@/lib/dates";
-  import type { Tag as TagType } from "@/backend/schema/tag";
   import { formatForMonth, getToday, isToday } from "@/lib/dates";
 
   let newTag: string;
   let multiple = false;
   let dirty: boolean = false;
   let picker: HTMLInputElement;
-  let localTags: TagType[] = [];
   let timer: Timer | null = null;
   let project: Project | undefined;
   let confirmDelete: boolean = false;
@@ -43,14 +41,12 @@
     $showLoader = true;
 
     if (multiple) {
-      localTags = $tags;
       timers = await trpc.timers.bulkGet.query($selectedTimers);
       if (timers) newValues = { ...emptyTimer };
     } else {
       timer = await trpc.timers.get.query(params.id);
       if (timer) newValues = { ...timer };
       if (timer) project = $projects.find((p) => p._id === timer?.project);
-      if (timer) localTags = await trpc.tags.getAllByProject.query(timer.project);
     }
 
     $showLoader = false;
@@ -102,15 +98,14 @@
     const val = (e as { currentTarget: EventTarget & HTMLInputElement }).currentTarget
       .value;
 
-    let existing =
-      localTags.find((t) => t._id === val) || (await trpc.tags.get.query(val));
+    let existing = $tags.find((t) => t._id === val) || (await trpc.tags.get.query(val));
 
-    if (!existing && newValues && project && project._id) {
-      const result = await trpc.tags.create.mutate({ value: val, project: project._id });
+    if (!existing && newValues) {
+      const result = await trpc.tags.create.mutate({ value: val });
 
       if (result.acknowledged && result.insertedId) {
         existing = await trpc.tags.get.query(result.insertedId);
-        localTags = await trpc.tags.getAllByProject.query(project._id);
+        await updateTags();
       }
     }
 
@@ -209,7 +204,7 @@
             />
             <Icon slot="icon" icon="material-symbols:search" class="text-neutral-light" />
             <datalist id="tags">
-              {#each localTags as tag}
+              {#each $tags as tag}
                 <option value={tag._id}>{tag.value}</option>
               {/each}
             </datalist>
@@ -217,7 +212,7 @@
               {#if newValues.tags}
                 {#each newValues.tags as tag}
                   <Tag closeable on:close={() => removeTag(tag)}>
-                    {localTags.find((t) => t._id === tag)?.value || tag}
+                    {$tags.find((t) => t._id === tag)?.value || tag}
                   </Tag>
                 {/each}
               {/if}

@@ -3,9 +3,11 @@
   import same from "@/lib/same";
   import Icon from "@iconify/svelte";
   import { get } from "svelte/store";
+  import Tag from "@/core/Tag.svelte";
   import Months from "./Months.svelte";
   import { pop } from "svelte-spa-router";
   import Header from "@/core/Header.svelte";
+  import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
@@ -13,10 +15,13 @@
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
+  import tags, { updateTags } from "@/lib/stores/tags";
   import Container from "@/foundation/Container.svelte";
   import type { Settings } from "@/backend/schema/settings";
+  import type { Tag as TagType } from "@/backend/schema/tag";
 
   let dirty = false;
+  let deletedTag: TagType | undefined;
   let newValues: Settings | null = get(settings);
 
   $: if (!newValues && $settings) newValues = JSON.parse(JSON.stringify($settings));
@@ -33,12 +38,22 @@
     if (!$settings) return;
     newValues = { ...$settings };
   }
+
+  async function handleDeleteTag() {
+    if (!deletedTag?._id) return;
+    const result = await trpc.tags.deleteTag.mutate({ id: deletedTag._id });
+
+    if (result.acknowledged) {
+      deletedTag = undefined;
+      await updateTags();
+    }
+  }
 </script>
 
 <Layout>
   <Header slot="header" main="Settings" sub="Account" />
   <Container>
-    <section slot="primary" class="max-w-xs xl:flex-1">
+    <section slot="primary" class="flex-1">
       <Copy as="h3" semibold variant="gradient" class="my-4 uppercase"
         >Dates and Times</Copy
       >
@@ -80,7 +95,23 @@
         </Field>
       </div>
     </section>
-    <section class="flex-1" slot="secondary" />
+    <section
+      class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4 pt-0"
+      slot="secondary"
+    >
+      <Copy as="h3" semibold variant="gradient" class="my-4 uppercase">Tags</Copy>
+      <div>
+        {#await $tags}
+          <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
+        {:then tags}
+          {#each tags as tag}
+            <Tag closeable on:close={() => (deletedTag = tag)}>
+              {tag.value}
+            </Tag>
+          {/each}
+        {/await}
+      </div>
+    </section>
   </Container>
   <div slot="cta">
     {#if dirty}
@@ -116,3 +147,34 @@
     {/if}
   </div>
 </Layout>
+
+{#if deletedTag}
+  <Dialog
+    open={true}
+    title="Permanently delete tag {deletedTag.value}"
+    sub="You are about to..."
+  >
+    <Button slot="close" value="cancel" on:click={() => (deletedTag = undefined)}>
+      <Icon icon="material-symbols:close" class="h-7 w-7" />
+    </Button>
+    <section class="flex flex-1 flex-col items-center justify-center py-4">
+      <DualAction>
+        <Button
+          slot="secondary"
+          on:click={() => (deletedTag = undefined)}
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <span slot="content">Are you sure?</span>
+        <Button
+          on:click={handleDeleteTag}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    </section>
+  </Dialog>
+{/if}

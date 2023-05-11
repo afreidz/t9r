@@ -15,27 +15,6 @@ const tagsRouter = router({
 
     return collection.findOne<Tag>({ owner: userId, _id: new ObjectId(input) });
   }),
-  getAllByProject: protectedProcedure
-    .input(z.string())
-    .query(async ({ input, ctx }) => {
-      const { userId } = ctx.user;
-      const db = await getDBClient();
-      const collection = db.collection("tags");
-
-      const result = await collection
-        .find<Tag>({ owner: userId, project: input })
-        .toArray();
-
-      if (result instanceof DBError) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: result.message,
-          cause: result,
-        });
-      } else {
-        return result;
-      }
-    }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const { userId } = ctx.user;
     const db = await getDBClient();
@@ -112,21 +91,20 @@ const tagsRouter = router({
       const db = await getDBClient();
       const collection = db.collection("tags");
 
-      const { value, project } = input;
+      const { value } = input;
       const regex = new RegExp(`^${value}$`, "i");
-      const existing = await collection.findOne<Tag>({ value: regex, project });
+      const existing = await collection.findOne<Tag>({ value: regex });
 
       if (existing) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Project and value for tag already exists",
+          message: `"${value}" tag already exists`,
           cause: existing,
         });
       }
 
       const result = await collection.insertOne({
         value,
-        project,
         owner: userId,
       });
 

@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 const TagSchema = z.object({
-  project: z.string(),
   _id: z.string().optional(),
   owner: z.string().optional(),
   value: z.string().min(2).max(30),
