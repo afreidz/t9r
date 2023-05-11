@@ -161,101 +161,86 @@
         />
       </ActionBar>
     </Header>
-    <ul class="flex-1">
-      {#each timesheet as entry, e}
-        {#if entry.days.some((day) => day.timers.length > 0)}
-          {@const hours = sumTimerHours(entry.days.map((d) => d.timers).flat())}
-          {@const percent = entry.forecast ? (hours / entry.forecast.hours) * 100 : 100}
-          {@const variance = (percent - 100).toFixed(2)}
-          <li class="mb-6">
-            <div class="sticky left-0 flex items-center gap-4">
-              <div
-                class="relative flex flex-1 items-center overflow-hidden rounded-full bg-neutral-900"
-              >
-                <TimerComponent
-                  disableNav
-                  class="mb-0 h-full"
-                  style="width: {Math.min(percent, 100)}%;"
-                  project={entry.project}
-                  title={entry.project.name}
+    <div class="mt-8 flex flex-1 justify-center">
+      <Container class="flex-1">
+        <div slot="primary" class="grid w-full auto-rows-min grid-cols-1 overflow-auto">
+          {#each timesheet as entry, e}
+            {#if entry.days.some((day) => day.timers.length > 0)}
+              {@const hours = sumTimerHours(entry.days.map((d) => d.timers).flat())}
+              {@const percent = entry.forecast
+                ? (hours / entry.forecast.hours) * 100
+                : 100}
+              {@const variance = (percent - 100).toFixed(2)}
+              <header class="sticky left-0 right-0 col-span-full">
+                <div
+                  class="flex flex-1 items-center overflow-hidden rounded-full bg-neutral-900"
                 >
-                  <div slot="left">
-                    {#if entry.forecast}
-                      <Tag>Forecasted: {entry.forecast.hours}hrs</Tag>
-                    {/if}
-                  </div>
-                  <div slot="right">
-                    <Tag
-                      >{#if entry.forecast}Actual: {/if}{hours}hrs</Tag
-                    >
-                  </div>
-                </TimerComponent>
-              </div>
-              {#if entry.forecast}
-                <div>
-                  <Tag class={Number(variance) >= 0 ? "!bg-emerald-500" : "!bg-red-500"}
-                    >{Number(variance) > 0 ? "+" : ""}{variance}%</Tag
+                  <TimerComponent
+                    disableNav
+                    class="mb-0 h-full"
+                    style="width: {Math.max(50, Math.min(percent, 100))}%;"
+                    project={entry.project}
+                    title={entry.project.name}
                   >
-                </div>
-              {/if}
-            </div>
-            <ul
-              on:scroll={syncScroll}
-              bind:this={sections[e + 1]}
-              class="flex w-full flex-none snap-x items-center gap-8 overflow-auto md:snap-none md:justify-between"
-            >
-              {#each entry.days as day, i}
-                <div class="flex snap-center flex-col items-center">
-                  <Copy as="strong" variant="gradient" class="flex-none py-4 uppercase">
-                    {day.date.toLocaleString("en", { weekday: "short" })}
-                    {getSunday(viewDate).add({ days: i }).day}
-                  </Copy>
-                  <Field
-                    as="div"
-                    label="Hours"
-                    class="w-64 min-w-[140px] flex-none md:w-fit"
-                  >
-                    <Copy
-                      as="strong"
-                      variant="gradient"
-                      class="flex flex-none items-center justify-center p-6 text-3xl"
-                      >{sumTimerHours(day.timers)}</Copy
-                    >
-                    <footer class="flex items-stretch justify-evenly">
-                      <ActionCopy
-                        title="copy hours"
-                        on:click={() => clipboard.write(`${sumTimerHours(day.timers)}`)}
-                      />
-                      {#if day.timers.length > 0}
-                        <ActionInfo
-                          isStatic={true}
-                          on:click={() => {
-                            $showRightSidebar = true;
-                            details = getTasksAndTagsFromTimers(day.timers);
-                            detailsEntry = entry;
-                            detailsDate = day.date;
-                            detailsProject = entry.project;
-                          }}
-                        />
+                    <div slot="left">
+                      {#if entry.forecast}
+                        <Tag>Forecasted: {entry.forecast.hours}hrs</Tag>
                       {/if}
-                    </footer>
-                  </Field>
+                    </div>
+                    {#if entry.forecast}
+                      <Tag
+                        class={Number(variance) >= 0 ? "!bg-emerald-500" : "!bg-red-500"}
+                        >{Number(variance) > 0 ? "+" : ""}{variance}%</Tag
+                      >
+                    {/if}
+                    <div slot="right">
+                      <Tag
+                        >{#if entry.forecast}Actual: {/if}{hours}hrs</Tag
+                      >
+                    </div>
+                  </TimerComponent>
                 </div>
-              {/each}
-            </ul>
-          </li>
-        {/if}
-      {/each}
-      <li>
-        <TimerComponent disableNav title="Totals" color={totalColor} />
-        <ul
-          on:scroll={syncScroll}
-          bind:this={sections[0]}
-          class="flex w-full flex-none snap-x items-center gap-8 overflow-auto md:snap-none md:justify-between"
-        >
-          {#each week as date, i}
-            <li>
-              <div class="flex snap-center flex-col items-center">
+              </header>
+              <ul class="grid grid-cols-[repeat(7,_minmax(10rem,_16rem))] gap-4">
+                {#each entry.days as day, i}
+                  <li class="mb-6 flex flex-col items-center">
+                    <Copy as="strong" variant="gradient" class="flex-none py-4 uppercase">
+                      {day.date.toLocaleString("en", { weekday: "short" })}
+                      {getSunday(viewDate).add({ days: i }).day}
+                    </Copy>
+                    <Field as="div" class="relative w-full" label="Hours">
+                      <Copy
+                        as="strong"
+                        variant="gradient"
+                        class="flex flex-none items-center justify-center p-6 text-3xl"
+                        >{sumTimerHours(day.timers)}</Copy
+                      >
+                      <footer class="absolute top-0 right-2">
+                        {#if day.timers.length > 0}
+                          <ActionInfo
+                            isStatic={true}
+                            on:click={() => {
+                              $showRightSidebar = true;
+                              details = getTasksAndTagsFromTimers(day.timers);
+                              detailsEntry = entry;
+                              detailsDate = day.date;
+                              detailsProject = entry.project;
+                            }}
+                          />
+                        {/if}
+                      </footer>
+                    </Field>
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          {/each}
+          <!-- <header class="sticky left-0 right-0 col-span-full">
+            <TimerComponent disableNav title="Totals" color={totalColor} />
+          </header>
+          <ul class="grid grid-cols-[repeat(7,_minmax(10rem,_16rem))] gap-4">
+            {#each week as date, i}
+              <li class="mb-6 flex flex-col items-center">
                 <Copy as="strong" variant="gradient" class="flex-none py-4 uppercase">
                   {date}
                 </Copy>
@@ -271,25 +256,18 @@
                     >{sumDayHours(timesheet, i)}</Copy
                   >
                 </Field>
-              </div>
-            </li>
-          {/each}
-        </ul>
-      </li>
-    </ul>
+              </li>
+            {/each}
+          </ul> -->
+        </div>
+      </Container>
+    </div>
   {/if}
 
   <div slot="right" class="flex flex-1 flex-col overflow-auto md:min-w-[320px]">
     {#if details && $showRightSidebar}
       {@const text = getCopyTextFromTasks(details)}
       <header class="flex items-center justify-between px-2">
-        <ActionCopy
-          title="copy details"
-          disabled={details.length === 0}
-          on:click={async () => {
-            await clipboard.write(text);
-          }}
-        />
         <div class="flex flex-none items-center gap-2">
           <ActionPrev
             on:click={() => {
@@ -335,27 +313,33 @@
         />
       </header>
       {#if details.length}
-        <ul
-          class="m-4 rounded-md p-6 shadow-xl"
+        <button
+          on:click={async () => {
+            await clipboard.write(text);
+          }}
+          class="relative m-4 rounded-md p-6 shadow-xl"
           style="background-color: {detailsProject.color}"
         >
-          {#each details as task}
-            <li class="my-1">
-              <Copy class="whitespace-nowrap text-sm line-clamp-1">• {task.title}</Copy>
-              <ul class="ml-4 list-disc">
-                {#each task.tags as tag}
-                  <li class="flex">
-                    <span class="sr-only">•</span>
-                    <Tag
-                      class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
-                      >{tag}</Tag
-                    >
-                  </li>
-                {/each}
-              </ul>
-            </li>
-          {/each}
-        </ul>
+          <ul>
+            {#each details as task}
+              <li class="my-1">
+                <Copy class="whitespace-nowrap text-sm line-clamp-1">• {task.title}</Copy>
+                <ul class="ml-4 list-disc">
+                  {#each task.tags as tag}
+                    <li class="flex">
+                      <span class="sr-only">•</span>
+                      <Tag
+                        class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
+                        >{tag}</Tag
+                      >
+                    </li>
+                  {/each}
+                </ul>
+              </li>
+            {/each}
+          </ul>
+          <ActionCopy title="copy details" class="absolute right-2 top-0" />
+        </button>
       {:else}
         <Copy as="div" semibold variant="gradient" class="my-10 text-center uppercase"
           >No timers recorded for this project + day</Copy
