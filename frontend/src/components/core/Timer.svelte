@@ -76,7 +76,9 @@
   }`}
   style={`background: ${grad}; ${$$props.style || ""}`}
 >
-  <figure class="flex w-full max-w-[56px] shrink-0 items-center justify-center">
+  <figure
+    class="flex w-full max-w-[40px] shrink-0 items-center justify-center md:max-w-[56px]"
+  >
     {#if selectMode}
       <Check checked={!!id && $selectedTimers.includes(id)} on:change />
     {:else}
@@ -90,7 +92,8 @@
       dim
       as="small"
       variant="pseudomono"
-      class="text-left text-xs leading-none line-clamp-1">{project?.name || ""}</Copy
+      class="shrink text-left text-xs leading-none line-clamp-1"
+      >{project?.name || ""}</Copy
     >
     <strong class="text-sm font-normal !leading-none line-clamp-1 md:text-lg"
       >{title || "Timer"}</strong

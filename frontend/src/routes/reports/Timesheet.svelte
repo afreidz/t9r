@@ -4,6 +4,7 @@
     getToday,
     getMonth,
     getSunday,
+    isInThisWeek,
     getDurationHoursFromString,
   } from "@/lib/dates";
   import trpc from "@/lib/trpc";
@@ -11,7 +12,7 @@
   import now from "@/lib/stores/now";
   import clipboard from "clipboardy";
   import Tag from "@/core/Tag.svelte";
-  import { config } from "@/lib/theme";
+  // import { config } from "@/lib/theme";
   import tags from "@/lib/stores/tags";
   import { pop } from "svelte-spa-router";
   import Header from "@/core/Header.svelte";
@@ -54,6 +55,7 @@
 
   export let params: { date: string } = { date: getToday().toString() };
 
+  let key: unknown;
   let timesheet: Timesheet;
   let detailsProject: Project;
   let details: Tasks | undefined;
@@ -61,10 +63,10 @@
   let detailsDate: Temporal.PlainDate | undefined;
   let detailsEntry: Timesheet[number] | undefined;
   let week = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-  let totalColor = (config.theme?.colors?.neutral as any)["900"];
+  // let totalColor = (config.theme?.colors?.neutral as any)["900"];
 
   $: if (params.date) viewDate = Temporal.PlainDate.from(params.date);
-  $: if (viewDate)
+  $: if (viewDate) {
     Promise.all(
       $projects.map(async (project) => {
         const days = await Promise.all(
@@ -84,6 +86,8 @@
         return { project, days, forecast };
       })
     ).then((result: Timesheet) => (timesheet = result));
+    if (isInThisWeek(viewDate)) key = $now;
+  }
 
   function getTasksAndTagsFromTimers(timers: Timer[]) {
     const tasks: Tasks = timers.map((timer) => {
@@ -136,7 +140,7 @@
       class="mb-1"
     >
       <div slot="right">
-        {#key $now}
+        {#key key}
           <HourSum value={sumTimerHours(getAllTimersFromTimesheet(timesheet))} />
         {/key}
       </div>
@@ -166,65 +170,69 @@
                 : 100}
               {@const variance = (percent - 100).toFixed(2)}
               <header class="sticky left-0 right-0 col-span-full">
-                <div
-                  class="flex h-10 flex-1 items-center overflow-hidden rounded-full bg-neutral-900 md:h-14"
-                >
+                <div class="h-10 flex-1 items-center rounded-full bg-neutral-900 md:h-14">
                   <TimerComponent
                     disableNav
-                    class="mb-0"
+                    class="!mb-0 !h-full !shadow-none"
                     style="width: {Math.max(50, Math.min(percent, 100))}%;"
                     project={entry.project}
                     title={entry.project.name}
                   >
-                    <div slot="left">
-                      {#if entry.forecast}
-                        <Tag>Forecasted: {entry.forecast.hours}hrs</Tag>
-                      {/if}
-                    </div>
-                    {#if entry.forecast}
-                      <Tag
-                        class={Number(variance) >= 0 ? "!bg-emerald-500" : "!bg-red-500"}
-                        >{Number(variance) > 0 ? "+" : ""}{variance}%</Tag
-                      >
-                    {/if}
                     <div slot="right">
-                      <Tag
-                        >{#if entry.forecast}Actual: {/if}{hours}hrs</Tag
-                      >
+                      {#key key}
+                        <Tag>{hours}hrs</Tag>
+                      {/key}
                     </div>
                   </TimerComponent>
                 </div>
+                {#if entry.forecast}
+                  <div class="my-2 flex justify-end">
+                    {#key key}
+                      <Tag class="flex-none whitespace-nowrap"
+                        >Forecast: {entry.forecast.hours}hrs</Tag
+                      >
+                      <Tag
+                        class={Number(variance) >= 0
+                          ? "flex-none !bg-emerald-500"
+                          : "flex-none !bg-red-500"}
+                        >Variance: {Number(variance) > 0 ? "+" : ""}{variance}%</Tag
+                      >
+                    {/key}
+                  </div>
+                {/if}
               </header>
               <ul
-                class="grid grid-cols-[repeat(7,16rem)] gap-4 md:grid-cols-[repeat(7,_minmax(10rem,_16rem))]"
+                class="mb-8 grid grid-cols-[repeat(7,16rem)] gap-4 md:grid-cols-[repeat(7,_minmax(10rem,_16rem))]"
               >
                 {#each entry.days as day, i}
                   <li class="mb-6 flex snap-center flex-col items-center">
-                    <Copy as="strong" variant="gradient" class="flex-none py-4 uppercase">
+                    <Copy as="strong" variant="gradient" class="flex-none py-2 uppercase">
                       {day.date.toLocaleString("en", { weekday: "short" })}
                       {getSunday(viewDate).add({ days: i }).day}
                     </Copy>
                     <Field as="div" class="relative w-full" label="Hours">
-                      <Copy
-                        as="strong"
-                        variant="gradient"
-                        class="flex flex-none items-center justify-center p-6 text-3xl"
-                        >{sumTimerHours(day.timers)}</Copy
-                      >
-                      <footer class="absolute top-0 right-2">
-                        {#if day.timers.length > 0}
-                          <ActionInfo
-                            isStatic={true}
-                            on:click={() => {
-                              $showRightSidebar = true;
-                              details = getTasksAndTagsFromTimers(day.timers);
-                              detailsEntry = entry;
-                              detailsDate = day.date;
-                              detailsProject = entry.project;
-                            }}
-                          />
-                        {/if}
-                      </footer>
+                      {#key key}
+                        <Copy
+                          as="strong"
+                          variant="gradient"
+                          class="flex flex-none items-center justify-center p-6 text-3xl"
+                          >{sumTimerHours(day.timers)}</Copy
+                        >
+                        <footer class="absolute top-0 right-2">
+                          {#if day.timers.length > 0}
+                            <ActionInfo
+                              isStatic={true}
+                              on:click={() => {
+                                $showRightSidebar = true;
+                                details = getTasksAndTagsFromTimers(day.timers);
+                                detailsEntry = entry;
+                                detailsDate = day.date;
+                                detailsProject = entry.project;
+                              }}
+                            />
+                          {/if}
+                        </footer>
+                      {/key}
                     </Field>
                   </li>
                 {/each}

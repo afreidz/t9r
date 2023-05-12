@@ -10,7 +10,6 @@
   import SubNav from "./Sub.svelte";
   import Icon from "@iconify/svelte";
   import SubItem from "./SubItem.svelte";
-  import { getToday } from "@/lib/dates";
   import projects from "@/stores/projects";
   import MainItem from "./MainItem.svelte";
   import Dialog from "@/core/Dialog.svelte";
@@ -40,7 +39,7 @@
         <SubNav>
           <SubItem
             active={$location.startsWith("/timers/day")}
-            to={`/timers/day/${getToday().toString()}`}
+            to="/timers/day"
             on:navigate
           >
             <Icon
@@ -52,7 +51,7 @@
           </SubItem>
           <SubItem
             active={$location.startsWith("/timers/week")}
-            to={`/timers/week/${getToday().toString()}`}
+            to="/timers/week"
             on:navigate
           >
             <Icon
@@ -64,7 +63,7 @@
           </SubItem>
           <SubItem
             active={$location.startsWith("/timers/month")}
-            to={`/timers/month/${getToday().toString()}`}
+            to="/timers/month"
             on:navigate
           >
             <Icon

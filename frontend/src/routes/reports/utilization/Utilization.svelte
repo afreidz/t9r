@@ -19,15 +19,15 @@
   import type { YearlyUtilizationReport } from "@/backend/schema/timer";
   import { isBeforeDate, isToday, getToday, isAfterPYM, isBeforePYM } from "@/lib/dates";
 
-  type DonutChartData = {
-    percent: number;
-    color: "stroke-red-400" | "stroke-amber-400" | "stroke-emerald-400";
-  };
-
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
+
+  type DonutChartData = {
+    percent: number;
+    color: "stroke-red-400" | "stroke-amber-400" | "stroke-emerald-400";
+  };
 
   let view = Temporal.Now.plainDateISO();
   let fyStart: Temporal.PlainYearMonth;
@@ -267,7 +267,7 @@
               out:fade={{ duration: 100, delay: 300 }}
               class="absolute top-0 left-0 -mt-10 w-full rounded-md bg-neutral-700 p-3 text-sm shadow-lg before:absolute before:left-1/2 before:top-[100%] before:-translate-x-1/2 before:border-8 before:border-x-transparent before:border-b-transparent before:border-t-neutral-700 before:content-['']"
             >
-              QTD: {qtd.percent}%
+              QTD: {qtd.percent.toFixed(2)}%
             </div>
           {/if}
           {#if showYTD}
@@ -276,7 +276,7 @@
               out:fade={{ duration: 100, delay: 300 }}
               class="absolute top-0 left-0 -mt-10 w-full rounded-md bg-neutral-700 p-3 text-sm shadow-lg before:absolute before:left-1/2 before:top-[100%] before:-translate-x-1/2 before:border-8 before:border-x-transparent before:border-b-transparent before:border-t-neutral-700 before:content-['']"
             >
-              YTD: {ytd.percent}%
+              YTD: {ytd.percent.toFixed(2)}%
             </div>
           {/if}
         </figure>

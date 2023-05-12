@@ -123,6 +123,13 @@ export function isAfterDate(d1: Temporal.PlainDate, d2: Temporal.PlainDate) {
   return !isBeforeDate(d1, d2);
 }
 
+export function isInThisWeek(d: Temporal.PlainDate) {
+  const today = getToday();
+  const sunday = getSunday(today);
+  if (d.equals(today)) return true;
+  return isAfterDate(d, sunday) && isBeforeDate(d, sunday.add({ weeks: 1 }));
+}
+
 export function isBeforePYM(
   pym1: Temporal.PlainYearMonth,
   pym2: Temporal.PlainYearMonth

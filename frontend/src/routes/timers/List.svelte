@@ -81,7 +81,7 @@
 
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
-  $: if (params?.date) viewDate = Temporal.PlainDate.from(params.date);
+  $: if (params.date) viewDate = Temporal.PlainDate.from(params.date);
   $: if ($settings?.sod) sod = Temporal.PlainTime.from($settings.sod);
   $: if (filteredTimers) viewTimers = filteredTimers;
   $: if ($now) nowText = formatForShortTime($now);

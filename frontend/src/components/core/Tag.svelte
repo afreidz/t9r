@@ -5,7 +5,7 @@
   const dispatch = createEventDispatcher();
 
   export let round: boolean = false;
-  export let color: string = "inherit";
+  export let color: string = "white";
   export let closeable: boolean = false;
 </script>
 
