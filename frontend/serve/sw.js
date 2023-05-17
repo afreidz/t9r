@@ -8,16 +8,18 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.url.startsWith("chrome-extension://")) return;
-  event.respondWith(
-    (async () => {
-      try {
-        const res = await fetch(event.request);
-        const cache = await caches.open("cache");
-        cache.put(event.request.url, res.clone());
-        return res;
-      } catch (error) {
-        return caches.match(event.request);
-      }
-    })()
+  event.respondWith(fetch(event.request));
+});
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys().then((keyList) => {
+      return Promise.all(
+        keyList.map((key) => {
+          if (key === CACHE_NAME) return;
+          return caches.delete(key);
+        })
+      );
+    })
   );
 });

@@ -161,7 +161,12 @@
 
 <Layout>
   {#if newValues}
-    <Header slot="header" class="mb-1" main={newValues.title} sub="Timer details For" />
+    <Header
+      slot="header"
+      class="mb-1"
+      main={newValues.title || "Timer"}
+      sub="Timer details For"
+    />
     <Container class="flex-1">
       <section slot="primary" class="xl:flex-1">
         <Field label="Title">
@@ -328,7 +333,9 @@
           {/if}
         </Button>
 
-        <span slot="content">{timers ? timers.length + " selected" : timer?.title}</span>
+        <span slot="content"
+          >{timers ? timers.length + " selected" : timer?.title || "Timer"}</span
+        >
         <Button
           on:click={update}
           slot="primary"
@@ -347,7 +354,7 @@
         >
           <Icon icon="material-symbols:skull-outline-sharp" />
         </Button>
-        <span slot="content">{timer?.title}</span>
+        <span slot="content">{timer?.title || "Timer"}</span>
         <Button
           slot="primary"
           title="Navigate back"

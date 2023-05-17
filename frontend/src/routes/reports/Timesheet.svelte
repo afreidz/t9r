@@ -173,8 +173,8 @@
                 <div class="h-10 flex-1 items-center rounded-full bg-neutral-900 md:h-14">
                   <TimerComponent
                     disableNav
-                    class="!mb-0 !h-full !shadow-none"
-                    style="width: {Math.max(50, Math.min(percent, 100))}%;"
+                    class="!mb-0 !h-full !min-w-[32%] !shadow-none md:!min-w-[48%] lg:!min-w-[32%] xl:!min-w-[auto]"
+                    style="width: {Math.max(15, Math.min(percent, 100))}%;"
                     project={entry.project}
                     title={entry.project.name}
                   >
@@ -186,7 +186,7 @@
                   </TimerComponent>
                 </div>
                 {#if entry.forecast}
-                  <div class="my-2 flex justify-end">
+                  <div class="my-2 flex justify-between md:justify-end">
                     {#key key}
                       <Tag class="flex-none whitespace-nowrap"
                         >Forecast: {entry.forecast.hours}hrs</Tag

@@ -408,25 +408,27 @@
       <ActionClose on:click={() => ($showRightSidebar = false)} />
     </header>
     <div class="m-4">
-      {#if $showRightSidebar && timers.length}
-        {#each viewTimers as timer}
-          <TimerCard
-            id={timer._id}
-            end={timer.end}
-            tags={timer.tags}
-            title={timer.title}
-            start={timer.start}
-            hours={sumTimerHours([timer])}
-            date={formatForMonth(timer.date)}
-            highlight={highlightTimer === timer._id}
-            on:blur={() => (highlightCard = undefined)}
-            on:focus={() => (highlightCard = timer._id)}
-            on:mouseover={() => (highlightCard = timer._id)}
-            on:mouseleave={() => (highlightCard = undefined)}
-            project={$projects.find((p) => p._id === timer.project)}
-          />
-        {/each}
-      {/if}
+      {#key key}
+        {#if $showRightSidebar && timers.length}
+          {#each viewTimers as timer}
+            <TimerCard
+              id={timer._id}
+              end={timer.end}
+              tags={timer.tags}
+              title={timer.title}
+              start={timer.start}
+              hours={sumTimerHours([timer])}
+              date={formatForMonth(timer.date)}
+              highlight={highlightTimer === timer._id}
+              on:blur={() => (highlightCard = undefined)}
+              on:focus={() => (highlightCard = timer._id)}
+              on:mouseover={() => (highlightCard = timer._id)}
+              on:mouseleave={() => (highlightCard = undefined)}
+              project={$projects.find((p) => p._id === timer.project)}
+            />
+          {/each}
+        {/if}
+      {/key}
     </div>
   </div>
 
