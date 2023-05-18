@@ -12,7 +12,6 @@
   import now from "@/lib/stores/now";
   import clipboard from "clipboardy";
   import Tag from "@/core/Tag.svelte";
-  // import { config } from "@/lib/theme";
   import tags from "@/lib/stores/tags";
   import { pop } from "svelte-spa-router";
   import Header from "@/core/Header.svelte";
@@ -63,7 +62,6 @@
   let detailsDate: Temporal.PlainDate | undefined;
   let detailsEntry: Timesheet[number] | undefined;
   let week = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-  // let totalColor = (config.theme?.colors?.neutral as any)["900"];
 
   $: if (params.date) viewDate = Temporal.PlainDate.from(params.date);
   $: if (viewDate) {
@@ -106,12 +104,6 @@
     });
 
     return tasks;
-  }
-
-  function sumDayHours(timesheet: Timesheet, d: number) {
-    return timesheet.reduce((hours, projectTime) => {
-      return (hours += sumTimerHours(projectTime.days[d].timers));
-    }, 0);
   }
 
   function getAllTimersFromTimesheet(timesheet: Timesheet): Timer[] {
@@ -163,7 +155,7 @@
           class="grid w-full snap-x snap-mandatory auto-rows-min grid-cols-1 overflow-auto"
         >
           {#each timesheet as entry, e}
-            {#if entry.days.some((day) => day.timers.length > 0)}
+            {#if entry.days.some((day) => day.timers.length > 0) || entry.forecast}
               {@const hours = sumTimerHours(entry.days.map((d) => d.timers).flat())}
               {@const percent = entry.forecast
                 ? (hours / entry.forecast.hours) * 100
