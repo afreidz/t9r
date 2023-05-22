@@ -101,6 +101,7 @@
     const qs = new URLSearchParams($querystring);
     if (qs.has("filters")) {
       filters = JSON.parse(qs.get("filters") || "");
+      updateTimers();
     }
   }
 

@@ -47,7 +47,7 @@
           ...emptyTimer,
           tags: $tags
             .filter((tag) => {
-              return timers && timers.every((t) => tag._id && t.tags.includes(tag._id));
+              return timers && timers.every((t) => tag._id && t.tags?.includes(tag._id));
             })
             .map((t) => t._id) as string[],
         };
