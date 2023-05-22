@@ -1,19 +1,15 @@
 <script lang="ts">
   import tags from "@/lib/stores/tags";
-  import { getFiscalYearStartMonth, getToday } from "@/lib/dates";
   import projects from "@/lib/stores/projects";
   import Field from "@/foundation/Field.svelte";
   import type { TimerQuery } from "@/backend/schema/timer";
+  import { getFiscalYearStartMonth, getToday } from "@/lib/dates";
 
   export let showFY = false;
   export let value: string | string[];
   export let criteria: TimerQuery["criteria"] = undefined;
   export let predicate: TimerQuery["predicate"] = undefined;
 
-  $: if (criteria) predicate = undefined;
-  $: if (predicate)
-    value = criteria && ["date", "tags", "project"].includes(criteria) ? [] : "";
-  $: if (["date", "tags", "project"]) value = [];
   $: if (criteria === "utilized") predicate = "equals";
   $: if (criteria === "tags" || criteria === "project") predicate = "contains";
   $: if (criteria === "date" && predicate === "fiscal")
@@ -31,35 +27,31 @@
     <option value="duration">Duration</option>
   </select>
 </Field>
-{#if criteria === "title"}
+{#if criteria && !["tags", "project", "utilized"].includes(criteria)}
   <Field label="Predicate">
     <select bind:value={predicate}>
-      <option value="starts_with">Starts with</option>
-      <option value="ends_with">Ends with</option>
-      <option value="contains">Contains</option>
-      <option value="equals">Equals</option>
-    </select>
-  </Field>
-{:else if criteria === "date"}
-  <Field label="Predicate">
-    <select bind:value={predicate}>
-      <option value="before">Before</option>
-      <option value="after">After</option>
-      <option value="equals">Equals</option>
-      <option value="between">Between</option>
-      {#if showFY}
-        <option value="fiscal">Fiscal Year</option>
+      {#if criteria === "title"}
+        <option value="starts_with">Starts with</option>
+        <option value="ends_with">Ends with</option>
+        <option value="contains">Contains</option>
+        <option value="equals">Equals</option>
       {/if}
-    </select>
-  </Field>
-{:else if criteria === "duration"}
-  <Field label="Predicate">
-    <select bind:value={predicate}>
-      <option value="eq">Equal to</option>
-      <option value="lt">Less than</option>
-      <option value="gt">Greater than</option>
-      <option value="lte">Less than or equal to</option>
-      <option value="gte">Greater than or equal to</option>
+      {#if criteria === "date"}
+        <option value="before">Before</option>
+        <option value="after">After</option>
+        <option value="equals">Equals</option>
+        <option value="between">Between</option>
+        {#if showFY}
+          <option value="fiscal">Fiscal Year</option>
+        {/if}
+      {/if}
+      {#if criteria === "duration"}
+        <option value="eq">Equal to</option>
+        <option value="lt">Less than</option>
+        <option value="gt">Greater than</option>
+        <option value="lte">Less than or equal to</option>
+        <option value="gte">Greater than or equal to</option>
+      {/if}
     </select>
   </Field>
 {/if}

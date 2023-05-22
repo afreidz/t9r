@@ -17,7 +17,7 @@
     dispatch("clear");
   }
 
-  $: isFiltered = filters.some((f) => !!f.criteria && !!f.predicate && !!f.value);
+  $: isFiltered = filters.some((f) => !!f.criteria && !!f.predicate);
 </script>
 
 <div class={$$props.class}>

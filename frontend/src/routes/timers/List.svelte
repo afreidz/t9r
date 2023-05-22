@@ -248,6 +248,7 @@
   }
 
   function handleClearFilters() {
+    filters = [];
     viewTimers = timers;
     $showLeftSidebar = false;
     filteredTimers = undefined;
