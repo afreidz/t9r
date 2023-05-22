@@ -11,7 +11,7 @@
   $: if (clickable) tag = "button";
 </script>
 
-<li class:active class="flex items-center {$$props.class}">
+<li class:active class="flex items-center border-neutral-light/20 {$$props.class}">
   {#if to}
     <Link {to} class="flex flex-1 items-center gap-2" on:navigate>
       <div class="flex-none">

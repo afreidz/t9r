@@ -88,6 +88,22 @@
             <Icon slot="icon" class="text-neutral-light" icon="ic:baseline-list-alt" />
             All
           </SubItem>
+          {#if $savedQueries.length}
+            <SubItem class="my-2 -ml-4 border-b">&nbsp;</SubItem>
+            {#each $savedQueries as query}
+              <SubItem active={false} to={query.url} on:navigate>
+                <Icon
+                  slot="icon"
+                  class="text-neutral-light"
+                  icon="ic:baseline-list-alt"
+                />
+                {query.label}
+                <Button slot="right" on:click={() => removeSavedQuery(query)}>
+                  <Icon class="text-neutral-light" icon="mdi:close-circle-outline" />
+                </Button>
+              </SubItem>
+            {/each}
+          {/if}
         </SubNav>
       {/if}
     </MainItem>
@@ -242,35 +258,7 @@
         </SubNav>
       {/if}
     </MainItem>
-    {#if $savedQueries.length}
-      <MainItem clickable active={false} on:click={() => ($showQueries = !$showQueries)}>
-        <Icon
-          slot="right"
-          icon="ph:caret-down-bold"
-          class={`flex-none transition-transform ease-in-out ${
-            $showQueries ? "rotate-180" : ""
-          }`}
-        />
-        <span slot="main">Saved Queries</span>
-        {#if $showQueries}
-          <SubNav>
-            {#each $savedQueries as query}
-              <SubItem active={false} to={query.url} on:navigate>
-                <Icon
-                  slot="icon"
-                  class="text-neutral-light"
-                  icon="ic:baseline-list-alt"
-                />
-                {query.label}
-                <Button slot="right" on:click={() => removeSavedQuery(query)}>
-                  <Icon class="text-neutral-light" icon="mdi:close-circle-outline" />
-                </Button>
-              </SubItem>
-            {/each}
-          </SubNav>
-        {/if}
-      </MainItem>
-    {/if}
+
     <MainItem
       clickable
       active={$location.startsWith("/account")}
