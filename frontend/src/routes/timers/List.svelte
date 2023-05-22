@@ -33,11 +33,12 @@
   import TimerCard from "@/core/TimerCard.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import breakpoints from "@/lib/stores/breakpoints";
-  import type { Timer } from "@/backend/schema/timer";
   import Filters from "@/core/filters/Filters.svelte";
+  import type { TimerQuery } from "@/backend/schema/timer";
   import { filterTimers, sumTimerHours } from "@/lib/timers";
   import { location, push, querystring } from "svelte-spa-router";
   import { addToSelected, removeFromSelected } from "@/lib/stores/selected";
+  import type { Timer, TimerQueryCombinator } from "@/backend/schema/timer";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
@@ -65,12 +66,12 @@
   let loader: Promise<void>;
   let sod: Temporal.PlainTime;
   let viewTimers: Timer[] = [];
+  let filters: TimerQuery[] = [];
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
   let hourIndicators: HTMLElement[] = [];
   let filteredTimers: Timer[] | undefined;
-  let filters: Filter.Set = [{ value: "" }];
-  let combinator: Filter.Combinator = "and";
+  let combinator: TimerQueryCombinator = "and";
   let highlightCard: string | undefined = undefined;
   let highlightTimer: string | undefined = undefined;
   let duration: "days" | "months" | "weeks" | "all" = "days";
@@ -222,9 +223,12 @@
     return formatForShortTime(pt);
   }
 
-  function handleFilter(updateNav = true) {
-    if (filters.some((f) => f.criteria)) {
-      filteredTimers = filterTimers(filters, timers, combinator);
+  async function handleFilter(updateNav = true) {
+    if (filters.some((f) => f.criteria && f.predicate)) {
+      filteredTimers =
+        duration === "all"
+          ? await trpc.timers.getByFilter.query({ filters, combinator })
+          : filterTimers(filters, timers, combinator);
       viewTimers = filteredTimers;
       if (updateNav) {
         const filterQS = JSON.stringify(filters);
@@ -290,13 +294,18 @@
       {#if view === "timeline"}
         <ActionZoomOut on:click={() => ($timelineZoom *= 0.95)} />
       {/if}
-      <ActionPrev on:click={navigatePrev} disabled={duration === "all" && page === 0} />
+      <ActionPrev
+        on:click={navigatePrev}
+        disabled={duration === "all" && (page === 0 || filters.length)}
+      />
       {#if duration !== "all"}
         <ActionCurrent on:click={navigateCurrent} disabled={isToday(viewDate)} />
       {/if}
       <ActionNext
         on:click={navigateNext}
-        disabled={duration === "all" ? timers.length === 0 : isToday(viewDate)}
+        disabled={duration === "all"
+          ? timers.length === 0 || filters.length
+          : isToday(viewDate)}
       />
       {#if view === "timeline"}
         <ActionZoomIn on:click={() => ($timelineZoom *= 1.05)} />
@@ -446,6 +455,7 @@
         class="mx-4 flex-1"
         bind:filters
         bind:combinator
+        showFY={duration === "all"}
         on:clear={() => handleClearFilters()}
       />
       <footer

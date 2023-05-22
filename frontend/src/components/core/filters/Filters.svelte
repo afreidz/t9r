@@ -3,12 +3,14 @@
   import { createEventDispatcher } from "svelte";
   import ActionAdd from "@/core/actions/Add.svelte";
   import ActionRemove from "@/core/actions/Remove.svelte";
+  import type { TimerQuery, TimerQueryCombinator } from "@/backend/schema/timer";
 
   let isFiltered = false;
   let dispatch = createEventDispatcher();
 
-  export let filters: Filter.Set = [{ value: "" }];
-  export let combinator: Filter.Combinator = "and";
+  export let showFY = false;
+  export let filters: TimerQuery[] = [{ value: "" }];
+  export let combinator: TimerQueryCombinator = "and";
 
   function clear() {
     filters = [{ value: "" }];
@@ -37,6 +39,7 @@
       </div>
     {/if}
     <Criteria
+      {showFY}
       bind:value={filter.value}
       bind:criteria={filter.criteria}
       bind:predicate={filter.predicate}

@@ -1,38 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta
-      name="viewport"
-      content="viewport-fit=cover, width=device-width, initial-scale=1.0 user-scalable=no"
-    />
-
-    <meta charset="UTF-8" />
-    <meta name="color" content="#1E2227" />
-    <meta name="theme-color" content="#1E2227" />
-    <meta name="application-name" content="t9r" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0 user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="color" content="#1E2227">
+    <meta name="theme-color" content="#1E2227">
+    <meta name="application-name" content="t9r">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>t9r</title>
-
-    <link rel="icon" href="favicon.ico" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;1,100;1,200;1,300&family=Inter:wght@100;300;500;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="app.css" />
-
-    <script defer type="module" src="app.js"></script>
+    <link rel="icon" href="favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;1,100;1,200;1,300&amp;family=Inter:wght@100;300;500;700;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="app.css">
+    <script defer="" type="module" src="app.js"></script>
+    <link rel="apple-touch-icon" href="icons/apple-icon-180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
   </head>
   <body>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", async () => {
           try {
-            const { scope } = await navigator.serviceWorker.register("./sw.js");
+            const {
+              scope
+            } = await navigator.serviceWorker.register("./sw.js");
             console.log(`Worker started with scope: ${scope}`);
           } catch (err) {
             console.log(`Worker failed with error: ${err}`);

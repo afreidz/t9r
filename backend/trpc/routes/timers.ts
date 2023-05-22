@@ -4,10 +4,13 @@ import TimerSchema, {
   type Timer,
   PlainDate,
   PlainYearMonth,
+  TimerQuerySchema,
+  TimerQuerySchemaCombinator,
   type YearlyUtilizationReport,
 } from "../../schema/timer";
 import type { Sort } from "mongodb";
 import { TRPCError } from "@trpc/server";
+import { filterTimers } from "../../lib/timers";
 import { router, protectedProcedure } from "../lib";
 import getDBClient, { DBError, ObjectId } from "../../database";
 
@@ -229,6 +232,34 @@ const timersRouter = router({
       });
 
       return months as YearlyUtilizationReport;
+    }),
+  getByFilter: protectedProcedure
+    .input(
+      z.object({
+        filters: z.array(TimerQuerySchema),
+        combinator: TimerQuerySchemaCombinator,
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const { filters, combinator } = input;
+      const collection = db.collection("timers");
+
+      const allTimers = await collection
+        .find<Timer>({ owner: userId })
+        .sort(timerSort)
+        .toArray();
+
+      if (filters.every((f) => f.criteria && f.predicate)) {
+        return filterTimers(filters, allTimers, combinator);
+      } else {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Every filter must have "criteria", "predicate", and "value"`,
+          cause: filters,
+        });
+      }
     }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const { userId } = ctx.user;

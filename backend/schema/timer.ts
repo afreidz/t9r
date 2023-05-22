@@ -63,6 +63,7 @@ export type MonthlyUtilizationReport = {
     hours: number;
   }[];
 };
+
 export type YearlyUtilizationReport = [
   MonthlyUtilizationReport,
   MonthlyUtilizationReport,
@@ -77,3 +78,19 @@ export type YearlyUtilizationReport = [
   MonthlyUtilizationReport,
   MonthlyUtilizationReport
 ];
+
+export const TimerQuerySchema = z.object({
+  value: z.string().or(z.array(z.string())),
+  criteria: z
+    .enum(["tags", "date", "title", "project", "utilized", "duration"])
+    .optional(),
+  predicate: z
+    .enum(["starts_with", "ends_with", "contains", "equals"])
+    .or(z.enum(["gte", "gt", "lte", "lt", "eq"]))
+    .or(z.enum(["before", "after", "eq", "between", "fiscal"]))
+    .optional(),
+});
+
+export const TimerQuerySchemaCombinator = z.enum(["and", "or"]);
+export type TimerQueryCombinator = z.infer<typeof TimerQuerySchemaCombinator>;
+export type TimerQuery = z.infer<typeof TimerQuerySchema>;

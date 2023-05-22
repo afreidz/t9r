@@ -42,7 +42,15 @@
 
     if (multiple) {
       timers = await trpc.timers.bulkGet.query($selectedTimers);
-      if (timers) newValues = { ...emptyTimer };
+      if (timers)
+        newValues = {
+          ...emptyTimer,
+          tags: $tags
+            .filter((tag) => {
+              return timers && timers.every((t) => tag._id && t.tags.includes(tag._id));
+            })
+            .map((t) => t._id) as string[],
+        };
     } else {
       timer = await trpc.timers.get.query(params.id);
       if (timer) newValues = { ...timer };
@@ -195,35 +203,33 @@
             class="text-neutral-light"
           />
         </Field>
-        {#if !multiple}
-          <Field label="Tags">
-            <input
-              min={2}
-              max={30}
-              list="tags"
-              class="mb-2 appearance-none"
-              type="search"
-              autocomplete="on"
-              on:change={addTag}
-              bind:value={newTag}
-            />
-            <Icon slot="icon" icon="material-symbols:search" class="text-neutral-light" />
-            <datalist id="tags">
-              {#each $tags as tag}
-                <option value={tag._id}>{tag.value}</option>
+        <Field label="Tags">
+          <input
+            min={2}
+            max={30}
+            list="tags"
+            class="mb-2 appearance-none"
+            type="search"
+            autocomplete="on"
+            on:change={addTag}
+            bind:value={newTag}
+          />
+          <Icon slot="icon" icon="material-symbols:search" class="text-neutral-light" />
+          <datalist id="tags">
+            {#each $tags as tag}
+              <option value={tag._id}>{tag.value}</option>
+            {/each}
+          </datalist>
+          <div class="flex flex-wrap border-t border-neutral-900/50 pb-1 pt-5">
+            {#if newValues.tags}
+              {#each newValues.tags as tag}
+                <Tag closeable on:close={() => removeTag(tag)}>
+                  {$tags.find((t) => t._id === tag)?.value || tag}
+                </Tag>
               {/each}
-            </datalist>
-            <div class="flex flex-wrap border-t border-neutral-900/50 pb-1 pt-5">
-              {#if newValues.tags}
-                {#each newValues.tags as tag}
-                  <Tag closeable on:close={() => removeTag(tag)}>
-                    {$tags.find((t) => t._id === tag)?.value || tag}
-                  </Tag>
-                {/each}
-              {/if}
-            </div>
-          </Field>
-        {/if}
+            {/if}
+          </div>
+        </Field>
         <Field>
           <Switch
             class="justify-between"

@@ -72,6 +72,20 @@ const forecastRouter = router({
         project: input.project,
       });
     }),
+  getByWeek: protectedProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("forecasts");
+
+      return collection
+        .find<Forecast>({
+          owner: userId,
+          week: input,
+        })
+        .toArray();
+    }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const { userId } = ctx.user;
     const db = await getDBClient();

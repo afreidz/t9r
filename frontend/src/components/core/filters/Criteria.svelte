@@ -1,11 +1,14 @@
 <script lang="ts">
   import tags from "@/lib/stores/tags";
+  import { getFiscalYearStartMonth, getToday } from "@/lib/dates";
   import projects from "@/lib/stores/projects";
   import Field from "@/foundation/Field.svelte";
+  import type { TimerQuery } from "@/backend/schema/timer";
 
+  export let showFY = false;
   export let value: string | string[];
-  export let criteria: Filter.Criteria | undefined = undefined;
-  export let predicate: Filter.Predicate | undefined = undefined;
+  export let criteria: TimerQuery["criteria"] = undefined;
+  export let predicate: TimerQuery["predicate"] = undefined;
 
   $: if (criteria) predicate = undefined;
   $: if (predicate)
@@ -13,6 +16,8 @@
   $: if (["date", "tags", "project"]) value = [];
   $: if (criteria === "utilized") predicate = "equals";
   $: if (criteria === "tags" || criteria === "project") predicate = "contains";
+  $: if (criteria === "date" && predicate === "fiscal")
+    getFiscalYearStartMonth(getToday()).then((fy) => (value = [fy.toString()]));
 </script>
 
 <Field label="Criteria">
@@ -42,6 +47,9 @@
       <option value="after">After</option>
       <option value="equals">Equals</option>
       <option value="between">Between</option>
+      {#if showFY}
+        <option value="fiscal">Fiscal Year</option>
+      {/if}
     </select>
   </Field>
 {:else if criteria === "duration"}
@@ -66,16 +74,22 @@
     {:else if criteria === "title"}
       <input bind:value />
     {:else if criteria === "date"}
-      <input type="date" bind:value={value[0]} />
-      {#if predicate === "between"}
-        <input type="date" bind:value={value[1]} />
+      {#if predicate !== "fiscal"}
+        <input type="date" bind:value={value[0]} />
+        {#if predicate === "between"}
+          <input type="date" bind:value={value[1]} />
+        {/if}
+      {:else}
+        {#await getFiscalYearStartMonth(getToday()) then fy}
+          <span>{fy.toString()}</span>
+        {/await}
       {/if}
     {:else if criteria === "duration"}
       <input bind:value type="number" min={0.25} max={24} />
     {:else if criteria === "utilized"}
       <select bind:value>
-        <option value={true}>true</option>
-        <option value={false}>false</option>
+        <option value="true">true</option>
+        <option value="false">false</option>
       </select>
     {:else if criteria === "tags"}
       <select bind:value multiple>
