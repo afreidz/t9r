@@ -18,10 +18,10 @@
         <slot name="icon" />
       </div>
       <Copy as="div" dim={!active} variant="pseudomono"><slot /></Copy>
-      <div class="flex-none">
-        <slot name="right" />
-      </div>
     </Link>
+    <div class="flex-none">
+      <slot name="right" />
+    </div>
   {:else}
     <svelte:element
       this={tag}

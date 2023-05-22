@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     showTimers,
+    showQueries,
     showReports,
     showAccount,
     showProjects,
@@ -16,8 +17,14 @@
   import { location } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
   import NewProject from "@/core/NewProject.svelte";
+  import savedQueries, { type SavedQuery } from "@/lib/stores/queries";
 
   let newProject = false;
+
+  function removeSavedQuery(q: SavedQuery) {
+    const updated = $savedQueries.filter((sq) => sq.label !== q.label);
+    $savedQueries = updated;
+  }
 </script>
 
 <nav class="flex flex-1 flex-col px-5 text-lg">
@@ -235,6 +242,35 @@
         </SubNav>
       {/if}
     </MainItem>
+    {#if $savedQueries.length}
+      <MainItem clickable active={false} on:click={() => ($showQueries = !$showQueries)}>
+        <Icon
+          slot="right"
+          icon="ph:caret-down-bold"
+          class={`flex-none transition-transform ease-in-out ${
+            $showQueries ? "rotate-180" : ""
+          }`}
+        />
+        <span slot="main">Saved Queries</span>
+        {#if $showQueries}
+          <SubNav>
+            {#each $savedQueries as query}
+              <SubItem active={false} to={query.url} on:navigate>
+                <Icon
+                  slot="icon"
+                  class="text-neutral-light"
+                  icon="ic:baseline-list-alt"
+                />
+                {query.label}
+                <Button slot="right" on:click={() => removeSavedQuery(query)}>
+                  <Icon class="text-neutral-light" icon="mdi:close-circle-outline" />
+                </Button>
+              </SubItem>
+            {/each}
+          </SubNav>
+        {/if}
+      </MainItem>
+    {/if}
     <MainItem
       clickable
       active={$location.startsWith("/account")}

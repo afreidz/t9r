@@ -35,10 +35,14 @@ export const showArchived = writable<Boolean>(
 export const showForecasts = writable<Boolean>(
   gi("showForecasts") ? gi("showForecasts") === "true" : true
 );
+export const showQueries = writable<Boolean>(
+  gi("showQueries") ? gi("showQueries") === "true" : true
+);
 
 showTimers.subscribe((v) => si("showTimers", `${v}`));
 showReports.subscribe((v) => si("showReports", `${v}`));
 showAccount.subscribe((v) => si("showAccount", `${v}`));
 showArchived.subscribe((v) => si("showArchived", `${v}`));
 showProjects.subscribe((v) => si("showProjects", `${v}`));
+showQueries.subscribe((v) => si("showForecasts", `${v}`));
 showForecasts.subscribe((v) => si("showForecasts", `${v}`));

@@ -21,6 +21,7 @@
   import { onMount } from "svelte";
   import { get } from "svelte/store";
   import now from "@/lib/stores/now";
+  import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
@@ -31,11 +32,14 @@
   import NewTimer from "@/core/NewTimer.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerCard from "@/core/TimerCard.svelte";
+  import savedQueries from "@/lib/stores/queries";
   import TimerComponent from "@/core/Timer.svelte";
   import breakpoints from "@/lib/stores/breakpoints";
   import Filters from "@/core/filters/Filters.svelte";
+  import Dialog from "@/components/core/Dialog.svelte";
   import type { TimerQuery } from "@/backend/schema/timer";
   import { filterTimers, sumTimerHours } from "@/lib/timers";
+  import DualAction from "@/components/core/DualAction.svelte";
   import { location, push, querystring } from "svelte-spa-router";
   import { addToSelected, removeFromSelected } from "@/lib/stores/selected";
   import type { Timer, TimerQueryCombinator } from "@/backend/schema/timer";
@@ -45,6 +49,7 @@
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionView from "@/core/actions/View.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
+  import ActionSave from "@/core/actions/Save.svelte";
   import ActionClose from "@/core/actions/Close.svelte";
   import ActionSelect from "@/core/actions/Select.svelte";
   import ActionFilter from "@/core/actions/Filter.svelte";
@@ -67,6 +72,8 @@
   let sod: Temporal.PlainTime;
   let viewTimers: Timer[] = [];
   let filters: TimerQuery[] = [];
+  let showSaveQueryDialog = false;
+  let saveQueryLabel: string = "";
   let viewChanged: boolean = false;
   let viewDate: Temporal.PlainDate;
   let hourIndicators: HTMLElement[] = [];
@@ -252,6 +259,17 @@
     if (target.checked) addToSelected(id);
     if (!target.checked) removeFromSelected(id);
   }
+
+  function saveQuery() {
+    $savedQueries = [
+      ...$savedQueries,
+      {
+        url: window.location.hash.replace("#", ""),
+        label: saveQueryLabel,
+      },
+    ];
+    showSaveQueryDialog = false;
+  }
 </script>
 
 <Layout>
@@ -289,6 +307,8 @@
         />
         {#if duration !== "all"}
           <ActionPicker />
+        {:else if filters.length}
+          <ActionSave on:click={() => (showSaveQueryDialog = true)} />
         {/if}
       </div>
       {#if view === "timeline"}
@@ -482,3 +502,30 @@
     />
   </div>
 </Layout>
+
+{#if showSaveQueryDialog}
+  <Dialog open={true} title="Save current query as a favorite?" sub="Do you want to...">
+    <Button slot="close" value="cancel" on:click={() => (showSaveQueryDialog = false)}>
+      <Icon icon="material-symbols:close" class="h-7 w-7" />
+    </Button>
+    <section class="flex flex-1 flex-col items-center justify-center py-4">
+      <DualAction>
+        <Button
+          slot="secondary"
+          on:click={() => (showSaveQueryDialog = false)}
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <input bind:value={saveQueryLabel} slot="content" placeholder="Query label" />
+        <Button
+          on:click={saveQuery}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    </section>
+  </Dialog>
+{/if}
