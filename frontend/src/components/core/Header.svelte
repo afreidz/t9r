@@ -12,8 +12,8 @@
   export { main, as, sub };
 </script>
 
-<header class="px-4 pt-3 md:px-6 md:pt-6 {rest.class}">
-  <div class="flex items-center border-b border-neutral-900 pb-4">
+<header class="border-neutral-900 px-4 pt-3 md:px-6 md:pt-6 {rest.class}">
+  <div class="flex items-center border-b border-inherit pb-4">
     <svelte:element this={as || "h2"} class="flex-1">
       <Copy dim as="small" light variant="pseudomono" class="block">
         {#if sub}

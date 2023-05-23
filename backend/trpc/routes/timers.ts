@@ -10,8 +10,10 @@ import TimerSchema, {
 } from "../../schema/timer";
 import type { Sort } from "mongodb";
 import { TRPCError } from "@trpc/server";
+import { getToday } from "../../lib/dates";
 import { filterTimers } from "../../lib/timers";
 import { router, protectedProcedure } from "../lib";
+import getFiscalYearStartMonthSS from "../../lib/onlySS";
 import getDBClient, { DBError, ObjectId } from "../../database";
 
 const timerSort: Sort = { date: 1, start: 1 };
@@ -250,6 +252,12 @@ const timersRouter = router({
         .find<Timer>({ owner: userId })
         .sort(timerSort)
         .toArray();
+
+      const fyfilter = filters.filter((f) => f.predicate === "fiscal");
+      if (fyfilter.length) {
+        const fy = await getFiscalYearStartMonthSS(getToday(), ctx.user);
+        fyfilter.forEach((f) => (f.value = fy.toString()));
+      }
 
       if (filters.every((f) => f.criteria && f.predicate)) {
         return filterTimers(filters, allTimers, combinator);

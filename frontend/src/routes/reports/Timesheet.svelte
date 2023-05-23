@@ -231,30 +231,6 @@
               </ul>
             {/if}
           {/each}
-          <!-- <header class="sticky left-0 right-0 col-span-full">
-            <TimerComponent disableNav title="Totals" color={totalColor} />
-          </header>
-          <ul class="grid grid-cols-[repeat(7,_minmax(10rem,_16rem))] gap-4">
-            {#each week as date, i}
-              <li class="mb-6 flex flex-col items-center">
-                <Copy as="strong" variant="gradient" class="flex-none py-4 uppercase">
-                  {date}
-                </Copy>
-                <Field
-                  as="div"
-                  label="Total hours"
-                  class="w-64 min-w-[140px] flex-none md:w-fit"
-                >
-                  <Copy
-                    as="strong"
-                    variant="gradient"
-                    class="my-8 flex flex-none items-center justify-center text-3xl"
-                    >{sumDayHours(timesheet, i)}</Copy
-                  >
-                </Field>
-              </li>
-            {/each}
-          </ul> -->
         </div>
       </Container>
     </div>

@@ -12,6 +12,16 @@ function internalFilter(f: TimerQuery, t: Timer, defaultReturn = true) {
     } else {
       return (t[f.criteria as keyof Timer] as string) === f.value;
     }
+  } else if (
+    f.criteria === "date" &&
+    f.predicate === "fiscal" &&
+    typeof f.value === "string"
+  ) {
+    const td = Temporal.PlainDate.from(t.date);
+    const vd = Temporal.PlainYearMonth.from(f.value);
+    const d1 = new Temporal.PlainDate(vd.year, vd.month, 1);
+    const d2 = d1.add({ years: 1 });
+    return isAfterDate(td, d1) && isBeforeDate(td, d2);
   } else if ((f.criteria === "tags" || f.criteria === "project") && f.value) {
     const search = Array.isArray(f.value) ? f.value : [f.value as string];
     return search.some((s) => {
@@ -58,12 +68,6 @@ function internalFilter(f: TimerQuery, t: Timer, defaultReturn = true) {
       const td = Temporal.PlainDate.from(t.date);
       const vd1 = Temporal.PlainDate.from(f.value[0]);
       return td.toString() === vd1.toString();
-    } else if (f.predicate === "fiscal") {
-      const td = Temporal.PlainDate.from(t.date);
-      const vd = Temporal.PlainYearMonth.from(f.value[0]);
-      const d1 = new Temporal.PlainDate(vd.year, vd.month, 1);
-      const d2 = d1.add({ years: 1 });
-      return isAfterDate(td, d1) && isBeforeDate(td, d2);
     }
   }
   return defaultReturn;

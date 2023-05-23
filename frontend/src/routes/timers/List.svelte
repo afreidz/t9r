@@ -83,10 +83,6 @@
   let highlightTimer: string | undefined = undefined;
   let duration: "days" | "months" | "weeks" | "all" = "days";
 
-  onMount(() => {
-    $showRightSidebar = get(breakpoints).xxxl;
-  });
-
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
   $: if (params.date) viewDate = Temporal.PlainDate.from(params.date);
@@ -132,10 +128,6 @@
         behavior: "smooth",
       });
     }, 300);
-  }
-
-  $: if (!timers.length) {
-    $showRightSidebar = false;
   }
 
   function navigateNext() {

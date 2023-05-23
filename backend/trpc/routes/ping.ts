@@ -1,4 +1,5 @@
 import "temporal-polyfill/global";
+import { TRPCError } from "@trpc/server";
 import { router, publicProcedure } from "../lib";
 
 const pingRouter = router({
@@ -6,6 +7,13 @@ const pingRouter = router({
     return `Ping received from ${
       ctx.user?.userDetails || "anonymous"
     } at ${Temporal.Now.plainDateTimeISO()}`;
+  }),
+  error: publicProcedure.query(() => {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `This is just a test error`,
+      cause: { router: "ping", procedure: "error" },
+    });
   }),
 });
 

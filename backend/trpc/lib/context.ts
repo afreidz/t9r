@@ -1,6 +1,6 @@
 import type { CreateAzureFuncContextOptions } from "./utils";
 
-type User = {
+export type User = {
   userId: string;
   userDetails: unknown;
 };

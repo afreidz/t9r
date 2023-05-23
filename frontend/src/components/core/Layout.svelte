@@ -2,14 +2,15 @@
   import {
     main,
     showLoader,
+    globalError,
     isSelecting,
     showLeftSidebar,
     showRightSidebar,
     mainResizeObserver,
   } from "@/lib/stores/ui";
-  import { onMount } from "svelte";
   import Icon from "@iconify/svelte";
   import Logo from "@/core/Logo.svelte";
+  import Error from "@/core/Error.svelte";
   import { fly } from "svelte/transition";
   import Nav from "@/core/nav/Nav.svelte";
   import updateStores from "@/lib/stores";
@@ -25,13 +26,12 @@
 
   let menuOpen = false;
 
-  onMount(() => {
-    $showLeftSidebar = false;
-    $showRightSidebar = false;
-  });
-
   $: if ($main) observeResize($main, mainResizeObserver);
 </script>
+
+{#if $globalError}
+  <Error on:close={() => ($globalError = undefined)}>{$globalError}</Error>
+{/if}
 
 <div
   class="grid h-screen min-w-[320px] grid-cols-[0px_auto] grid-rows-[4rem_auto_3rem] bg-neutral-900 p-4 pt-0 text-text-light md:grid-cols-[320px_auto] md:p-6 md:pt-4"

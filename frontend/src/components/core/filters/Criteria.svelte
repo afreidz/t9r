@@ -14,6 +14,20 @@
   $: if (criteria === "tags" || criteria === "project") predicate = "contains";
   $: if (criteria === "date" && predicate === "fiscal")
     getFiscalYearStartMonth(getToday()).then((fy) => (value = [fy.toString()]));
+
+  function handleDurationChange(e: { currentTarget: HTMLInputElement }) {
+    value = `${e.currentTarget.value}`;
+  }
+
+  function handleFirstDateChange(e: { currentTarget: HTMLInputElement }) {
+    if (typeof value === "string") value = [];
+    value[0] = e.currentTarget.value;
+  }
+
+  function handleSecondDateChange(e: { currentTarget: HTMLInputElement }) {
+    if (typeof value === "string") value = [];
+    value[1] = e.currentTarget.value;
+  }
 </script>
 
 <Field label="Criteria">
@@ -67,9 +81,17 @@
       <input bind:value />
     {:else if criteria === "date"}
       {#if predicate !== "fiscal"}
-        <input type="date" bind:value={value[0]} />
+        <input
+          type="date"
+          value={Array.isArray(value) && value[0]}
+          on:change={handleFirstDateChange}
+        />
         {#if predicate === "between"}
-          <input type="date" bind:value={value[1]} />
+          <input
+            type="date"
+            value={Array.isArray(value) && value[1]}
+            on:change={handleSecondDateChange}
+          />
         {/if}
       {:else}
         {#await getFiscalYearStartMonth(getToday()) then fy}
@@ -77,7 +99,7 @@
         {/await}
       {/if}
     {:else if criteria === "duration"}
-      <input bind:value type="number" min={0.25} max={24} />
+      <input on:change={handleDurationChange} type="number" min={0.25} max={24} />
     {:else if criteria === "utilized"}
       <select bind:value>
         <option value="true">true</option>
