@@ -2,13 +2,25 @@
   import tags from "@/lib/stores/tags";
   import projects from "@/lib/stores/projects";
   import Field from "@/foundation/Field.svelte";
+  import type { Tag } from "@/backend/schema/tag";
   import type { TimerQuery } from "@/backend/schema/timer";
   import { getFiscalYearStartMonth, getToday } from "@/lib/dates";
+  import Icon from "@iconify/svelte";
 
   export let showFY = false;
   export let value: string | string[];
   export let criteria: TimerQuery["criteria"] = undefined;
   export let predicate: TimerQuery["predicate"] = undefined;
+
+  let tagSearch: string = "";
+  let hiddenTags: Tag[] = [];
+  $: if (tagSearch.length) {
+    hiddenTags = $tags.filter(
+      (t) => !t.value.toLowerCase().includes(tagSearch.toLowerCase())
+    );
+  } else {
+    hiddenTags = [];
+  }
 
   $: if (criteria === "utilized") predicate = "equals";
   $: if (criteria === "tags" || criteria === "project") predicate = "contains";
@@ -74,10 +86,7 @@
     {#if criteria === "project"}
       <select bind:value multiple>
         {#each $projects as project}
-          <option
-            class="mr-2 rounded-sm p-1 outline-none checked:bg-white/10 checked:text-white"
-            value={project._id}>{project.name}</option
-          >
+          <option value={project._id}>{project.name}</option>
         {/each}
       </select>
     {:else if criteria === "title"}
@@ -109,14 +118,23 @@
         <option value="false">false</option>
       </select>
     {:else if criteria === "tags"}
+      <div class="mb-2 flex items-center border-b border-white/10">
+        <input type="search" bind:value={tagSearch} class="flex-1" />
+        <Icon slot="icon" icon="material-symbols:search" />
+      </div>
       <select bind:value multiple>
         {#each $tags as tag}
-          <option
-            class="mr-2 rounded-sm p-1 outline-none checked:bg-white/10 checked:text-white"
-            value={tag._id}>{tag.value}</option
+          <option class:hidden={hiddenTags.includes(tag)} value={tag._id}
+            >{tag.value}</option
           >
         {/each}
       </select>
     {/if}
   </Field>
 {/if}
+
+<style lang="postcss">
+  option {
+    @apply mr-2 mb-1 rounded-sm p-1 accent-violet-600 checked:appearance-none checked:bg-white/10 checked:text-white;
+  }
+</style>

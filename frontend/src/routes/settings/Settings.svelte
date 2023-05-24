@@ -129,13 +129,12 @@
       slot="secondary"
     >
       {#if $tags.length}
-        <Copy as="h3" semibold variant="gradient" class="my-4 uppercase">Tags</Copy>
+        <Copy as="h3" semibold variant="gradient" class="mt-4 mb-2 uppercase">Tags</Copy>
         <Field label="Search">
           <input
             min={2}
             max={30}
             list="tags"
-            class="mb-2 appearance-none"
             type="search"
             autocomplete="on"
             bind:value={tagSearch}

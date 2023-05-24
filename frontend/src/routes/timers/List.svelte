@@ -514,7 +514,12 @@
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
-        <input bind:value={saveQueryLabel} slot="content" placeholder="Query label" />
+        <input
+          bind:value={saveQueryLabel}
+          slot="content"
+          placeholder="Query label"
+          class="max-w-[128px] sm:max-w-none"
+        />
         <Button
           on:click={saveQuery}
           slot="primary"

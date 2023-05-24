@@ -147,7 +147,7 @@
     const today = Temporal.Now.plainDateISO();
     const date = Temporal.PlainDate.from(item.date);
     const trackingStart =
-      $settings?.trackingStart && Temporal.PlainDate.from($settings.trackingStart);
+      $settings.trackingStart && Temporal.PlainDate.from($settings.trackingStart);
 
     if (trackingStart && isBeforeDate(date, trackingStart)) return "bg-neutral-700";
     if (item.day === "" && item.hours === 0) return "transparent";
