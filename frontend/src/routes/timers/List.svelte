@@ -142,6 +142,10 @@
     push(`/timers/${duration}/${getToday()}`);
   }
 
+  function navigateDate(e: CustomEvent) {
+    push(`/timers/${duration}/${e.detail}`);
+  }
+
   async function updateTimers() {
     loaded = false;
     $showLoader = true;
@@ -289,21 +293,25 @@
       : "Timers for"}
   >
     <div slot="right">
-      {#key $now}
-        <HourSum value={sumTimerHours(viewTimers)} />
-      {/key}
+      {#if timers.length}
+        {#key $now}
+          <HourSum value={sumTimerHours(viewTimers)} />
+        {/key}
+      {/if}
     </div>
 
     <ActionBar class={view === "timeline" ? "sticky left-0" : ""}>
       <div slot="left" class="flex gap-2">
-        <ActionFilter
-          direction="left"
-          enabled={$showLeftSidebar}
-          on:click={() => ($showLeftSidebar = !$showLeftSidebar)}
-          class={`from-violet-600 to-cyan-600 ${filteredTimers && "bg-gradient-to-br"}`}
-        />
+        {#if timers.length}
+          <ActionFilter
+            direction="left"
+            enabled={$showLeftSidebar}
+            on:click={() => ($showLeftSidebar = !$showLeftSidebar)}
+            class={`from-violet-600 to-cyan-600 ${filteredTimers && "bg-gradient-to-br"}`}
+          />
+        {/if}
         {#if duration !== "all"}
-          <ActionPicker />
+          <ActionPicker on:change={navigateDate} />
         {:else if filters.length}
           <ActionSave on:click={() => (showSaveQueryDialog = true)} />
         {/if}
@@ -327,33 +335,36 @@
       {#if view === "timeline"}
         <ActionZoomIn on:click={() => ($timelineZoom *= 1.05)} />
       {/if}
+
       <div slot="right" class="flex gap-2">
-        <ActionSelect
-          enabled={$isSelecting}
-          on:click={() => ($isSelecting = !$isSelecting)}
-          on:all={() => {
-            viewTimers.forEach((t) => t._id && addToSelected(t._id));
-          }}
-          on:none={() => {
-            viewTimers.forEach((t) => t._id && removeFromSelected(t._id));
-          }}
-        />
-        {#if duration === "days" && $breakpoints.md}
-          <ActionView
-            bind:current={view}
+        {#if timers.length}
+          <ActionSelect
+            enabled={$isSelecting}
+            on:click={() => ($isSelecting = !$isSelecting)}
+            on:all={() => {
+              viewTimers.forEach((t) => t._id && addToSelected(t._id));
+            }}
+            on:none={() => {
+              viewTimers.forEach((t) => t._id && removeFromSelected(t._id));
+            }}
+          />
+          {#if duration === "days" && $breakpoints.md}
+            <ActionView
+              bind:current={view}
+              on:click={() => {
+                viewChanged = true;
+              }}
+            />
+          {/if}
+          <ActionInfo
+            direction="right"
+            disabled={!timers.length}
+            enabled={$showRightSidebar}
             on:click={() => {
-              viewChanged = true;
+              $showRightSidebar = !$showRightSidebar;
             }}
           />
         {/if}
-        <ActionInfo
-          direction="right"
-          disabled={!timers.length}
-          enabled={$showRightSidebar}
-          on:click={() => {
-            $showRightSidebar = !$showRightSidebar;
-          }}
-        />
       </div>
     </ActionBar>
   </Header>

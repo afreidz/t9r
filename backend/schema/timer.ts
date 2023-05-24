@@ -45,8 +45,8 @@ const TimerSchema = z
     owner: z.string().optional(),
     end: PlainTime.optional().nullable(),
     tags: z.array(z.string()).default([]),
-    title: z.string().min(2).max(60).optional(),
     utilized: z.boolean().optional().default(false),
+    title: z.string().min(2).max(60).optional().default("Timer"),
   })
   .passthrough();
 

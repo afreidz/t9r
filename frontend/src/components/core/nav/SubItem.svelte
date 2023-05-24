@@ -5,10 +5,9 @@
   export let to: string | undefined = undefined;
   export let clickable: boolean = false;
   export let active: boolean = false;
+  export let as = "div";
 
-  let tag = "div";
-
-  $: if (clickable) tag = "button";
+  $: if (clickable) as = "button";
 </script>
 
 <li class:active class="flex items-center border-neutral-light/20 {$$props.class}">
@@ -24,7 +23,8 @@
     </div>
   {:else}
     <svelte:element
-      this={tag}
+      this={as}
+      {...$$restProps}
       on:click
       on:keypress
       class="flex flex-1 items-center gap-2"

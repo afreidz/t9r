@@ -45,6 +45,19 @@
       if (timers)
         newValues = {
           ...emptyTimer,
+          title:
+            timers && timers.every((t) => t.title === timers?.[0].title)
+              ? timers?.[0]?.title
+              : "",
+          date:
+            timers && timers.every((t) => t.date === timers?.[0].date)
+              ? timers?.[0]?.date
+              : undefined,
+          utilized: timers && timers.every((t) => t.utilized),
+          project:
+            timers && timers.every((t) => t.project === timers?.[0].project)
+              ? timers?.[0]?.project
+              : undefined,
           tags: $tags
             .filter((tag) => {
               return timers && timers.every((t) => tag._id && t.tags?.includes(tag._id));

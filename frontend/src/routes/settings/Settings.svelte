@@ -12,7 +12,6 @@
   import Time from "@/foundation/Time.svelte";
   import Link from "@/foundation/Link.svelte";
   import { showLoader } from "@/lib/stores/ui";
-  import settings from "@/lib/stores/settings";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -21,12 +20,17 @@
   import ActionClose from "@/core/actions/Close.svelte";
   import type { Settings } from "@/backend/schema/settings";
   import type { Tag as TagType } from "@/backend/schema/tag";
+  import settings, { updateSettings } from "@/lib/stores/settings";
 
   let dirty = false;
   let tagSearch: string = "";
   let filteredTags: TagType[] = [];
   let deletedTag: TagType | undefined;
+  let trackStartInput: HTMLInputElement;
   let newValues: Partial<Settings> = $settings;
+
+  $: if (!Object.keys($settings).length)
+    trpc.settings.updateOrCreate.mutate($settings).then(updateSettings);
 
   $: if (!Object.keys(newValues).length && $settings)
     newValues = JSON.parse(JSON.stringify($settings));
@@ -96,7 +100,18 @@
         {/if}
         {#if newValues?.trackingStart}
           <Field label="Track utilization as of">
-            <input type="date" bind:value={newValues.trackingStart} />
+            <input
+              type="date"
+              bind:this={trackStartInput}
+              bind:value={newValues.trackingStart}
+            />
+            <button
+              slot="icon"
+              class="text-neutral-light"
+              on:click={() => trackStartInput?.showPicker()}
+            >
+              <Icon icon="mdi:calendar-today-outline" />
+            </button>
           </Field>
         {/if}
         {#if newValues?.sod}
@@ -125,8 +140,9 @@
       </div>
     </section>
     <section
-      class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4 pt-0"
+      class="my-1 flex flex-1 flex-col rounded-md p-4 pt-0"
       slot="secondary"
+      class:bg-neutral-900={$tags.length || $settings.savedQueries?.length}
     >
       {#if $tags.length}
         <Copy as="h3" semibold variant="gradient" class="mt-4 mb-2 uppercase">Tags</Copy>

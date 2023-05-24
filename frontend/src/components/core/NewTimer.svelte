@@ -32,7 +32,7 @@
         lastTimer && lastTimer.end
           ? Temporal.PlainTime.from(lastTimer.end).toString()
           : $settings?.sod || Temporal.Now.plainTimeISO().round(roundDown).toString(),
-      utilized: $mostRecentProject.defaultUtilized === false ? false : true,
+      utilized: !!$mostRecentProject.defaultUtilized,
     });
 
     dispatch("timer-update");
@@ -53,7 +53,7 @@
       slot="content"
       class="appearance-none !bg-transparent text-black outline-none"
       on:change={handleChange}
-      value={$projects[0]._id}
+      value={$mostRecentProject._id}
     >
       {#each $projects.filter((p) => !p.archived) as project}
         <option selected={project === $mostRecentProject} value={project._id}
