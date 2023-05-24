@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
+    showLoader,
     showTimers,
-    showQueries,
     showReports,
     showAccount,
     showProjects,
@@ -15,16 +15,11 @@
   import MainItem from "./MainItem.svelte";
   import Dialog from "@/core/Dialog.svelte";
   import { location } from "svelte-spa-router";
+  import settings from "@/lib/stores/settings";
   import Button from "@/foundation/Button.svelte";
   import NewProject from "@/core/NewProject.svelte";
-  import savedQueries, { type SavedQuery } from "@/lib/stores/queries";
 
   let newProject = false;
-
-  function removeSavedQuery(q: SavedQuery) {
-    const updated = $savedQueries.filter((sq) => sq.label !== q.label);
-    $savedQueries = updated;
-  }
 </script>
 
 <nav class="flex flex-1 flex-col px-5 text-lg">
@@ -88,9 +83,9 @@
             <Icon slot="icon" class="text-neutral-light" icon="ic:baseline-list-alt" />
             All
           </SubItem>
-          {#if $savedQueries.length}
+          {#if $settings?.savedQueries?.length}
             <SubItem class="my-2 -ml-4 border-b">&nbsp;</SubItem>
-            {#each $savedQueries as query}
+            {#each $settings.savedQueries as query}
               <SubItem active={false} to={query.url} on:navigate>
                 <Icon
                   slot="icon"
@@ -98,9 +93,6 @@
                   icon="ic:baseline-list-alt"
                 />
                 {query.label}
-                <Button slot="right" on:click={() => removeSavedQuery(query)}>
-                  <Icon class="text-neutral-light" icon="mdi:close-circle-outline" />
-                </Button>
               </SubItem>
             {/each}
           {/if}

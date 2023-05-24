@@ -77,10 +77,10 @@
           <slot />
         {/if}
       </div>
-      <Sidebar direction="right" enabled={$showRightSidebar}>
+      <Sidebar direction="right" enabled={$showRightSidebar && $$slots.right}>
         <slot name="right" />
       </Sidebar>
-      <Sidebar direction="left" enabled={$showLeftSidebar}>
+      <Sidebar direction="left" enabled={$showLeftSidebar && $$slots.left}>
         <slot name="left" />
       </Sidebar>
     </main>

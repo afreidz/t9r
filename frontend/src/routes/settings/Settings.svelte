@@ -2,7 +2,6 @@
   import trpc from "@/lib/trpc";
   import same from "@/lib/same";
   import Icon from "@iconify/svelte";
-  import { get } from "svelte/store";
   import Tag from "@/core/Tag.svelte";
   import Months from "./Months.svelte";
   import { pop } from "svelte-spa-router";
@@ -11,26 +10,42 @@
   import Layout from "@/core/Layout.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
+  import Link from "@/foundation/Link.svelte";
+  import { showLoader } from "@/lib/stores/ui";
   import settings from "@/lib/stores/settings";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import tags, { updateTags } from "@/lib/stores/tags";
   import Container from "@/foundation/Container.svelte";
+  import ActionClose from "@/core/actions/Close.svelte";
   import type { Settings } from "@/backend/schema/settings";
   import type { Tag as TagType } from "@/backend/schema/tag";
 
   let dirty = false;
+  let tagSearch: string = "";
+  let filteredTags: TagType[] = [];
   let deletedTag: TagType | undefined;
-  let newValues: Settings | null = get(settings);
+  let newValues: Partial<Settings> = $settings;
 
-  $: if (!newValues && $settings) newValues = JSON.parse(JSON.stringify($settings));
-  $: if (newValues && $settings) dirty = !same<Settings>(newValues, $settings);
+  $: if (!Object.keys(newValues).length && $settings)
+    newValues = JSON.parse(JSON.stringify($settings));
+  $: if (newValues && $settings) dirty = !same(newValues, $settings);
+
+  $: if (tagSearch.length) {
+    filteredTags = $tags.filter((tag) =>
+      tag.value.toLowerCase().includes(tagSearch.toLowerCase())
+    );
+  } else {
+    filteredTags = [];
+  }
 
   async function update() {
     if (!newValues) return;
+    $settings = newValues;
+    $showLoader = true;
     await trpc.settings.updateOrCreate.mutate(newValues);
-    $settings = await trpc.settings.get.query();
+    $showLoader = false;
     pop();
   }
 
@@ -47,6 +62,20 @@
       deletedTag = undefined;
       await updateTags();
     }
+  }
+
+  function toggleTagVisibility(t: TagType) {
+    if (newValues.hiddenTags?.includes(t._id ?? t.value)) {
+      newValues.hiddenTags = newValues.hiddenTags.filter(
+        (ht) => ht !== (t._id ?? t.value)
+      );
+    } else {
+      newValues.hiddenTags = [...(newValues.hiddenTags ?? []), t._id ?? t.value];
+    }
+  }
+
+  function deleteSavedQuery(q: Settings["savedQueries"][number]) {
+    newValues.savedQueries = newValues.savedQueries?.filter((sq) => sq.label !== q.label);
   }
 </script>
 
@@ -99,18 +128,60 @@
       class="my-1 flex flex-1 flex-col rounded-md bg-neutral-900 p-4 pt-0"
       slot="secondary"
     >
-      <Copy as="h3" semibold variant="gradient" class="my-4 uppercase">Tags</Copy>
-      <div>
-        {#await $tags}
-          <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
-        {:then tags}
-          {#each tags as tag}
-            <Tag closeable on:close={() => (deletedTag = tag)}>
-              {tag.value}
-            </Tag>
-          {/each}
-        {/await}
-      </div>
+      {#if $tags.length}
+        <Copy as="h3" semibold variant="gradient" class="my-4 uppercase">Tags</Copy>
+        <Field label="Search">
+          <input
+            min={2}
+            max={30}
+            list="tags"
+            class="mb-2 appearance-none"
+            type="search"
+            autocomplete="on"
+            bind:value={tagSearch}
+          />
+          <Icon slot="icon" icon="material-symbols:search" class="text-neutral-light" />
+        </Field>
+        <div class="h-96 overflow-auto">
+          {#await updateTags()}
+            <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
+          {:then}
+            {#each filteredTags.length ? filteredTags : $tags as tag}
+              <Tag
+                closeable
+                on:close={() => (deletedTag = tag)}
+                class={newValues.hiddenTags?.includes(tag._id ?? tag.value)
+                  ? "!bg-white/10"
+                  : ""}
+              >
+                <button type="button" on:click={() => toggleTagVisibility(tag)}>
+                  {#if newValues.hiddenTags?.includes(tag._id ?? tag.value)}
+                    <Icon slot="hide" icon="ant-design:eye-invisible-outlined" />
+                  {:else}
+                    <Icon slot="hide" icon="ant-design:eye-outlined" />
+                  {/if}
+                </button>
+                {tag.value}
+              </Tag>
+            {/each}
+          {/await}
+        </div>
+      {/if}
+      {#if newValues.savedQueries?.length}
+        <Copy as="h3" semibold variant="gradient" class="my-4 mt-10 uppercase"
+          >Saved Queries</Copy
+        >
+        <div class="max-h-96 overflow-auto">
+          <ul class="border-t border-white/10">
+            {#each newValues.savedQueries as savedQuery}
+              <li class="flex items-center justify-between border-b border-inherit px-4">
+                <Link to={savedQuery.url}>{savedQuery.label}</Link>
+                <ActionClose on:click={() => deleteSavedQuery(savedQuery)} />
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
     </section>
   </Container>
   <div slot="cta">

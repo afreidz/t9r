@@ -62,7 +62,7 @@
 
   export let params: { id: string };
 
-  $: if (newValues) dirty = !same<Partial<Timer>>(newValues, { ...timer });
+  $: if (newValues) dirty = !same(newValues, { ...timer });
   $: multiple = params?.id === "selected";
 
   function reset() {

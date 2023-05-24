@@ -18,8 +18,6 @@
     showRightSidebar,
   } from "@/lib/stores/ui";
   import trpc from "@/lib/trpc";
-  import { onMount } from "svelte";
-  import { get } from "svelte/store";
   import now from "@/lib/stores/now";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
@@ -32,7 +30,6 @@
   import NewTimer from "@/core/NewTimer.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerCard from "@/core/TimerCard.svelte";
-  import savedQueries from "@/lib/stores/queries";
   import TimerComponent from "@/core/Timer.svelte";
   import breakpoints from "@/lib/stores/breakpoints";
   import Filters from "@/core/filters/Filters.svelte";
@@ -254,14 +251,20 @@
     if (!target.checked) removeFromSelected(id);
   }
 
-  function saveQuery() {
-    $savedQueries = [
-      ...$savedQueries,
+  async function saveQuery() {
+    if (!$settings.savedQueries) $settings.savedQueries = [];
+
+    $settings.savedQueries = [
+      ...$settings.savedQueries,
       {
         url: window.location.hash.replace("#", ""),
         label: saveQueryLabel,
       },
     ];
+
+    $showLoader = true;
+    await trpc.settings.updateOrCreate.mutate({ savedQueries: $settings.savedQueries });
+    $showLoader = false;
     showSaveQueryDialog = false;
   }
 </script>

@@ -74,7 +74,10 @@
     {#if criteria === "project"}
       <select bind:value multiple>
         {#each $projects as project}
-          <option value={project._id}>{project.name}</option>
+          <option
+            class="mr-2 rounded-sm p-1 outline-none checked:bg-white/10 checked:text-white"
+            value={project._id}>{project.name}</option
+          >
         {/each}
       </select>
     {:else if criteria === "title"}
@@ -108,7 +111,10 @@
     {:else if criteria === "tags"}
       <select bind:value multiple>
         {#each $tags as tag}
-          <option value={tag._id}>{tag.value}</option>
+          <option
+            class="mr-2 rounded-sm p-1 outline-none checked:bg-white/10 checked:text-white"
+            value={tag._id}>{tag.value}</option
+          >
         {/each}
       </select>
     {/if}

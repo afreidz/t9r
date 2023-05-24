@@ -40,7 +40,7 @@
     if (project) newValues = { ...project, budget: project.budget || null };
   }
 
-  $: if (newValues && project) dirty = !same<Project>(newValues, project);
+  $: if (newValues && project) dirty = !same(newValues, project);
 
   $: if (forecastWeeks && project && !forecasts) {
     forecasts = Promise.all(

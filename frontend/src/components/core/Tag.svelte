@@ -16,6 +16,7 @@
   style={`color: ${color}`}
   class:aspect-square={round}
 >
+  <slot name="hide" />
   <slot />
   {#if closeable}
     <button

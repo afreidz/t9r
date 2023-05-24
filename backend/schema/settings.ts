@@ -13,6 +13,15 @@ const SettingsSchema = z.object({
   fiscalYearStart: z.number().min(1).max(12).default(4),
   defaultUtilization: z.number().min(0).max(100).default(100),
   trackingStart: PlainDate.default(Temporal.Now.plainDateISO().toString()),
+  hiddenTags: z.array(z.string()).default([]),
+  savedQueries: z
+    .array(
+      z.object({
+        label: z.string(),
+        url: z.string(),
+      })
+    )
+    .default([]),
 });
 
 export default SettingsSchema;

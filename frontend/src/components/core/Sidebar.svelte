@@ -1,6 +1,17 @@
 <script lang="ts">
+  import ActionClose from "@/core/actions/Close.svelte";
+  import { showLeftSidebar, showRightSidebar } from "@/lib/stores/ui";
+
   export let direction: "left" | "right" = "right";
   export let enabled = false;
+
+  function handleClose() {
+    if (direction === "left") {
+      $showLeftSidebar = false;
+    } else {
+      $showRightSidebar = false;
+    }
+  }
 </script>
 
 <div
@@ -17,5 +28,6 @@
 >
   {#if enabled}
     <slot />
+    <ActionClose class="absolute top-1 right-2" on:click={handleClose} />
   {/if}
 </div>

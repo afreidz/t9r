@@ -20,6 +20,7 @@
   import Copy from "@/foundation/Copy.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import projects from "@/lib/stores/projects";
+  import settings from "@/lib/stores/settings";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
@@ -29,6 +30,7 @@
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
   import type { Forecast } from "@/backend/schema/forecast";
+  import type { Tag as TagType } from "@/backend/schema/tag";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
@@ -49,7 +51,7 @@
 
   type Tasks = {
     title: string;
-    tags: string[];
+    tags: TagType[];
   }[];
 
   export let params: { date: string } = { date: getToday().toString() };
@@ -97,9 +99,9 @@
 
       return {
         title,
-        tags: $tags
-          .filter((tag) => timer.tags && tag._id && timer.tags.includes(tag._id))
-          .map((tag) => tag.value),
+        tags: $tags.filter(
+          (tag) => timer.tags && tag._id && timer.tags.includes(tag._id)
+        ),
       };
     });
 
@@ -117,7 +119,13 @@
         (task) =>
           "• " +
           task.title +
-          (task.tags.length ? "\n" + task.tags.map((tag) => `\t◦ ${tag}`).join("\n") : "")
+          (task.tags.length
+            ? "\n" +
+              task.tags
+                .filter((t) => !$settings.hiddenTags?.includes(t._id ?? t.value))
+                .map((tag) => `\t◦ ${tag.value}`)
+                .join("\n")
+            : "")
       )
       .join("\n");
   }
@@ -277,12 +285,6 @@
               detailsEntry.days.at(-1)?.date.equals(detailsDate)}
           />
         </div>
-        <ActionClose
-          on:click={() => {
-            details = undefined;
-            $showRightSidebar = false;
-          }}
-        />
       </header>
       {#if details.length}
         <button
@@ -302,7 +304,7 @@
                       <span class="sr-only">•</span>
                       <Tag
                         class="max-w-none flex-1 text-center !text-xs !leading-6 line-clamp-1"
-                        >{tag}</Tag
+                        >{tag.value}</Tag
                       >
                     </li>
                   {/each}
