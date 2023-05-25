@@ -20,6 +20,8 @@
   import NewProject from "@/core/NewProject.svelte";
 
   let newProject = false;
+
+  $: if (!$projects.length) newProject = true;
 </script>
 
 <nav class="flex flex-1 flex-col px-5 text-lg">

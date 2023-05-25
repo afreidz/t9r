@@ -72,6 +72,7 @@
         {/if}
       {/if}
       {#if criteria === "duration"}
+        <option value="running">Running</option>
         <option value="eq">Equal to</option>
         <option value="lt">Less than</option>
         <option value="gt">Greater than</option>
@@ -111,7 +112,11 @@
         {/await}
       {/if}
     {:else if criteria === "duration"}
-      <input on:change={handleDurationChange} type="number" min={0.25} max={24} />
+      {#if predicate !== "running"}
+        <input on:change={handleDurationChange} type="number" min={0.25} max={24} />
+      {:else}
+        Is running
+      {/if}
     {:else if criteria === "utilized"}
       <select bind:value>
         <option value="true">true</option>

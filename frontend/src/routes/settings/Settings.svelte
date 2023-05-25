@@ -5,6 +5,7 @@
   import Tag from "@/core/Tag.svelte";
   import Months from "./Months.svelte";
   import { pop } from "svelte-spa-router";
+  import { user } from "@/lib/stores/user";
   import Header from "@/core/Header.svelte";
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
@@ -84,7 +85,13 @@
 </script>
 
 <Layout>
-  <Header slot="header" main="Settings" sub="Account" />
+  <Header slot="header" main="Settings" sub="Account">
+    <aside slot="right" class="flex flex-col items-center justify-center">
+      <Copy dim variant="pseudomono" as="small">Signed in as:</Copy>
+      <Copy semibold as="strong" variant="gradient" class="uppercase">{$user?.email}</Copy
+      >
+    </aside>
+  </Header>
   <Container>
     <section slot="primary" class="flex-1">
       <Copy as="h3" semibold variant="gradient" class="my-4 uppercase"

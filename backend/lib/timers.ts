@@ -33,8 +33,10 @@ function internalFilter(f: TimerQuery, t: Timer, defaultReturn = true) {
   } else if (f.criteria === "utilized") {
     if (f.value === "true") return t.utilized;
     return !t.utilized;
-  } else if (f.criteria === "duration" && f.value) {
-    const val = Number(f.value);
+  } else if (f.criteria === "duration") {
+    if (f.predicate === "running") return !t.end;
+
+    const val = Number(f.value ?? 0);
     const dur = getDurationHoursFromString(
       t.start,
       t.end || Temporal.Now.plainTimeISO().toString()
