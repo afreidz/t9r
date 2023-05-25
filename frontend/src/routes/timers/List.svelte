@@ -24,6 +24,7 @@
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
+  import visible from "@/lib/stores/visible";
   import Copy from "@/foundation/Copy.svelte";
   import HourSum from "@/core/SumChip.svelte";
   import settings from "@/lib/stores/settings";
@@ -55,7 +56,7 @@
   import ActionZoomOut from "@/core/actions/ZoomOut.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
-  export let params: { date: string } = { date: Temporal.Now.plainDateISO().toString() };
+  export let params: { date?: string } = {};
 
   let key: unknown;
   let loaded = false;
@@ -65,7 +66,6 @@
   let stage: HTMLElement;
   let view: Views = "list";
   let timers: Timer[] = [];
-  let loader: Promise<void>;
   let sod: Temporal.PlainTime;
   let viewTimers: Timer[] = [];
   let filters: TimerQuery[] = [];
@@ -80,14 +80,15 @@
   let highlightTimer: string | undefined = undefined;
   let duration: "days" | "months" | "weeks" | "all" = "days";
 
+  $: if ($visible)
+    viewDate = params.date ? Temporal.PlainDate.from(params.date) : getToday();
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
-  $: if (viewDate || (duration === "all" && page)) loader = updateTimers();
-  $: if (params.date) viewDate = Temporal.PlainDate.from(params.date);
   $: if ($settings?.sod) sod = Temporal.PlainTime.from($settings.sod);
   $: if (filteredTimers) viewTimers = filteredTimers;
+  $: if (viewDate && isToday(viewDate)) key = $now;
   $: if ($now) nowText = formatForShortTime($now);
   $: if (!filteredTimers) viewTimers = timers;
-  $: if (isToday(viewDate)) key = $now;
+  $: if (viewDate) updateTimers();
   $: if (view) loaded = false;
 
   $: if ($querystring) {
@@ -167,9 +168,8 @@
         });
         break;
       case "days":
-        if (!viewDate) break;
         timers = await trpc.timers.getByDate.query({
-          date: viewDate.toString(),
+          date: params.date ?? getToday().toString(),
         });
         break;
     }
@@ -505,7 +505,7 @@
       date={viewDate}
       on:timer-update={() => {
         loaded = false;
-        loader = updateTimers();
+        updateTimers();
       }}
     />
   </div>
