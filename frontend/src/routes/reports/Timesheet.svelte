@@ -136,7 +136,9 @@
     <Header
       slot="header"
       sub="Timesheet for week of"
-      main={`${getSunday(viewDate).day} ${getMonth(viewDate)} ${viewDate.year}`}
+      main={`${getSunday(viewDate).day} ${getMonth(getSunday(viewDate))} ${
+        getSunday(viewDate).year
+      }`}
       class="mb-1"
     >
       <div slot="right">
