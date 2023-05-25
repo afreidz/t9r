@@ -256,10 +256,8 @@
   }
 
   async function saveQuery() {
-    if (!$settings.savedQueries) $settings.savedQueries = [];
-
-    $settings.savedQueries = [
-      ...$settings.savedQueries,
+    const newQueries = [
+      ...($settings.savedQueries ?? []),
       {
         url: window.location.hash.replace("#", ""),
         label: saveQueryLabel,
@@ -267,7 +265,8 @@
     ];
 
     $showLoader = true;
-    await trpc.settings.updateOrCreate.mutate({ savedQueries: $settings.savedQueries });
+    await trpc.settings.updateOrCreate.mutate({ ...$settings, savedQueries: newQueries });
+    $settings = { ...$settings, savedQueries: newQueries };
     $showLoader = false;
     showSaveQueryDialog = false;
   }
