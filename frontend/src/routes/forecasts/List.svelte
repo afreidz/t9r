@@ -10,6 +10,7 @@
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
+  import type { Project } from "@/backend/schema/project";
   import { formatForForecastWeek, getToday, getWeeksArray } from "@/lib/dates";
 
   export let params: { num: number };
@@ -24,7 +25,10 @@
   let weeksArray: Temporal.PlainDate[] = [];
 
   let dirty = false;
+  let activeProjects: Project[];
   let thisWeek: Temporal.PlainDate | undefined = undefined;
+
+  $: if ($projects) activeProjects = $projects.filter((p) => !p.archived);
 
   $: if (params.num) {
     weeksArray =
@@ -80,7 +84,7 @@
 <Layout>
   <Header slot="header" sub="Forecasted hours for" main="All Projects" class="mb-1" />
   <div
-    style="grid-template-rows: 2rem repeat({$projects.length}, minmax(40px, 1fr)); grid-template-columns: max-content repeat({params.num}, 1fr);"
+    style="grid-template-rows: 2rem repeat({activeProjects.length}, minmax(40px, 1fr)); grid-template-columns: max-content repeat({params.num}, 1fr);"
     class="relative grid overflow-auto"
   >
     <div
@@ -99,13 +103,13 @@
       >
         {formatForForecastWeek(week)}
       </strong>
-      {#each $projects as project, z}
+      {#each activeProjects as project, z}
         <div
           style="grid-column-start: {i + 2}; grid-row-start: {z + 2}"
           class:border-l-2={week === thisWeek}
           class:border-r-2={week === thisWeek}
-          class:border-b-2={week === thisWeek && z === $projects.length - 1}
-          class:rounded-b-lg={week === thisWeek && z === $projects.length - 1}
+          class:border-b-2={week === thisWeek && z === activeProjects.length - 1}
+          class:rounded-b-lg={week === thisWeek && z === activeProjects.length - 1}
           class="border-blue-500 px-2"
         >
           <Field label="Hrs">
@@ -126,7 +130,7 @@
         </div>
       {/each}
     {/each}
-    {#each $projects as project, i}
+    {#each activeProjects as project, i}
       <div
         style="grid-row-start: {i + 2}"
         class="sticky left-0 z-[1] col-start-1 flex min-w-[150px] max-w-[180px] items-center bg-neutral-800 py-1 pr-2 md:max-w-none"

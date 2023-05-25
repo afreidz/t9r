@@ -427,7 +427,7 @@
           {/if}
           <div slot="right">
             {#if view !== "timeline"}
-              <Tag>{timer.end ? sumTimerHours([timer]) : "running"}hrs</Tag>
+              <Tag>{timer.end ? `${sumTimerHours([timer])}hrs` : "running"}</Tag>
             {/if}
           </div>
         </TimerComponent>

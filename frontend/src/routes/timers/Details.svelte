@@ -48,7 +48,7 @@
           title:
             timers && timers.every((t) => t.title === timers?.[0].title)
               ? timers?.[0]?.title
-              : "",
+              : undefined,
           date:
             timers && timers.every((t) => t.date === timers?.[0].date)
               ? timers?.[0]?.date

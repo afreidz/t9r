@@ -121,7 +121,10 @@ const forecastRouter = router({
       };
       const opts = { upsert: true };
 
-      const result = await collection.updateOne(query, update, opts);
+      const result =
+        input.hours === 0
+          ? await collection.deleteOne({ ...query, owner: userId })
+          : await collection.updateOne(query, update, opts);
 
       if (result instanceof DBError) {
         throw new TRPCError({

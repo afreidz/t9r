@@ -30,8 +30,11 @@
   let trackStartInput: HTMLInputElement;
   let newValues: Partial<Settings> = $settings;
 
-  $: if (!Object.keys($settings).length)
-    trpc.settings.updateOrCreate.mutate($settings).then(updateSettings);
+  updateSettings().then((s) => {
+    if (!s) {
+      trpc.settings.updateOrCreate.mutate({}).then(updateSettings);
+    }
+  });
 
   $: if (!Object.keys(newValues).length && $settings)
     newValues = JSON.parse(JSON.stringify($settings));
