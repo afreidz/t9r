@@ -36,6 +36,8 @@
     }
   });
 
+  $: console.log($settings);
+
   $: if (!Object.keys(newValues).length && $settings)
     newValues = JSON.parse(JSON.stringify($settings));
   $: if (newValues && $settings) dirty = !same(newValues, $settings);
@@ -152,7 +154,7 @@
     <section
       class="my-1 flex flex-1 flex-col rounded-md p-4 pt-0"
       slot="secondary"
-      class:bg-neutral-900={$tags.length || $settings.savedQueries?.length}
+      class:bg-neutral-900={$tags.length || newValues.savedQueries?.length}
     >
       {#if $tags.length}
         <Copy as="h3" semibold variant="gradient" class="mt-4 mb-2 uppercase">Tags</Copy>

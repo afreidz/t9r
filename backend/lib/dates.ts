@@ -70,8 +70,12 @@ export function getSunday(d: Temporal.PlainDate = getToday()) {
   return d.subtract({ days: d.dayOfWeek });
 }
 
-export function getWeeksArray(n: number = 1, forward = true) {
-  const Sunday = getSunday();
+export function getWeeksArray(
+  d: Temporal.PlainDate = getToday(),
+  n: number = 1,
+  forward = true
+) {
+  const Sunday = getSunday(d);
 
   const opp = forward ? "add" : "subtract";
   const weeks: Temporal.PlainDate[] = [];
@@ -91,7 +95,8 @@ export function plainDateToLegacy(
   return new Date(zoned.epochMilliseconds);
 }
 
-export function formatForForecastWeek(d: Temporal.PlainDate) {
+export function formatForForecastWeek(i: Temporal.PlainDate | string) {
+  const d = Temporal.PlainDate.from(i);
   const date = plainDateToLegacy(d);
   return date.toLocaleString(locale, { dateStyle: "short" });
 }
@@ -101,7 +106,12 @@ export function formatForShortTime(d: Temporal.PlainDateTime) {
   return date.toLocaleString(locale, { timeStyle: "short" });
 }
 
-export function isBeforeDate(d1: Temporal.PlainDate, d2: Temporal.PlainDate) {
+export function isBeforeDate(
+  i1: Temporal.PlainDate | string,
+  i2: Temporal.PlainDate | string
+) {
+  const d1 = Temporal.PlainDate.from(i1);
+  const d2 = Temporal.PlainDate.from(i2);
   return Temporal.PlainDate.compare(d1, d2) <= 0;
 }
 

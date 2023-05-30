@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { Sort } from "mongodb";
 import { TRPCError } from "@trpc/server";
-import { PlainYearMonth } from "../../schema/timer";
+import { PlainDate } from "../../schema/timer";
 import { router, protectedProcedure } from "../lib";
 import getDBClient, { DBError, ObjectId } from "../../database";
 import ForecastSchema, { type Forecast } from "../../schema/forecast";
@@ -21,39 +21,6 @@ const forecastRouter = router({
       _id: new ObjectId(input),
     });
   }),
-  getByProjectAndDates: protectedProcedure
-    .input(
-      z.object({
-        start: PlainYearMonth,
-        end: PlainYearMonth,
-        project: z.string(),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      const { userId } = ctx.user;
-      const db = await getDBClient();
-      const collection = db.collection("forecasts");
-
-      const project = input.project;
-      const end = Temporal.PlainYearMonth.from(input.end);
-      const start = Temporal.PlainYearMonth.from(input.start);
-      const duration = start.until(end, { largestUnit: "years" });
-      const monthsBetween = duration.years * 12 + duration.months;
-
-      let regex = ``;
-      new Array(monthsBetween).fill(null).forEach((_, n) => {
-        const yearsToAdd = Math.floor(n / 12);
-        const month = `${start.add({ months: n }).month}`.padStart(2, "0");
-        regex += `${start.year + yearsToAdd}-${month}-\\d{2}`;
-        if (n < monthsBetween) regex += "|";
-      });
-
-      const $regex = new RegExp(`^${regex}`);
-
-      return collection
-        .find<Forecast>({ owner: userId, project, week: { $regex } })
-        .toArray();
-    }),
   getByWeekAndProject: protectedProcedure
     .input(
       z.object({
@@ -71,6 +38,32 @@ const forecastRouter = router({
         week: input.week,
         project: input.project,
       });
+    }),
+  getAllByDates: protectedProcedure
+    .input(
+      z.object({
+        start: PlainDate,
+        end: PlainDate,
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { userId } = ctx.user;
+      const db = await getDBClient();
+      const collection = db.collection("forecasts");
+
+      const end = Temporal.PlainDate.from(input.end);
+      const start = Temporal.PlainDate.from(input.start);
+
+      return collection
+        .find<Forecast>({
+          owner: userId,
+          week: {
+            $gte: start.toString(),
+            $lte: end.toString(),
+          },
+        })
+        .sort(forecastSort)
+        .toArray();
     }),
   getByWeek: protectedProcedure
     .input(z.string())

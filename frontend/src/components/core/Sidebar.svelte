@@ -15,6 +15,7 @@
 </script>
 
 <div
+  class:hidden={!enabled}
   class:pointer-events-auto={enabled}
   class:pointer-events-none={!enabled}
   class:left-0={direction === "left" && enabled}

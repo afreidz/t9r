@@ -2,11 +2,11 @@ import Main from "@/routes/Main.svelte";
 import NotFound from "@/routes/NotFound.svelte";
 import Timers from "@/routes/timers/List.svelte";
 import Settings from "@/routes/settings/Settings.svelte";
-import TimesheetReport from "./reports/Timesheet.svelte";
-import ForecastList from "@/routes/forecasts/List.svelte";
 import TimerDetails from "@/routes/timers/Details.svelte";
 import ProjectDetails from "@/routes/project/Details.svelte";
-import UtilizationReport from "./reports/utilization/Utilization.svelte";
+import WorkplanReport from "@/routes/reports/Workplan.svelte";
+import TimesheetReport from "@/routes/reports/Timesheet.svelte";
+import UtilizationReport from "@/routes/reports/utilization/Utilization.svelte";
 
 export default {
   "/": Main,
@@ -23,8 +23,9 @@ export default {
   "/timers/weeks/:date": Timers,
   "/timer/:id": TimerDetails,
   "/project/:id": ProjectDetails,
-  "/forecasts/:num": ForecastList,
   "/reports/week": TimesheetReport,
+  "/reports/workplan": WorkplanReport,
+  "/reports/workplan/:date": WorkplanReport,
   "/reports/week/:date": TimesheetReport,
   "/reports/utilization": UtilizationReport,
   "*": NotFound,

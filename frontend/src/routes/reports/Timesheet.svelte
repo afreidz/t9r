@@ -37,7 +37,6 @@
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionCopy from "@/core/actions/Copy.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
-  import ActionClose from "@/core/actions/Close.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
   type Timesheet = {

@@ -2,6 +2,9 @@
   import same from "@/lib/same";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
+  import Tag from "@/core/Tag.svelte";
+  import Plan from "@/core/Plan.svelte";
+  import { getSunday, getToday } from "@/lib/dates";
   import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
@@ -21,6 +24,7 @@
   import type { Project } from "@/backend/schema/project";
   import { formatForForecastWeek, getWeeksArray } from "@/lib/dates";
   import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
+  import Link from "@/components/foundation/Link.svelte";
 
   export let params: { id: string };
 
@@ -29,8 +33,11 @@
   let showGradientStops = false;
   let project: Project | undefined;
   let newValues: Project | undefined;
-  let forecastWeeks = getWeeksArray(5, false);
   let projectTimers: Promise<Timer[]> | undefined;
+  let forecastWeeks = [
+    ...getWeeksArray(getToday(), 4, false).reverse(),
+    ...getWeeksArray(getToday().add({ weeks: 1 }), 2),
+  ];
   let forecasts: Promise<(ForecastAndActual | undefined)[]> | undefined;
 
   $: if (params.id && project?._id !== params.id) {
@@ -233,29 +240,35 @@
             {/if}
           {/await}
         {/if}
-        <Copy as="h3" semibold variant="gradient" class="my-4 uppercase"
-          >Recent Weekly Hours</Copy
+
+        <Copy
+          as="h3"
+          semibold
+          variant="gradient"
+          class="my-4 flex justify-between uppercase"
         >
-        <div class="mx-4 md:mx-6">
-          {#if forecasts}
-            <Chart cols={60} rows={5} height={320} axis={10}>
-              {#await forecasts}
-                <Icon icon="eos-icons:loading" class="h-4 w-4 text-white" />
-              {:then forecasts}
-                {#each forecasts as forecast, i}
-                  {#if forecast}
-                    <ChartItem
-                      index={i}
-                      max={forecast?.hours}
-                      color={project?.color}
-                      value={forecast?.actual}
-                      label={formatForForecastWeek(forecastWeeks[i])}
-                    />
-                  {/if}
-                {/each}
-              {/await}
-            </Chart>
-          {/if}
+          <span>Workplan</span>
+          <Link to="/reports/workplan" class="flex items-center gap-1"
+            ><Icon icon="material-symbols:edit-outline" class="text-white" /> Edit</Link
+          >
+        </Copy>
+        <div class="mx-4 flex md:mx-6">
+          {#await forecasts then forecasts}
+            {#if forecasts}
+              {#each forecasts as forecast, i}
+                {#if forecast}
+                  <Plan
+                    readonly={true}
+                    color={project?.color}
+                    value={forecast.hours || 0}
+                    actual={forecast.actual ?? undefined}
+                    heading={formatForForecastWeek(forecastWeeks[i])}
+                    highlight={forecastWeeks[i].equals(getSunday(getToday()))}
+                  />
+                {/if}
+              {/each}
+            {/if}
+          {/await}
         </div>
       {/key}
     </section>

@@ -18,6 +18,7 @@
     showRightSidebar,
   } from "@/lib/stores/ui";
   import trpc from "@/lib/trpc";
+  import qs from "@/lib/stores/qs";
   import now from "@/lib/stores/now";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
@@ -274,7 +275,6 @@
 
 <Layout>
   <Header
-    as="h2"
     slot="header"
     main={duration === "months"
       ? `${getMonth(viewDate)} ${viewDate.year}`
@@ -284,6 +284,8 @@
         }`
       : duration === "days"
       ? `${viewDate.day} ${getMonth(viewDate)} ${viewDate.year}`
+      : $qs.has("label")
+      ? $qs.get("label")
       : "All Timers"}
     sub={duration === "days"
       ? `Timers for ${getWeekDay(viewDate)}`

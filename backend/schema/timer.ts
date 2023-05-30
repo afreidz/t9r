@@ -36,19 +36,17 @@ export const PlainYearMonth = z.string().refine((s) => {
   }
 });
 
-const TimerSchema = z
-  .object({
-    date: PlainDate,
-    start: PlainTime,
-    project: z.string(),
-    _id: z.string().optional(),
-    owner: z.string().optional(),
-    end: PlainTime.optional().nullable(),
-    tags: z.array(z.string()).default([]),
-    utilized: z.boolean().optional().default(false),
-    title: z.string().min(2).max(60).optional().default("Timer"),
-  })
-  .passthrough();
+const TimerSchema = z.object({
+  date: PlainDate,
+  start: PlainTime,
+  project: z.string(),
+  _id: z.string().optional(),
+  owner: z.string().optional(),
+  end: PlainTime.optional().nullable(),
+  tags: z.array(z.string()).default([]),
+  utilized: z.boolean().optional().default(false),
+  title: z.string().min(2).max(60).optional().default("Timer"),
+});
 
 export default TimerSchema;
 export type Timer = z.infer<typeof TimerSchema>;

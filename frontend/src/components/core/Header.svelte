@@ -1,18 +1,12 @@
 <script lang="ts">
   import Copy from "@/foundation/Copy.svelte";
-  import type { HTMLAttributes } from "svelte/elements";
 
-  type $$Props = HTMLAttributes<HTMLElement> & {
-    sub?: string;
-    main?: string;
-    as?: keyof HTMLElementTagNameMap;
-  };
-
-  let { as, main, sub, ...rest }: $$Props = $$props;
-  export { main, as, sub };
+  export let sub: string | null = null;
+  export let main: string | null = null;
+  export let as: keyof HTMLElementTagNameMap = "h2";
 </script>
 
-<header class="border-neutral-900 px-4 pt-3 md:px-6 md:pt-6 {rest.class}">
+<header class="border-neutral-900 px-4 pt-3 md:px-6 md:pt-6 {$$restProps.class}">
   <div class="flex items-center border-b border-inherit pb-4">
     <svelte:element this={as || "h2"} class="flex-1">
       <Copy dim as="small" light variant="pseudomono" class="block">

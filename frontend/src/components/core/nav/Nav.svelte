@@ -180,7 +180,7 @@
       {/if}
     </MainItem>
     {#if $projects.length}
-      <MainItem
+      <!-- <MainItem
         clickable
         active={$location.startsWith("/forecasts")}
         on:click={() => ($showForecasts = !$showForecasts)}
@@ -229,7 +229,7 @@
             </SubItem>
           </SubNav>
         {/if}
-      </MainItem>
+      </MainItem> -->
       <MainItem
         clickable
         active={$location.startsWith("/reports")}
@@ -264,6 +264,14 @@
                 class="text-neutral-light"
               />
               Weekly Timesheet
+            </SubItem>
+            <SubItem
+              active={$location.startsWith("/reports/workplan")}
+              to="/reports/workplan"
+              on:navigate
+            >
+              <Icon slot="icon" icon="carbon:plan" class="text-neutral-light" />
+              Workplan
             </SubItem>
           </SubNav>
         {/if}
