@@ -19,7 +19,7 @@
   export let actual: Promise<number> | number | undefined = undefined;
 </script>
 
-<div class="p-4">
+<div>
   <strong
     bind:this={elm}
     class:ring-2={highlight}
@@ -35,17 +35,17 @@
       step={1}
       max={168}
       type="number"
-      class="max-w-[80px]"
+      class="max-w-[80px] text-center text-2xl font-bold"
       readonly={$$props.readonly}
       on:change={(e) => dispatch("change", Number(e.currentTarget.value))}
     />
-    <div slot="upper-right" class="h-full w-full">
+    <div slot="upper-right" class="h-7 min-w-[1.75rem]">
       {#await actual then actual}
         {#if actual}
           <Tag
             title="Actual hours"
             background={color}
-            class="!m-0 flex h-full w-full !max-w-none items-center justify-center !p-0 !shadow-xl"
+            class="!m-0 flex h-full w-full !max-w-none items-center justify-center !shadow-xl"
             >{actual}</Tag
           >
         {/if}

@@ -18,7 +18,7 @@
   <div class="mt-8 flex flex-none items-start">
     <slot name="icon" />
   </div>
-  <div class="absolute -top-2 -right-2 h-7 w-7">
+  <div class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2">
     <slot name="upper-right" />
   </div>
 </svelte:element>

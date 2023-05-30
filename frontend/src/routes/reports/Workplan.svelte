@@ -17,6 +17,7 @@
   import Layout from "@/core/Layout.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import projects from "@/lib/stores/projects";
+  import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -133,7 +134,7 @@
   </Header>
   {#if viewDate && workplan && newPlans}
     <div
-      class="grid w-full snap-x snap-mandatory auto-rows-min grid-cols-1 overflow-auto"
+      class="grid w-full snap-x snap-mandatory auto-rows-min grid-cols-1 gap-y-2 overflow-auto"
     >
       {#each workplan.projects as project, z}
         <header class="sticky left-0 right-0 col-span-full">
@@ -146,8 +147,8 @@
           />
         </header>
         <div
-          style="grid-template-columns: repeat({newPlans.length}, 1fr);"
-          class="grid w-full"
+          style="grid-template-columns: repeat({newPlans.length}, 117px);"
+          class="grid w-full gap-8"
         >
           {#each newPlans as plan, i}
             <Plan
@@ -164,6 +165,16 @@
           {/each}
         </div>
       {/each}
+      <div
+        style="grid-template-columns: repeat({newPlans.length}, 117px);"
+        class="my-4 grid w-full gap-8"
+      >
+        {#each newPlans as plan, i}
+          <div class="flex items-center justify-center">
+            <Tag>{plan.forecasts.reduce((h, f) => (h += f.hours), 0)}hrs</Tag>
+          </div>
+        {/each}
+      </div>
     </div>
   {/if}
 
