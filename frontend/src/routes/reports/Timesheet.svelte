@@ -38,6 +38,7 @@
   import ActionCopy from "@/core/actions/Copy.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
+  import Link from "@/components/foundation/Link.svelte";
 
   type Timesheet = {
     project: Project;
@@ -173,7 +174,7 @@
               <header class="sticky left-0 right-0 col-span-full">
                 <div class="h-10 flex-1 items-center rounded-full bg-neutral-900 md:h-14">
                   <TimerComponent
-                    disableNav
+                    href={`/#/project/${entry.project._id}`}
                     class="!mb-0 !h-full !min-w-[32%] !shadow-none md:!min-w-[48%] lg:!min-w-[32%] xl:!min-w-[auto]"
                     style="width: {Math.max(15, Math.min(percent, 100))}%;"
                     project={entry.project}
@@ -207,10 +208,16 @@
               >
                 {#each entry.days as day, i}
                   <li class="mb-6 flex snap-center flex-col items-center">
-                    <Copy as="strong" variant="gradient" class="flex-none py-2 uppercase">
-                      {day.date.toLocaleString("en", { weekday: "short" })}
-                      {getSunday(viewDate).add({ days: i }).day}
-                    </Copy>
+                    <Link
+                      to={`/timers/day/${day.date.toString()}`}
+                      variant="gradient"
+                      class="flex-none py-2 uppercase"
+                    >
+                      <strong>
+                        {day.date.toLocaleString("en", { weekday: "short" })}
+                        {getSunday(viewDate).add({ days: i }).day}
+                      </strong>
+                    </Link>
                     <Field as="div" class="relative w-full" label="Hours">
                       {#key key}
                         <Copy

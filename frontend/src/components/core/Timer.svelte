@@ -70,7 +70,7 @@
   class:ring-2={highlight}
   class:ring-white={highlight}
   inert={!disableNav ? undefined : true}
-  href={!disableNav && !selectMode ? `/#/timer/${id}` : undefined}
+  href={!disableNav && !selectMode ? $$props.href || `/#/timer/${id}` : undefined}
   class={`relative z-10 mb-2 flex h-10 flex-none items-center overflow-auto !rounded-full text-white shadow-md md:h-14 ${
     $$props.class || ""
   }`}

@@ -141,7 +141,7 @@
             class="!mb-0"
             {project}
             buttonFlex
-            disableNav
+            href={`/#/project/${project._id}`}
             title={project.name}
           />
         </header>
