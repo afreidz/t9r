@@ -1,7 +1,9 @@
 <script lang="ts">
   import Tag from "@/core/Tag.svelte";
+  import Link from "@/foundation/Link.svelte";
   import Field from "@/foundation/Field.svelte";
   import { createEventDispatcher } from "svelte";
+  import { formatForForecastWeek } from "@/lib/dates";
 
   const dispatch = createEventDispatcher();
 
@@ -11,23 +13,26 @@
     elm.scrollIntoView({ inline: "start", behavior: "smooth" });
   }
 
+  $: if (week) heading = formatForForecastWeek(week);
+
   export let value: Number;
   export let color = "white";
   export let scrollTo = false;
   export let highlight = false;
   export let heading: string = "";
+  export let week: Temporal.PlainDate | string;
   export let actual: Promise<number> | number | undefined = undefined;
 </script>
 
 <div>
-  <strong
-    bind:this={elm}
-    class:ring-2={highlight}
+  <Link
+    {highlight}
+    to={`/timers/week/${week.toString()}`}
     style={$$props.style || ""}
     class="m-2 flex items-center justify-center rounded-lg p-1 ring-blue-500"
   >
-    {heading}
-  </strong>
+    <strong bind:this={elm}>{heading}</strong>
+  </Link>
   <Field label="Hrs">
     <input
       {value}

@@ -1,17 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { link, location } from "svelte-spa-router";
-  import type { HTMLAnchorAttributes } from "svelte/elements";
-
-  type $$Props = HTMLAnchorAttributes & {
-    to?: string;
-    disabled?: boolean;
-    elm?: HTMLAnchorElement;
-  };
 
   const dispatch = createEventDispatcher();
 
-  export let disabled: boolean = false;
+  export let disabled = false;
+  export let highlight = false;
   export let to: string | undefined = undefined;
   export let elm: HTMLAnchorElement | undefined = undefined;
 </script>
@@ -20,6 +14,7 @@
   {...$$props}
   href={to}
   bind:this={elm}
+  class:ring={highlight}
   class:rounded-md={true}
   class:focus:ring={true}
   class:inline-block={true}

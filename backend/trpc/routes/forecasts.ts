@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Sort } from "mongodb";
 import { TRPCError } from "@trpc/server";
+import { getSunday } from "../../lib/dates";
 import { PlainDate } from "../../schema/timer";
 import { router, protectedProcedure } from "../lib";
 import getDBClient, { DBError, ObjectId } from "../../database";
@@ -51,8 +52,10 @@ const forecastRouter = router({
       const db = await getDBClient();
       const collection = db.collection("forecasts");
 
-      const end = Temporal.PlainDate.from(input.end);
-      const start = Temporal.PlainDate.from(input.start);
+      const start = getSunday(Temporal.PlainDate.from(input.start));
+      const end = getSunday(Temporal.PlainDate.from(input.end)).add({
+        days: 6,
+      });
 
       return collection
         .find<Forecast>({

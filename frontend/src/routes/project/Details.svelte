@@ -4,7 +4,6 @@
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import Plan from "@/core/Plan.svelte";
-  import { getSunday, getToday } from "@/lib/dates";
   import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
@@ -12,19 +11,20 @@
   import Colors from "@/core/Colors.svelte";
   import Dialog from "@/core/Dialog.svelte";
   import Copy from "@/foundation/Copy.svelte";
+  import { getWeeksArray } from "@/lib/dates";
   import { sumTimerHours } from "@/lib/timers";
   import Field from "@/foundation/Field.svelte";
   import Chart from "@/core/chart/Chart.svelte";
   import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
+  import { getSunday, getToday } from "@/lib/dates";
   import DualAction from "@/core/DualAction.svelte";
   import type { Timer } from "@/backend/schema/timer";
   import ChartItem from "@/core/chart/ChartItem.svelte";
   import Container from "@/foundation/Container.svelte";
-  import type { Project } from "@/backend/schema/project";
-  import { formatForForecastWeek, getWeeksArray } from "@/lib/dates";
-  import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
   import Link from "@/components/foundation/Link.svelte";
+  import type { Project } from "@/backend/schema/project";
+  import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
 
   export let params: { id: string };
 
@@ -252,7 +252,7 @@
             ><Icon icon="material-symbols:edit-outline" class="text-white" /> Edit</Link
           >
         </Copy>
-        <div class="mx-4 flex md:mx-6">
+        <div class="flex justify-evenly gap-2 overflow-auto">
           {#await forecasts then forecasts}
             {#if forecasts}
               {#each forecasts as forecast, i}
@@ -260,9 +260,9 @@
                   <Plan
                     readonly={true}
                     color={project?.color}
+                    week={forecastWeeks[i]}
                     value={forecast.hours || 0}
                     actual={forecast.actual ?? undefined}
-                    heading={formatForForecastWeek(forecastWeeks[i])}
                     highlight={forecastWeeks[i].equals(getSunday(getToday()))}
                   />
                 {/if}
