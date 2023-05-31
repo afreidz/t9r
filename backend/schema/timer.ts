@@ -39,9 +39,9 @@ export const PlainYearMonth = z.string().refine((s) => {
 const TimerSchema = z.object({
   date: PlainDate,
   start: PlainTime,
-  project: z.string(),
   _id: z.string().optional(),
   owner: z.string().optional(),
+  project: z.string().nullable(),
   end: PlainTime.optional().nullable(),
   tags: z.array(z.string()).default([]),
   utilized: z.boolean().optional().default(false),

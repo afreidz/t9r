@@ -22,13 +22,17 @@ function internalFilter(f: TimerQuery, t: Timer, defaultReturn = true) {
     const d1 = new Temporal.PlainDate(vd.year, vd.month, 1);
     const d2 = d1.add({ years: 1 });
     return isAfterDate(td, d1) && isBeforeDate(td, d2);
-  } else if ((f.criteria === "tags" || f.criteria === "project") && f.value) {
+  } else if (f.criteria === "project") {
+    console.log(t.project, f.value);
     const search = Array.isArray(f.value) ? f.value : [f.value as string];
     return search.some((s) => {
-      return (
-        t[f.criteria as keyof Timer] &&
-        (t[f.criteria as keyof Timer] as string[]).includes(s)
-      );
+      if (s === "null") return !t.project;
+      return t.project && t.project === s;
+    });
+  } else if (f.criteria === "tags") {
+    const search = Array.isArray(f.value) ? f.value : [f.value as string];
+    return search.some((s) => {
+      return t.tags && t.tags.includes(s);
     });
   } else if (f.criteria === "utilized") {
     if (f.value === "true") return t.utilized;

@@ -34,6 +34,7 @@ const projectsRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { userId } = ctx.user;
       const db = await getDBClient();
+      const timers = db.collection("timers");
       const collection = db.collection("projects");
 
       const result = await collection.deleteOne({
@@ -47,26 +48,23 @@ const projectsRouter = router({
           message: result.message,
           cause: result,
         });
+      }
+
+      const timersResult = await timers.updateMany(
+        { project: input.id },
+        { $set: { project: null } }
+      );
+
+      if (timersResult instanceof DBError) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: timersResult.message,
+          cause: timersResult,
+        });
       } else {
         return result;
       }
     }),
-  deleteAll: protectedProcedure.mutation(async ({ ctx }) => {
-    const { userId } = ctx.user;
-    const db = await getDBClient();
-    const collection = db.collection("projects");
-
-    const result = await collection.deleteMany({ owner: userId });
-    if (result instanceof DBError) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: result.message,
-        cause: result,
-      });
-    } else {
-      return result;
-    }
-  }),
   create: protectedProcedure
     .input(ProjectSchema)
     .mutation(async ({ input, ctx }) => {

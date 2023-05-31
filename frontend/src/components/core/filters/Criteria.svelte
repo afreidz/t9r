@@ -89,6 +89,7 @@
         {#each $projects as project}
           <option value={project._id}>{project.name}</option>
         {/each}
+        <option value="null">unknown</option>
       </select>
     {:else if criteria === "title"}
       <input bind:value />
