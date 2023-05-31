@@ -14,6 +14,7 @@
   export let project: Project | undefined = undefined;
   export let disableNav: boolean | undefined = false;
   export let title: string | undefined = undefined;
+  export let sub: string | undefined = undefined;
   export let id: string | undefined = undefined;
   export let tags: (string | undefined)[] = [];
   export let color: string = "black";
@@ -93,7 +94,7 @@
       as="small"
       variant="pseudomono"
       class="shrink text-left text-xs leading-none line-clamp-1"
-      >{project?.name || ""}</Copy
+      >{sub || project?.name || ""}</Copy
     >
     <strong class="text-sm font-normal !leading-none line-clamp-1 md:text-lg"
       >{title || "Timer"}</strong

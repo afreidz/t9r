@@ -19,6 +19,7 @@
   import tags, { updateTags } from "@/lib/stores/tags";
   import Container from "@/foundation/Container.svelte";
   import ActionClose from "@/core/actions/Close.svelte";
+  import ActionReorder from "@/core/actions/Reorder.svelte";
   import type { Settings } from "@/backend/schema/settings";
   import type { Tag as TagType } from "@/backend/schema/tag";
   import settings, { updateSettings } from "@/lib/stores/settings";
@@ -35,8 +36,6 @@
       trpc.settings.updateOrCreate.mutate({}).then(updateSettings);
     }
   });
-
-  $: console.log($settings);
 
   $: if (!Object.keys(newValues).length && $settings)
     newValues = JSON.parse(JSON.stringify($settings));
@@ -61,7 +60,7 @@
 
   function reset() {
     if (!$settings) return;
-    newValues = { ...$settings };
+    newValues = JSON.parse(JSON.stringify($settings));
   }
 
   async function handleDeleteTag() {
@@ -86,6 +85,29 @@
 
   function deleteSavedQuery(q: Settings["savedQueries"][number]) {
     newValues.savedQueries = newValues.savedQueries?.filter((sq) => sq.label !== q.label);
+  }
+
+  function reorder(e: DragEvent, i: number) {
+    if (!e.dataTransfer) return;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.setData("text/plain", `${i}`);
+  }
+
+  function changeOrder(e: DragEvent, i: number) {
+    if (!e.dataTransfer || !newValues.savedQueries) return;
+    e.dataTransfer.dropEffect = "move";
+    const start = parseInt(e.dataTransfer.getData("text/plain"));
+    const newOrder = newValues.savedQueries;
+
+    if (start < i) {
+      newOrder.splice(i + 1, 0, newOrder[start]);
+      newOrder.splice(start, 1);
+    } else {
+      newOrder.splice(i, 0, newOrder[start]);
+      newOrder.splice(start + 1, 1);
+    }
+    newValues.savedQueries = newOrder;
   }
 </script>
 
@@ -200,9 +222,17 @@
         >
         <div class="max-h-96 overflow-auto">
           <ul class="border-t border-white/10">
-            {#each newValues.savedQueries as savedQuery}
-              <li class="flex items-center justify-between border-b border-inherit px-4">
-                <Link to={savedQuery.url}>{savedQuery.label}</Link>
+            {#each newValues.savedQueries as savedQuery, idx (savedQuery.url)}
+              <li
+                draggable={true}
+                on:dragover|preventDefault
+                on:dragenter|preventDefault
+                on:drop={(e) => changeOrder(e, idx)}
+                on:dragstart={(e) => reorder(e, idx)}
+                class="flex items-center justify-between gap-4 border-b border-inherit px-2"
+              >
+                {#if newValues.savedQueries.length > 1}<ActionReorder />{/if}
+                <Link to={savedQuery.url} class="flex-1">{savedQuery.label}</Link>
                 <ActionClose on:click={() => deleteSavedQuery(savedQuery)} />
               </li>
             {/each}

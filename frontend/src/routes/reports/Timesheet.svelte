@@ -28,6 +28,7 @@
   import { showRightSidebar } from "@/lib/stores/ui";
   import type { Timer } from "@/backend/schema/timer";
   import Container from "@/foundation/Container.svelte";
+  import Link from "@/components/foundation/Link.svelte";
   import type { Project } from "@/backend/schema/project";
   import type { Forecast } from "@/backend/schema/forecast";
   import type { Tag as TagType } from "@/backend/schema/tag";
@@ -38,7 +39,6 @@
   import ActionCopy from "@/core/actions/Copy.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
-  import Link from "@/components/foundation/Link.svelte";
 
   type Timesheet = {
     project: Project;
@@ -178,6 +178,7 @@
                     class="!mb-0 !h-full !min-w-[32%] !shadow-none md:!min-w-[48%] lg:!min-w-[32%] xl:!min-w-[auto]"
                     style="width: {Math.max(15, Math.min(percent, 100))}%;"
                     project={entry.project}
+                    sub="Timesheet for"
                     title={entry.project.name}
                   >
                     <div slot="right">

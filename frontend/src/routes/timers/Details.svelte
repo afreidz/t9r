@@ -263,11 +263,12 @@
         {#if multiple && timers}
           <h3 class="mb-3 text-center text-xl font-bold md:text-left">Timers</h3>
           {#each timers as timer}
+            {@const project = $projects.find((p) => p._id === timer?.project)}
             <TimerComponent
-              disableNav
               class="mt-3"
+              {project}
               title={timer.title}
-              project={$projects.find((p) => p._id === timer?.project)}
+              href={`/#/project/${project?._id}`}
             >
               <div slot="left">
                 <Tag>{formatForMonth(timer.date)}</Tag>
@@ -280,12 +281,13 @@
             </TimerComponent>
           {/each}
         {:else}
+          {@const project = $projects.find((p) => p._id === newValues?.project)}
           <h3 class="mb-3 text-center text-xl font-bold md:text-left">Timing</h3>
           <TimerComponent
-            disableNav
             class="mt-3"
+            {project}
             title={newValues.title}
-            project={$projects.find((p) => p._id === newValues?.project)}
+            href={`/#/project/${project?._id}`}
           >
             <div slot="right">
               {#if newValues.start && newValues.end}

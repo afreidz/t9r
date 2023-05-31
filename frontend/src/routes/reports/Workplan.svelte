@@ -141,8 +141,9 @@
             class="!mb-0"
             {project}
             buttonFlex
-            href={`/#/project/${project._id}`}
+            sub="Workplan for"
             title={project.name}
+            href={`/#/project/${project._id}`}
           />
         </header>
         <div
