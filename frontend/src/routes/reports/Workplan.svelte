@@ -11,9 +11,11 @@
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import Plan from "@/core/Plan.svelte";
+  import Dialog from "@/core/Dialog.svelte";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
   import Copy from "@/foundation/Copy.svelte";
+  import settings from "@/lib/stores/settings";
   import { sumTimerHours } from "@/lib/timers";
   import projects from "@/lib/stores/projects";
   import Button from "@/foundation/Button.svelte";
@@ -30,6 +32,7 @@
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
+  import ActionSave from "@/core/actions/Save.svelte";
   import ActionClose from "@/core/actions/Close.svelte";
   import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
@@ -44,8 +47,8 @@
     }[];
   };
 
-  type WorkplanFilterCriteria = Extract<TimerQuery["criteria"], "project">;
-  type WorkplanFilterPredicate = Extract<TimerQuery["predicate"], "contains">;
+  type WorkplanFilterCriteria = Extract<TimerQuery["criteria"], "project" | "date">;
+  type WorkplanFilterPredicate = Extract<TimerQuery["predicate"], "contains" | "between">;
   type WorkplanFilterValue = string[];
   type WorkplanFilters = {
     criteria: WorkplanFilterCriteria;
@@ -55,37 +58,45 @@
 
   let dirty = false;
   let workplan: WorkplanData;
+  let showSaveQueryDialog = false;
+  let saveQueryLabel: string = "";
   let filters: WorkplanFilters[] = [];
   let newPlans: WorkplanData["plans"];
   let thisWeek: Temporal.PlainDate | null;
   let viewDate: Temporal.PlainDate = getToday();
 
   $: dirty = !!newPlans && newPlans.some((w, i) => !same(w, workplan.plans[i]));
-
   $: if (viewDate) {
     thisWeek = getSunday(getToday()).equals(getSunday(viewDate))
       ? getSunday(viewDate)
       : null;
+  }
 
+  $: if (viewDate && $projects.length && $querystring) {
     const qs = new URLSearchParams($querystring);
+    const f: WorkplanFilters[] = JSON.parse(qs.get("filters") || "");
+    const fp = f.find((f) => f.criteria === "project");
+    const fd = f.find((f) => f.criteria === "date");
+    const d1 = fd ? Temporal.PlainDate.from(fd.value[0]) : viewDate;
+    const d2 = fd ? Temporal.PlainDate.from(fd.value[1]) : undefined;
 
-    if (qs.has("filters")) {
-      const f = JSON.parse(qs.get("filters") || "");
-      getWorkplanData(
-        viewDate,
-        $projects.filter((p) => f[0].value.includes(p._id))
-      );
-    } else {
-      getWorkplanData(
-        viewDate,
-        $projects.filter((p) => !p.archived)
-      );
-    }
+    getWorkplanData(
+      $projects.filter((p) => p._id && fp && fp.value.includes(p._id)),
+      d1,
+      d2
+    );
+  }
+
+  $: if (viewDate && $projects.length && !$querystring) {
+    getWorkplanData(
+      $projects.filter((p) => !p.archived),
+      viewDate
+    );
   }
 
   $: if ($querystring) {
     const qs = new URLSearchParams($querystring);
-    filters = JSON.parse(qs.get("filters") || "");
+    if (qs.has("filters")) filters = JSON.parse(qs.get("filters") || "");
   }
 
   async function sumProjectTimersByWeek(
@@ -100,14 +111,20 @@
     return sumTimerHours(timers);
   }
 
-  async function getWorkplanData(d = viewDate, projects: typeof $projects) {
+  async function getWorkplanData(
+    projects: typeof $projects,
+    d = viewDate,
+    d2?: Temporal.PlainDate
+  ) {
     $showLoader = true;
     const qtr = await getQuarterByDate(d);
     const fy = await getFiscalYearStartMonth(d);
+    const pids = projects.filter((p) => p._id).map((p) => p._id) as string[];
 
     const forecasts = await trpc.forecast.getAllByDates.query({
-      end: qtr.end.toString(),
-      start: qtr.start.toString(),
+      end: d2?.toString() || qtr.end.toString(),
+      start: d.toString() || qtr.start.toString(),
+      projects: pids,
     });
 
     const plans = getWeeksArray(qtr.start, 14).map((w) => ({
@@ -158,16 +175,40 @@
   }
 
   async function handleFilters(updateNav = true) {
+    const fd = filters.find((f) => f.criteria === "date");
+    const fp = filters.find((f) => f.criteria === "project");
+    const d1 = fd ? Temporal.PlainDate.from(fd.value[0]) : viewDate;
+    const d2 = fd ? Temporal.PlainDate.from(fd.value[1]) : undefined;
+
     workplan = await getWorkplanData(
-      viewDate,
-      $projects.filter((p) => p._id && filters[0].value.includes(p._id))
+      $projects.filter((p) => p._id && fp && fp.value.includes(p._id)),
+      d1,
+      d2
     );
+
     if (updateNav) {
       const filterQS = JSON.stringify(filters);
       const existingQS = new URLSearchParams($querystring);
       existingQS.set("filters", filterQS);
       push(`${$location}?${existingQS.toString()}`);
     }
+  }
+
+  async function saveQuery() {
+    const newQueries = [
+      ...($settings.savedQueries ?? []),
+      {
+        url: window.location.hash.replace("#", ""),
+        label: saveQueryLabel,
+        type: "workplan",
+      },
+    ];
+
+    $showLoader = true;
+    await trpc.settings.updateOrCreate.mutate({ ...$settings, savedQueries: newQueries });
+    $settings = { ...$settings, savedQueries: newQueries };
+    $showLoader = false;
+    showSaveQueryDialog = false;
   }
 </script>
 
@@ -185,11 +226,14 @@
           on:click={() => ($showLeftSidebar = !$showLeftSidebar)}
           class={`from-violet-600 to-cyan-600 ${filters.length && "bg-gradient-to-br"}`}
         />
+        {#if filters.length}
+          <ActionSave on:click={() => (showSaveQueryDialog = true)} />
+        {/if}
       </div>
       <ActionPrev on:click={() => (viewDate = viewDate.subtract({ months: 3 }))} />
       <ActionCurrent
         on:click={() => (viewDate = getToday())}
-        disabled={isToday(viewDate)}
+        disabled={viewDate && isToday(viewDate)}
       />
       <ActionNext on:click={() => (viewDate = viewDate.add({ months: 3 }))} />
     </ActionBar>
@@ -232,7 +276,7 @@
         style="grid-template-columns: repeat({newPlans.length}, 117px);"
         class="my-4 grid w-full gap-8"
       >
-        {#each newPlans as plan, i}
+        {#each newPlans as plan}
           <div class="flex items-center justify-center">
             <Tag>{plan.forecasts.reduce((h, f) => (h += f.hours), 0)}hrs</Tag>
           </div>
@@ -254,8 +298,10 @@
       <Filters
         class="mx-4 flex-1"
         bind:filters
+        staticCombinator="and"
         on:clear={() => handleClearFilters()}
-        disabled={["date", "duration", "tags", "title", "utilized"]}
+        disabledPredicates={["equals", "after", "before", "fiscal"]}
+        disabledCriteria={["duration", "tags", "title", "utilized", "date"]}
       />
       <footer
         class="sticky bottom-0 z-10 flex flex-none border-t border-black/20 bg-neutral-900 py-2 px-4"
@@ -303,3 +349,35 @@
     {/if}
   </div>
 </Layout>
+
+{#if showSaveQueryDialog}
+  <Dialog open={true} title="Save current query as a favorite?" sub="Do you want to...">
+    <Button slot="close" value="cancel" on:click={() => (showSaveQueryDialog = false)}>
+      <Icon icon="material-symbols:close" class="h-7 w-7" />
+    </Button>
+    <section class="flex flex-1 flex-col items-center justify-center py-4">
+      <DualAction>
+        <Button
+          slot="secondary"
+          on:click={() => (showSaveQueryDialog = false)}
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <input
+          bind:value={saveQueryLabel}
+          slot="content"
+          placeholder="Query label"
+          class="max-w-[128px] sm:max-w-none"
+        />
+        <Button
+          on:click={saveQuery}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    </section>
+  </Dialog>
+{/if}

@@ -21,6 +21,7 @@ const SettingsSchema = z.object({
       z.object({
         label: z.string(),
         url: z.string(),
+        type: z.string().default("timer"),
       })
     )
     .default([]),

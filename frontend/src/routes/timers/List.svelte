@@ -262,6 +262,7 @@
       {
         url: window.location.hash.replace("#", ""),
         label: saveQueryLabel,
+        type: "timer",
       },
     ];
 

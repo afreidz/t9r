@@ -220,7 +220,7 @@
         <Copy as="h3" semibold variant="gradient" class="my-4 mt-10 uppercase"
           >Saved Queries</Copy
         >
-        <div class="max-h-96 overflow-auto">
+        <div class="mb-6 max-h-96 overflow-auto">
           <ul class="border-t border-white/10">
             {#each newValues.savedQueries as savedQuery, idx (savedQuery.url)}
               <li
@@ -232,7 +232,12 @@
                 class="flex items-center justify-between gap-4 border-b border-inherit px-2"
               >
                 {#if newValues.savedQueries.length > 1}<ActionReorder />{/if}
-                <Link to={savedQuery.url} class="flex-1">{savedQuery.label}</Link>
+                <Link to={savedQuery.url} class="flex-1">
+                  {savedQuery.label}
+                  <Copy variant="pseudomono" dim light as="span" class="text-sm"
+                    >({savedQuery.type})</Copy
+                  >
+                </Link>
                 <ActionClose on:click={() => deleteSavedQuery(savedQuery)} />
               </li>
             {/each}

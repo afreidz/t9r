@@ -86,9 +86,9 @@
               <Icon slot="icon" class="text-neutral-light" icon="ic:baseline-list-alt" />
               All
             </SubItem>
-            {#if $settings?.savedQueries?.length}
+            {#if $settings?.savedQueries?.filter((q) => q.type === "timer").length}
               <SubItem class="my-2 -ml-4 border-b">&nbsp;</SubItem>
-              {#each $settings.savedQueries as query}
+              {#each $settings.savedQueries.filter((q) => q.type === "timer") as query}
                 <SubItem
                   active={$location.includes("/timers/all") &&
                     $qs.get("label") === query.label}
@@ -180,56 +180,6 @@
       {/if}
     </MainItem>
     {#if $projects.length}
-      <!-- <MainItem
-        clickable
-        active={$location.startsWith("/forecasts")}
-        on:click={() => ($showForecasts = !$showForecasts)}
-      >
-        <Icon
-          slot="right"
-          icon="ph:caret-down-bold"
-          class={`flex-none transition-transform ease-in-out ${
-            $showForecasts ? "rotate-180" : ""
-          }`}
-        />
-        <span slot="main">Forecasts</span>
-        {#if $showForecasts}
-          <SubNav>
-            <SubItem active={$location === "/forecasts/5"} to="/forecasts/5" on:navigate>
-              <Icon
-                slot="icon"
-                class="text-neutral-light"
-                icon="mdi:calendar-minus-outline"
-              />
-              Upcoming
-            </SubItem>
-            <SubItem
-              active={$location === "/forecasts/13"}
-              to="/forecasts/13"
-              on:navigate
-            >
-              <Icon
-                slot="icon"
-                class="text-neutral-light"
-                icon="mdi:calendar-month-outline"
-              />
-              Quarterly
-            </SubItem>
-            <SubItem
-              active={$location === "/forecasts/52"}
-              to="/forecasts/52"
-              on:navigate
-            >
-              <Icon
-                slot="icon"
-                class="text-neutral-light"
-                icon="mdi:calendar-blank-outline"
-              />
-              Annual
-            </SubItem>
-          </SubNav>
-        {/if}
-      </MainItem> -->
       <MainItem
         clickable
         active={$location.startsWith("/reports")}
@@ -246,7 +196,7 @@
         {#if $showReports}
           <SubNav>
             <SubItem
-              active={$location.startsWith("/reports/workplan")}
+              active={$location.startsWith("/reports/workplan") && !$qs.has("label")}
               to="/reports/workplan"
               on:navigate
             >
@@ -273,6 +223,20 @@
               />
               Weekly Timesheet
             </SubItem>
+            {#if $settings?.savedQueries?.filter((q) => q.type === "workplan").length}
+              <SubItem class="my-2 -ml-4 border-b">&nbsp;</SubItem>
+              {#each $settings.savedQueries.filter((q) => q.type === "workplan") as query}
+                <SubItem
+                  active={$location.includes("/reports/workplan") &&
+                    $qs.get("label") === query.label}
+                  to={`${query.url}&label=${encodeURI(query.label)}`}
+                  on:navigate
+                >
+                  <Icon slot="icon" class="text-neutral-light" icon="carbon:plan" />
+                  {query.label}
+                </SubItem>
+              {/each}
+            {/if}
           </SubNav>
         {/if}
       </MainItem>

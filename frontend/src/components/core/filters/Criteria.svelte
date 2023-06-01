@@ -11,7 +11,9 @@
   export let value: string | string[];
   export let criteria: TimerQuery["criteria"] = undefined;
   export let predicate: TimerQuery["predicate"] = undefined;
-  export let disabled: Exclude<TimerQuery["criteria"], undefined>[] = [];
+  export let selectedCriteria: TimerQuery["criteria"][] = [];
+  export let disabledCriteria: Exclude<TimerQuery["criteria"], undefined>[] = [];
+  export let disabledPredicates: Exclude<TimerQuery["predicate"], undefined>[] = [];
 
   let tagSearch: string = "";
   let hiddenTags: Tag[] = [];
@@ -46,39 +48,76 @@
 <Field label="Criteria">
   <select bind:value={criteria}>
     <option value={undefined}>Choose...</option>
-    {#if !disabled.includes("date")}<option value="date">Date</option>{/if}
-    {#if !disabled.includes("project")}<option value="project">Project</option>{/if}
-    {#if !disabled.includes("title")}<option value="title">Title</option>{/if}
-    {#if !disabled.includes("utilized")}<option value="utilized">Utilized</option>{/if}
-    {#if !disabled.includes("tags")}<option value="tags">Tags</option>{/if}
-    {#if !disabled.includes("duration")}<option value="duration">Duration</option>{/if}
+    {#if !disabledCriteria.includes("date")}<option
+        disabled={selectedCriteria.includes("date")}
+        value="date">Date</option
+      >{/if}
+    {#if !disabledCriteria.includes("project")}<option
+        disabled={selectedCriteria.includes("project")}
+        value="project">Project</option
+      >{/if}
+    {#if !disabledCriteria.includes("title")}<option
+        disabled={selectedCriteria.includes("title")}
+        value="title">Title</option
+      >{/if}
+    {#if !disabledCriteria.includes("utilized")}<option
+        disabled={selectedCriteria.includes("utilized")}
+        value="utilized">Utilized</option
+      >{/if}
+    {#if !disabledCriteria.includes("tags")}<option
+        disabled={selectedCriteria.includes("tags")}
+        value="tags">Tags</option
+      >{/if}
+    {#if !disabledCriteria.includes("duration")}<option
+        disabled={selectedCriteria.includes("duration")}
+        value="duration">Duration</option
+      >{/if}
   </select>
 </Field>
 {#if criteria && !["tags", "project", "utilized"].includes(criteria)}
   <Field label="Predicate">
     <select bind:value={predicate}>
       {#if criteria === "title"}
-        <option value="starts_with">Starts with</option>
-        <option value="ends_with">Ends with</option>
-        <option value="contains">Contains</option>
-        <option value="equals">Equals</option>
+        {#if !disabledPredicates.includes("starts_with")}<option value="starts_with"
+            >Starts with</option
+          >{/if}
+        {#if !disabledPredicates.includes("ends_with")}<option value="ends_with"
+            >Ends with</option
+          >{/if}
+        {#if !disabledPredicates.includes("contains")}<option value="contains"
+            >Contains</option
+          >{/if}
+        {#if !disabledPredicates.includes("equals")}<option value="equals">Equals</option
+          >{/if}
       {/if}
       {#if criteria === "date"}
-        <option value="before">Before</option>
-        <option value="after">After</option>
-        <option value="equals">Equals</option>
-        <option value="between">Between</option>
-        {#if showFY}
+        {#if !disabledPredicates.includes("before")}<option value="before">Before</option
+          >{/if}
+        {#if !disabledPredicates.includes("after")}<option value="after">After</option
+          >{/if}
+        {#if !disabledPredicates.includes("equals")}<option value="equals">Equals</option
+          >{/if}
+        {#if !disabledPredicates.includes("between")}<option value="between"
+            >Between</option
+          >{/if}
+        {#if showFY && !disabledPredicates.includes("fiscal")}
           <option value="fiscal">Fiscal Year</option>
         {/if}
       {/if}
       {#if criteria === "duration"}
-        <option value="running">Running</option>
-        <option value="eq">Equal to</option>
-        <option value="lt">Less than</option>
-        <option value="gt">Greater than</option>
-        <option value="lte">Less than or equal to</option>
-        <option value="gte">Greater than or equal to</option>
+        {#if !disabledPredicates.includes("running")}<option value="running"
+            >Running</option
+          >{/if}
+        {#if !disabledPredicates.includes("eq")}<option value="eq">Equal to</option>{/if}
+        {#if !disabledPredicates.includes("lt")}<option value="lt">Less than</option>{/if}
+        {#if !disabledPredicates.includes("gt")}<option value="gt">Greater than</option
+          >{/if}
+        {#if !disabledPredicates.includes("lte")}<option value="lte"
+            >Less than or equal to</option
+          >{/if}
+        {#if !disabledPredicates.includes("gte")}<option value="gte"
+            >Greater than or equal to</option
+          >{/if}
       {/if}
     </select>
   </Field>

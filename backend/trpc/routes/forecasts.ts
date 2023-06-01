@@ -1,9 +1,9 @@
 import { z } from "zod";
-import type { Sort } from "mongodb";
 import { TRPCError } from "@trpc/server";
 import { getSunday } from "../../lib/dates";
 import { PlainDate } from "../../schema/timer";
 import { router, protectedProcedure } from "../lib";
+import type { Document, Filter, Sort } from "mongodb";
 import getDBClient, { DBError, ObjectId } from "../../database";
 import ForecastSchema, { type Forecast } from "../../schema/forecast";
 
@@ -45,6 +45,7 @@ const forecastRouter = router({
       z.object({
         start: PlainDate,
         end: PlainDate,
+        projects: z.array(z.string()).optional(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -57,16 +58,17 @@ const forecastRouter = router({
         days: 6,
       });
 
-      return collection
-        .find<Forecast>({
-          owner: userId,
-          week: {
-            $gte: start.toString(),
-            $lte: end.toString(),
-          },
-        })
-        .sort(forecastSort)
-        .toArray();
+      const query: Filter<Document> = {
+        owner: userId,
+        week: {
+          $gte: start.toString(),
+          $lte: end.toString(),
+        },
+      };
+
+      if (input.projects) query.project = { $in: input.projects };
+
+      return collection.find<Forecast>(query).sort(forecastSort).toArray();
     }),
   getByWeek: protectedProcedure
     .input(z.string())
