@@ -123,7 +123,7 @@
 
     const forecasts = await trpc.forecast.getAllByDates.query({
       end: d2?.toString() || qtr.end.toString(),
-      start: d.toString() || qtr.start.toString(),
+      start: d2 ? d.toString() : qtr.start.toString(),
       projects: pids,
     });
 
