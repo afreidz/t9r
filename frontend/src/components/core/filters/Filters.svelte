@@ -10,7 +10,8 @@
 
   export let showFY = false;
   export let filters: TimerQuery[] = [{ value: "" }];
-  export let combinator: TimerQueryCombinator = "and";
+  export let combinator: TimerQueryCombinator | undefined = undefined;
+  export let disabled: Exclude<TimerQuery["criteria"], undefined>[] = [];
 
   function clear() {
     filters = [{ value: "" }];
@@ -40,13 +41,16 @@
     {/if}
     <Criteria
       {showFY}
+      {disabled}
       bind:value={filter.value}
       bind:criteria={filter.criteria}
       bind:predicate={filter.predicate}
     />
   {/each}
-  <footer class="flex items-center justify-between">
-    <span>add filter</span>
-    <ActionAdd on:click={() => (filters = [...filters, { value: "" }])} />
-  </footer>
+  {#if combinator || (!combinator && !filters.length)}
+    <footer class="flex items-center justify-between">
+      <span>add filter</span>
+      <ActionAdd on:click={() => (filters = [...filters, { value: "" }])} />
+    </footer>
+  {/if}
 </div>

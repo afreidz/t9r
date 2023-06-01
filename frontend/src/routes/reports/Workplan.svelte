@@ -11,22 +11,27 @@
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import Plan from "@/core/Plan.svelte";
-  import { pop } from "svelte-spa-router";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
+  import Copy from "@/foundation/Copy.svelte";
   import { sumTimerHours } from "@/lib/timers";
   import projects from "@/lib/stores/projects";
-  import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
+  import Filters from "@/core/filters/Filters.svelte";
   import type { Project } from "@/backend/schema/project";
+  import type { TimerQuery } from "@/backend/schema/timer";
   import type { Forecast } from "@/backend/schema/forecast";
+  import { showLeftSidebar, showLoader } from "@/lib/stores/ui";
+  import { pop, location, push, querystring } from "svelte-spa-router";
   import { getSunday, type FiscalQuarter, getFiscalYearStartMonth } from "@/lib/dates";
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
+  import ActionClose from "@/core/actions/Close.svelte";
+  import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
 
   type WorkplanData = {
@@ -39,18 +44,49 @@
     }[];
   };
 
+  type WorkplanFilterCriteria = Extract<TimerQuery["criteria"], "project">;
+  type WorkplanFilterPredicate = Extract<TimerQuery["predicate"], "contains">;
+  type WorkplanFilterValue = string[];
+  type WorkplanFilters = {
+    criteria: WorkplanFilterCriteria;
+    predicate: WorkplanFilterPredicate;
+    value: WorkplanFilterValue;
+  };
+
   let dirty = false;
   let workplan: WorkplanData;
+  let filters: WorkplanFilters[] = [];
   let newPlans: WorkplanData["plans"];
   let thisWeek: Temporal.PlainDate | null;
   let viewDate: Temporal.PlainDate = getToday();
 
-  $: if (viewDate) getWorkplanData();
   $: dirty = !!newPlans && newPlans.some((w, i) => !same(w, workplan.plans[i]));
-  $: if (viewDate)
+
+  $: if (viewDate) {
     thisWeek = getSunday(getToday()).equals(getSunday(viewDate))
       ? getSunday(viewDate)
       : null;
+
+    const qs = new URLSearchParams($querystring);
+
+    if (qs.has("filters")) {
+      const f = JSON.parse(qs.get("filters") || "");
+      getWorkplanData(
+        viewDate,
+        $projects.filter((p) => f[0].value.includes(p._id))
+      );
+    } else {
+      getWorkplanData(
+        viewDate,
+        $projects.filter((p) => !p.archived)
+      );
+    }
+  }
+
+  $: if ($querystring) {
+    const qs = new URLSearchParams($querystring);
+    filters = JSON.parse(qs.get("filters") || "");
+  }
 
   async function sumProjectTimersByWeek(
     week: Temporal.PlainDate | string,
@@ -64,10 +100,10 @@
     return sumTimerHours(timers);
   }
 
-  async function getWorkplanData(d = viewDate) {
+  async function getWorkplanData(d = viewDate, projects: typeof $projects) {
+    $showLoader = true;
     const qtr = await getQuarterByDate(d);
     const fy = await getFiscalYearStartMonth(d);
-    const activeProjects = $projects.filter((p) => !p.archived);
 
     const forecasts = await trpc.forecast.getAllByDates.query({
       end: qtr.end.toString(),
@@ -76,7 +112,7 @@
 
     const plans = getWeeksArray(qtr.start, 14).map((w) => ({
       week: w.toString(),
-      forecasts: activeProjects.map(
+      forecasts: projects.map(
         (p) =>
           forecasts.find((f) => f.week === w.toString() && f.project === p._id) ?? {
             hours: 0,
@@ -88,7 +124,8 @@
 
     newPlans = JSON.parse(JSON.stringify(plans));
 
-    workplan = { qtr, fy, plans, projects: activeProjects };
+    workplan = { qtr, fy, plans, projects };
+    $showLoader = false;
     return workplan;
   }
 
@@ -114,6 +151,24 @@
     );
     pop();
   }
+
+  function handleClearFilters() {
+    filters = [];
+    push($location);
+  }
+
+  async function handleFilters(updateNav = true) {
+    workplan = await getWorkplanData(
+      viewDate,
+      $projects.filter((p) => p._id && filters[0].value.includes(p._id))
+    );
+    if (updateNav) {
+      const filterQS = JSON.stringify(filters);
+      const existingQS = new URLSearchParams($querystring);
+      existingQS.set("filters", filterQS);
+      push(`${$location}?${existingQS.toString()}`);
+    }
+  }
 </script>
 
 <Layout>
@@ -123,6 +178,14 @@
     main="FY{workplan?.fy.year} Quarter {workplan?.qtr.qtr}"
   >
     <ActionBar>
+      <div slot="left" class="flex gap-2">
+        <ActionFilter
+          direction="left"
+          enabled={$showLeftSidebar}
+          on:click={() => ($showLeftSidebar = !$showLeftSidebar)}
+          class={`from-violet-600 to-cyan-600 ${filters.length && "bg-gradient-to-br"}`}
+        />
+      </div>
       <ActionPrev on:click={() => (viewDate = viewDate.subtract({ months: 3 }))} />
       <ActionCurrent
         on:click={() => (viewDate = getToday())}
@@ -150,7 +213,7 @@
           style="grid-template-columns: repeat({newPlans.length}, 117px);"
           class="grid w-full gap-8"
         >
-          {#each newPlans as plan, i}
+          {#each newPlans as plan}
             <Plan
               week={plan.week}
               color={project.color}
@@ -177,6 +240,35 @@
       </div>
     </div>
   {/if}
+
+  <div slot="left" class="flex flex-1 flex-col overflow-auto md:min-w-[320px]">
+    {#if $showLeftSidebar}
+      <header
+        class="sticky top-0 z-10 flex flex-none items-center justify-between border-b border-black/20 bg-neutral-900 py-2 px-4"
+      >
+        <Copy as="h3" semibold variant="gradient" class="text-lg uppercase"
+          >Filter Workplan</Copy
+        >
+        <ActionClose on:click={() => ($showLeftSidebar = false)} />
+      </header>
+      <Filters
+        class="mx-4 flex-1"
+        bind:filters
+        on:clear={() => handleClearFilters()}
+        disabled={["date", "duration", "tags", "title", "utilized"]}
+      />
+      <footer
+        class="sticky bottom-0 z-10 flex flex-none border-t border-black/20 bg-neutral-900 py-2 px-4"
+      >
+        <Button
+          class="flex-1 bg-gradient-to-br from-violet-600 to-cyan-600 py-4 text-center"
+          on:click={() => handleFilters()}
+        >
+          <Copy as="span" variant="gradient" bold class="uppercase">Apply Filters</Copy>
+        </Button>
+      </footer>
+    {/if}
+  </div>
 
   <div slot="cta">
     {#if workplan && dirty}

@@ -11,6 +11,7 @@
   export let value: string | string[];
   export let criteria: TimerQuery["criteria"] = undefined;
   export let predicate: TimerQuery["predicate"] = undefined;
+  export let disabled: Exclude<TimerQuery["criteria"], undefined>[] = [];
 
   let tagSearch: string = "";
   let hiddenTags: Tag[] = [];
@@ -45,12 +46,12 @@
 <Field label="Criteria">
   <select bind:value={criteria}>
     <option value={undefined}>Choose...</option>
-    <option value="date">Date</option>
-    <option value="project">Project</option>
-    <option value="title">Title</option>
-    <option value="utilized">Utilized</option>
-    <option value="tags">Tags</option>
-    <option value="duration">Duration</option>
+    {#if !disabled.includes("date")}<option value="date">Date</option>{/if}
+    {#if !disabled.includes("project")}<option value="project">Project</option>{/if}
+    {#if !disabled.includes("title")}<option value="title">Title</option>{/if}
+    {#if !disabled.includes("utilized")}<option value="utilized">Utilized</option>{/if}
+    {#if !disabled.includes("tags")}<option value="tags">Tags</option>{/if}
+    {#if !disabled.includes("duration")}<option value="duration">Duration</option>{/if}
   </select>
 </Field>
 {#if criteria && !["tags", "project", "utilized"].includes(criteria)}
