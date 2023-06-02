@@ -29,6 +29,13 @@
   $: if ($main) observeResize($main, mainResizeObserver);
 </script>
 
+<svelte:window
+  on:unhandledrejection={(e) => {
+    $globalError = e.reason.message;
+    push("/error");
+  }}
+/>
+
 {#if $globalError}
   <Error on:close={() => ($globalError = undefined)}>{$globalError}</Error>
 {/if}
@@ -85,7 +92,9 @@
       </Sidebar>
     </main>
     {#if !$showLoader}
-      <footer class="col-span-2 flex w-full items-center justify-center md:col-span-1">
+      <footer
+        class="col-span-2 flex w-full items-center justify-center md:col-span-1 md:pr-6"
+      >
         {#if $isSelecting && $selectedTimers.length}
           <DualAction label="Bulk edit">
             <Button

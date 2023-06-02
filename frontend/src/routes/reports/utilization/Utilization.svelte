@@ -56,7 +56,11 @@
       });
       trpc.timers.getUtilizationForYear
         .query({ date: startMonth.toString() })
-        .then((result) => (report = result));
+        .then((result) => {
+          const thisMonth = Temporal.PlainYearMonth.from(getToday());
+          const tmResult = result.find((r) => thisMonth.equals(r.date));
+          report = result.sort((a, b) => (a === tmResult ? -1 : b === tmResult ? 1 : 0));
+        });
     });
   }
 

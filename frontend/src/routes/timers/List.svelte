@@ -222,7 +222,7 @@
       second: 0,
     });
 
-    return formatForShortTime(pt);
+    return pt.toLocaleString("en", { hour12: true, hour: "numeric" });
   }
 
   async function handleFilter(updateNav = true) {

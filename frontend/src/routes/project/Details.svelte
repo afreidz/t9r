@@ -283,7 +283,7 @@
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
-        <span slot="content">{project?.name}</span>
+        <span slot="content" class="line-clamp-1">{project?.name}</span>
         <Button
           on:click={update}
           slot="primary"
@@ -302,7 +302,7 @@
         >
           <Icon icon="material-symbols:skull-outline-sharp" />
         </Button>
-        <span slot="content">{project?.name}</span>
+        <span slot="content" class="line-clamp-1">{project?.name}</span>
         <Button
           slot="primary"
           title="Navigate back"

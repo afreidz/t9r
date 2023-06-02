@@ -80,7 +80,7 @@
             </SubItem>
             <SubItem
               active={$location.startsWith("/timers/all") && !$qs.has("label")}
-              to="/timers/all"
+              to="/timers/all?"
               on:navigate
             >
               <Icon slot="icon" class="text-neutral-light" icon="ic:baseline-list-alt" />
@@ -197,7 +197,7 @@
           <SubNav>
             <SubItem
               active={$location.startsWith("/reports/workplan") && !$qs.has("label")}
-              to="/reports/workplan"
+              to="/reports/workplan?"
               on:navigate
             >
               <Icon slot="icon" icon="carbon:plan" class="text-neutral-light" />

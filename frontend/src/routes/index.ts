@@ -1,6 +1,7 @@
 import Main from "@/routes/Main.svelte";
 import NotFound from "@/routes/NotFound.svelte";
 import Timers from "@/routes/timers/List.svelte";
+import ErrorPage from "@/routes/ErrorPage.svelte";
 import Settings from "@/routes/settings/Settings.svelte";
 import TimerDetails from "@/routes/timers/Details.svelte";
 import ProjectDetails from "@/routes/project/Details.svelte";
@@ -28,5 +29,6 @@ export default {
   "/reports/workplan/:date": WorkplanReport,
   "/reports/week/:date": TimesheetReport,
   "/reports/utilization": UtilizationReport,
+  "/error": ErrorPage,
   "*": NotFound,
 };

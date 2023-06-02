@@ -144,39 +144,20 @@
   }
 
   async function stop() {
-    if (multiple) return;
-    if (!timer || !timer._id) return;
+    if (!timer || !timer._id || !newValues) return;
 
-    await trpc.timers.update.mutate({
-      id: timer._id,
-      details: {
-        end: Temporal.Now.plainTimeISO()
-          .round({
-            smallestUnit: "minute",
-            roundingIncrement: 15,
-            roundingMode: "ceil",
-          })
-          .toString(),
-      },
-    });
-
-    timer = await trpc.timers.get.query(timer._id);
-    if (timer) newValues = { ...timer };
+    newValues.end = Temporal.Now.plainTimeISO()
+      .round({
+        smallestUnit: "minute",
+        roundingIncrement: 15,
+        roundingMode: "ceil",
+      })
+      .toString();
   }
 
   async function restart() {
-    if (multiple) return;
-    if (!timer || !timer._id) return;
-
-    await trpc.timers.update.mutate({
-      id: timer._id,
-      details: {
-        end: null,
-      },
-    });
-
-    timer = await trpc.timers.get.query(timer._id);
-    if (timer) newValues = { ...timer };
+    if (!timer || !timer._id || !newValues) return;
+    newValues.end = null;
   }
 </script>
 
@@ -354,7 +335,7 @@
           {/if}
         </Button>
 
-        <span slot="content"
+        <span slot="content" class="line-clamp-1"
           >{timers ? timers.length + " selected" : timer?.title || "Timer"}</span
         >
         <Button
@@ -375,7 +356,7 @@
         >
           <Icon icon="material-symbols:skull-outline-sharp" />
         </Button>
-        <span slot="content">{timer?.title || "Timer"}</span>
+        <span slot="content" class="line-clamp-1">{timer?.title || "Timer"}</span>
         <Button
           slot="primary"
           title="Navigate back"

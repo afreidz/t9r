@@ -75,13 +75,13 @@
   $: if (viewDate && $projects.length && $querystring) {
     const qs = new URLSearchParams($querystring);
     const f: WorkplanFilters[] = JSON.parse(qs.get("filters") || "");
-    const fp = f.find((f) => f.criteria === "project");
+    const fp = f.find((f) => f.criteria === "project" && f.value.length);
     const fd = f.find((f) => f.criteria === "date");
     const d1 = fd ? Temporal.PlainDate.from(fd.value[0]) : viewDate;
     const d2 = fd ? Temporal.PlainDate.from(fd.value[1]) : undefined;
 
     getWorkplanData(
-      $projects.filter((p) => p._id && fp && fp.value.includes(p._id)),
+      $projects.filter((p) => !fp || (p._id && fp.value.includes(p._id))),
       d1,
       d2
     );
@@ -124,11 +124,15 @@
     const forecasts = await trpc.forecast.getAllByDates.query({
       end: d2?.toString() || qtr.end.toString(),
       start: d2 ? d.toString() : qtr.start.toString(),
-      projects: pids,
+      projects: pids.length ? pids : undefined,
     });
 
     const wastart = d2 ? d : qtr.start;
-    const weeks = d2 ? d2.since(d, { smallestUnit: "weeks" }).weeks : 14;
+    const weeks = d2
+      ? getSunday(d2)
+          .add({ weeks: 1 })
+          .since(d, { smallestUnit: "weeks", roundingMode: "ceil" }).weeks
+      : 14;
 
     const plans = getWeeksArray(wastart, weeks).map((w) => ({
       week: w.toString(),
@@ -169,7 +173,8 @@
         });
       })
     );
-    pop();
+
+    viewDate = viewDate;
   }
 
   function handleClearFilters() {
@@ -179,20 +184,21 @@
 
   async function handleFilters(updateNav = true) {
     const fd = filters.find((f) => f.criteria === "date");
-    const fp = filters.find((f) => f.criteria === "project");
+    const fp = filters.find((f) => f.criteria === "project" && f.value.length);
     const d1 = fd ? Temporal.PlainDate.from(fd.value[0]) : viewDate;
     const d2 = fd ? Temporal.PlainDate.from(fd.value[1]) : undefined;
 
     workplan = await getWorkplanData(
-      $projects.filter((p) => p._id && fp && fp.value.includes(p._id)),
+      $projects.filter((p) => !fp || (p._id && fp.value.includes(p._id))),
       d1,
       d2
     );
 
     if (updateNav) {
-      const filterQS = JSON.stringify(filters);
+      const filterQS = Object.keys(filters).length ? JSON.stringify(filters) : undefined;
       const existingQS = new URLSearchParams($querystring);
-      existingQS.set("filters", filterQS);
+      if (filterQS) existingQS.set("filters", filterQS);
+      if (!filterQS) existingQS.delete("filters");
       push(`${$location}?${existingQS.toString()}`);
     }
   }

@@ -67,16 +67,16 @@
     style={`background: ${grad}; ${$$props.style || ""}`}
   >
     <header class="flex justify-between gap-2">
-      <div class="flex max-w-[10rem] flex-1 flex-col items-center">
+      <div class="mx-4 flex max-w-[10rem] flex-shrink flex-col items-center">
         <Copy as="small" dim variant="pseudomono" class="text-sm">Hours</Copy>
         <Copy as="strong" variant="gradient" class="text-4xl">
           {hours}
         </Copy>
       </div>
-      <div class="flex flex-1 flex-col items-center">
+      <div class="flex flex-col items-center">
         <div class="text-left">
           <Copy as="small" dim variant="pseudomono" class="text-sm">{project.name}</Copy>
-          <span class="line-clamp-1">{title}</span>
+          <span class="block">{title}</span>
         </div>
       </div>
     </header>

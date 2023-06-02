@@ -123,7 +123,7 @@
   </Field>
 {/if}
 {#if predicate}
-  <Field label="Value">
+  <Field label="Value {criteria === 'duration' ? '(hours)' : ''}">
     {#if criteria === "project"}
       <select bind:value multiple>
         {#each $projects as project}
@@ -154,7 +154,13 @@
       {/if}
     {:else if criteria === "duration"}
       {#if predicate !== "running"}
-        <input on:change={handleDurationChange} type="number" min={0.25} max={24} />
+        <input
+          on:change={handleDurationChange}
+          type="number"
+          min={0.25}
+          max={24}
+          step={0.25}
+        />
       {:else}
         Is running
       {/if}
