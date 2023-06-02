@@ -16,6 +16,7 @@ const SettingsSchema = z.object({
   defaultUtilization: z.number().min(0).max(100).default(100),
   trackingStart: PlainDate.default(Temporal.Now.plainDateISO().toString()),
   hiddenTags: z.array(z.string()).default([]),
+  projectOrder: z.array(z.string()).default([]),
   savedQueries: z
     .array(
       z.object({

@@ -23,6 +23,7 @@
   import type { Settings } from "@/backend/schema/settings";
   import type { Tag as TagType } from "@/backend/schema/tag";
   import settings, { updateSettings } from "@/lib/stores/settings";
+  import projects from "@/lib/stores/projects";
 
   let dirty = false;
   let tagSearch: string = "";
@@ -94,7 +95,7 @@
     e.dataTransfer.setData("text/plain", `${i}`);
   }
 
-  function changeOrder(e: DragEvent, i: number) {
+  function changeQueryOrder(e: DragEvent, i: number) {
     if (!e.dataTransfer || !newValues.savedQueries) return;
     e.dataTransfer.dropEffect = "move";
     const start = parseInt(e.dataTransfer.getData("text/plain"));
@@ -108,6 +109,22 @@
       newOrder.splice(start + 1, 1);
     }
     newValues.savedQueries = newOrder;
+  }
+
+  function changeProjectOrder(e: DragEvent, i: number) {
+    if (!e.dataTransfer || !newValues.projectOrder) return;
+    e.dataTransfer.dropEffect = "move";
+    const start = parseInt(e.dataTransfer.getData("text/plain"));
+    const newOrder = newValues.projectOrder;
+
+    if (start < i) {
+      newOrder.splice(i + 1, 0, newOrder[start]);
+      newOrder.splice(start, 1);
+    } else {
+      newOrder.splice(i, 0, newOrder[start]);
+      newOrder.splice(start + 1, 1);
+    }
+    newValues.projectOrder = newOrder;
   }
 </script>
 
@@ -176,8 +193,98 @@
     <section
       class="my-1 flex flex-1 flex-col rounded-md p-4 pt-0"
       slot="secondary"
-      class:bg-neutral-900={$tags.length || newValues.savedQueries?.length}
+      class:bg-neutral-900={$tags.length ||
+        newValues.savedQueries?.length ||
+        newValues.projectOrder?.length}
     >
+      {#if newValues.savedQueries?.length && newValues.savedQueries.some((q) => q.type === "timer")}
+        <Copy as="h3" semibold variant="gradient" class="my-4 mt-10 uppercase"
+          >Saved Timer Queries</Copy
+        >
+        <div class="max-h-96 overflow-auto">
+          <ul class="border-t border-white/10">
+            {#each newValues.savedQueries as savedQuery, idx}
+              {#if savedQuery.type === "timer"}
+                <li
+                  draggable={true}
+                  on:dragover|preventDefault
+                  on:dragenter|preventDefault
+                  on:drop={(e) => changeQueryOrder(e, idx)}
+                  on:dragstart={(e) => reorder(e, idx)}
+                  class="flex items-center justify-between gap-4 border-b border-inherit px-2"
+                >
+                  {#if newValues.savedQueries.length > 1}<ActionReorder />{/if}
+                  <Link to={savedQuery.url} class="flex-1">
+                    {savedQuery.label}
+                  </Link>
+                  <ActionClose on:click={() => deleteSavedQuery(savedQuery)} />
+                </li>
+              {/if}
+            {/each}
+          </ul>
+        </div>
+      {/if}
+      {#if newValues.savedQueries?.length && newValues.savedQueries.some((q) => q.type === "workplan")}
+        <Copy as="h3" semibold variant="gradient" class="my-4 mt-10 uppercase"
+          >Saved Workplan Queries</Copy
+        >
+        <div class="max-h-96 overflow-auto">
+          <ul class="border-t border-white/10">
+            {#each newValues.savedQueries as savedQuery, idx}
+              {#if savedQuery.type === "workplan"}
+                <li
+                  draggable={true}
+                  on:dragover|preventDefault
+                  on:dragenter|preventDefault
+                  on:drop={(e) => changeQueryOrder(e, idx)}
+                  on:dragstart={(e) => reorder(e, idx)}
+                  class="flex items-center justify-between gap-4 border-b border-inherit px-2"
+                >
+                  {#if newValues.savedQueries.length > 1}<ActionReorder />{/if}
+                  <Link to={savedQuery.url} class="flex-1">
+                    {savedQuery.label}
+                  </Link>
+                  <ActionClose on:click={() => deleteSavedQuery(savedQuery)} />
+                </li>
+              {/if}
+            {/each}
+          </ul>
+        </div>
+      {/if}
+      {#if newValues?.projectOrder?.length}
+        <Copy as="h3" semibold variant="gradient" class="my-4 mt-10 uppercase"
+          >Project Order</Copy
+        >
+        <div class="mb-6 max-h-96 overflow-auto">
+          <ul class="border-t border-white/10">
+            {#each newValues.projectOrder as pid, idx}
+              {@const project = $projects.find((p) => p._id === pid)}
+              {#if project}
+                <li
+                  draggable={true}
+                  on:dragover|preventDefault
+                  on:dragenter|preventDefault
+                  on:dragstart={(e) => reorder(e, idx)}
+                  on:drop={(e) => changeProjectOrder(e, idx)}
+                  class="flex items-center justify-between gap-4 border-b border-inherit px-2"
+                >
+                  {#if newValues.projectOrder.length > 1}<ActionReorder />{/if}
+                  <Link to={`/#/project/${pid}`} class="flex-1">
+                    <div class="flex items-center gap-2">
+                      <i
+                        class="h-4 w-4 rounded-full"
+                        style="background-color: {project.color};"
+                      />
+                      {project.name}
+                    </div>
+                  </Link>
+                  <!-- <ActionClose /> -->
+                </li>
+              {/if}
+            {/each}
+          </ul>
+        </div>
+      {/if}
       {#if $tags.length}
         <Copy as="h3" semibold variant="gradient" class="mt-4 mb-2 uppercase">Tags</Copy>
         <Field label="Search">
@@ -191,7 +298,7 @@
           />
           <Icon slot="icon" icon="material-symbols:search" class="text-neutral-light" />
         </Field>
-        <div class="h-96 overflow-auto">
+        <div class="max-h-96 overflow-auto">
           {#await updateTags()}
             <Icon icon="eos-icons:loading" class="h-7 w-7 text-white" />
           {:then}
@@ -214,34 +321,6 @@
               </Tag>
             {/each}
           {/await}
-        </div>
-      {/if}
-      {#if newValues.savedQueries?.length}
-        <Copy as="h3" semibold variant="gradient" class="my-4 mt-10 uppercase"
-          >Saved Queries</Copy
-        >
-        <div class="mb-6 max-h-96 overflow-auto">
-          <ul class="border-t border-white/10">
-            {#each newValues.savedQueries as savedQuery, idx (savedQuery.url)}
-              <li
-                draggable={true}
-                on:dragover|preventDefault
-                on:dragenter|preventDefault
-                on:drop={(e) => changeOrder(e, idx)}
-                on:dragstart={(e) => reorder(e, idx)}
-                class="flex items-center justify-between gap-4 border-b border-inherit px-2"
-              >
-                {#if newValues.savedQueries.length > 1}<ActionReorder />{/if}
-                <Link to={savedQuery.url} class="flex-1">
-                  {savedQuery.label}
-                  <Copy variant="pseudomono" dim light as="span" class="text-sm"
-                    >({savedQuery.type})</Copy
-                  >
-                </Link>
-                <ActionClose on:click={() => deleteSavedQuery(savedQuery)} />
-              </li>
-            {/each}
-          </ul>
         </div>
       {/if}
     </section>
