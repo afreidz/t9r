@@ -25,7 +25,6 @@
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
-  import visible from "@/lib/stores/visible";
   import Copy from "@/foundation/Copy.svelte";
   import HourSum from "@/core/SumChip.svelte";
   import settings from "@/lib/stores/settings";
@@ -39,6 +38,7 @@
   import type { TimerQuery } from "@/backend/schema/timer";
   import { filterTimers, sumTimerHours } from "@/lib/timers";
   import DualAction from "@/components/core/DualAction.svelte";
+  import visible, { shouldRefresh } from "@/lib/stores/visible";
   import { location, push, querystring } from "svelte-spa-router";
   import { addToSelected, removeFromSelected } from "@/lib/stores/selected";
   import type { Timer, TimerQueryCombinator } from "@/backend/schema/timer";
@@ -73,15 +73,17 @@
   let showSaveQueryDialog = false;
   let saveQueryLabel: string = "";
   let viewChanged: boolean = false;
-  let viewDate: Temporal.PlainDate;
   let hourIndicators: HTMLElement[] = [];
   let filteredTimers: Timer[] | undefined;
   let combinator: TimerQueryCombinator = "and";
   let highlightCard: string | undefined = undefined;
   let highlightTimer: string | undefined = undefined;
   let duration: "days" | "months" | "weeks" | "all" = "days";
+  let viewDate: Temporal.PlainDate = params.date
+    ? Temporal.PlainDate.from(params.date)
+    : getToday();
 
-  $: if ($visible)
+  $: if ($shouldRefresh)
     viewDate = params.date ? Temporal.PlainDate.from(params.date) : getToday();
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
   $: if ($settings?.sod) sod = Temporal.PlainTime.from($settings.sod);
