@@ -127,7 +127,10 @@
       projects: pids,
     });
 
-    const plans = getWeeksArray(qtr.start, 14).map((w) => ({
+    const wastart = d2 ? d : qtr.start;
+    const weeks = d2 ? d2.since(d, { smallestUnit: "weeks" }).weeks : 14;
+
+    const plans = getWeeksArray(wastart, weeks).map((w) => ({
       week: w.toString(),
       forecasts: projects.map(
         (p) =>
@@ -301,7 +304,7 @@
         staticCombinator="and"
         on:clear={() => handleClearFilters()}
         disabledPredicates={["equals", "after", "before", "fiscal"]}
-        disabledCriteria={["duration", "tags", "title", "utilized", "date"]}
+        disabledCriteria={["duration", "tags", "title", "utilized"]}
       />
       <footer
         class="sticky bottom-0 z-10 flex flex-none border-t border-black/20 bg-neutral-900 py-2 px-4"
