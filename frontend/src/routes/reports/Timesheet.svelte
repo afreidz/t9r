@@ -13,7 +13,7 @@
   import clipboard from "clipboardy";
   import Tag from "@/core/Tag.svelte";
   import tags from "@/lib/stores/tags";
-  import { pop } from "svelte-spa-router";
+  import { pop, push } from "svelte-spa-router";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
   import HourSum from "@/core/SumChip.svelte";
@@ -35,6 +35,7 @@
 
   import ActionBar from "@/core/actions/Bar.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
+  import ActionLook from "@/core/actions/Look.svelte";
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionCopy from "@/core/actions/Copy.svelte";
   import ActionInfo from "@/core/actions/Info.svelte";
@@ -147,6 +148,9 @@
         {/key}
       </div>
       <ActionBar>
+        <div slot="right">
+          <ActionLook on:click={() => push(`/timers/week/${viewDate.toString()}`)} />
+        </div>
         <ActionPrev on:click={() => (viewDate = viewDate.subtract({ weeks: 1 }))} />
         <ActionCurrent
           on:click={() => (viewDate = getToday())}
@@ -164,7 +168,7 @@
           slot="primary"
           class="grid w-full snap-x snap-mandatory auto-rows-min grid-cols-1 overflow-auto"
         >
-          {#each timesheet as entry, e}
+          {#each timesheet as entry}
             {#if entry.days.some((day) => day.timers.length > 0) || entry.forecast}
               {@const hours = sumTimerHours(entry.days.map((d) => d.timers).flat())}
               {@const percent = entry.forecast

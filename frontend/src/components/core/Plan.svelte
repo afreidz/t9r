@@ -27,7 +27,7 @@
 <div>
   <Link
     {highlight}
-    to={`/timers/week/${week.toString()}`}
+    to={`/reports/week/${week.toString()}`}
     style={$$props.style || ""}
     class="m-2 flex items-center justify-center rounded-lg p-1 ring-blue-500"
   >
