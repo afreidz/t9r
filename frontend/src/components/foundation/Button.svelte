@@ -1,8 +1,8 @@
 <button
   on:click
   type="button"
-  class:rounded-md={true}
   class:focus:ring={true}
+  class:rounded-full={true}
   class:inline-block={true}
   class:outline-none={true}
   class:ring-blue-500={true}

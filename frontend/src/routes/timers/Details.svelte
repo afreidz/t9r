@@ -44,7 +44,8 @@
       timers = await trpc.timers.bulkGet.query($selectedTimers);
       if (timers)
         newValues = {
-          ...emptyTimer,
+          start: "09:00:00",
+          end: "17:00:00",
           title:
             timers && timers.every((t) => t.title === timers?.[0].title)
               ? timers?.[0]?.title
@@ -105,7 +106,11 @@
   }
 
   async function handleDelete() {
-    if (timer?._id) {
+    if (timers?.length) {
+      await trpc.timers.bulkDelete.mutate(
+        timers.map((t) => t._id).filter(Boolean) as string[]
+      );
+    } else if (timer?._id) {
       await trpc.timers.delete.mutate({ id: timer._id });
     }
     return pop();
@@ -156,8 +161,8 @@
   }
 
   async function restart() {
-    if (!timer || !timer._id || !newValues) return;
-    newValues.end = null;
+    if (newValues && ((timers && timers.length) || (timer && timer._id)))
+      return (newValues.end = null);
   }
 </script>
 
@@ -245,22 +250,52 @@
           <h3 class="mb-3 text-center text-xl font-bold md:text-left">Timers</h3>
           {#each timers as timer}
             {@const project = $projects.find((p) => p._id === timer?.project)}
-            <TimerComponent
-              class="mt-3"
-              {project}
-              title={timer.title}
-              href={`/#/project/${project?._id}`}
-            >
+            <TimerComponent class="mt-3" {project} disableNav={true} title={timer.title}>
               <div slot="left">
                 <Tag>{formatForMonth(timer.date)}</Tag>
               </div>
               <div slot="right">
-                {#if timer.start && timer.end}
+                {#if !timer.end}
+                  <Tag>running...</Tag>
+                {:else if timer.start}
                   <Tag>{getDurationHoursFromString(timer.start, timer.end)}hrs</Tag>
                 {/if}
               </div>
             </TimerComponent>
           {/each}
+          <div
+            class="my-3 flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
+          >
+            <Field label="Start Time">
+              {#if newValues.start}
+                <Time bind:value={newValues.start} />
+              {/if}
+            </Field>
+            <Icon icon="material-symbols:arrow-range" class="hidden text-4xl md:block" />
+            <Field label="End Time">
+              {#if newValues.end}
+                <Time bind:value={newValues.end} />
+              {/if}
+            </Field>
+          </div>
+          {#if timers.some((t) => t.end)}
+            <div class="flex justify-center">
+              <Button
+                on:click={restart}
+                class="h-9 max-w-min bg-gradient-to-br from-violet-600 to-cyan-600 px-8 text-center text-xl text-white"
+                >Restart</Button
+              >
+            </div>
+          {/if}
+          <div class="flex flex-1 items-end justify-center">
+            <Button
+              on:click={() => (confirmDelete = true)}
+              class="flex items-center gap-2 bg-red-600 px-8 py-4 text-center text-xl text-white"
+            >
+              <Icon icon="material-symbols:skull-outline-sharp" />
+              <span>Delete {timers.length} Timers</span>
+            </Button>
+          </div>
         {:else}
           {@const project = $projects.find((p) => p._id === newValues?.project)}
           <h3 class="mb-3 text-center text-xl font-bold md:text-left">Timing</h3>
@@ -371,7 +406,11 @@
 </Layout>
 
 {#if confirmDelete}
-  <Dialog open={true} title="Delete {timer?.title || ''}" sub="You are about to...">
+  <Dialog
+    open={true}
+    title="Delete {timers?.length ? `${timers.length} timers` : timer?.title || ''}"
+    sub="You are about to..."
+  >
     <Button slot="close" value="cancel" on:click={() => (confirmDelete = false)}>
       <Icon icon="material-symbols:close" class="h-7 w-7" />
     </Button>
