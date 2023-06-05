@@ -85,7 +85,13 @@
       <Check checked={!!id && $selectedTimers.includes(id)} on:change />
     {:else}
       <Tag class="!m-0 h-8 w-8 !max-w-none justify-center !p-0 text-2xl font-semibold"
-        >{project?.name ? charAt(project.name, 0) : title ? charAt(title, 0) : ""}</Tag
+        >{project?.icon
+          ? project.icon
+          : project?.name
+          ? charAt(project.name, 0)
+          : title
+          ? charAt(title, 0)
+          : ""}</Tag
       >
     {/if}
   </figure>

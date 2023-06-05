@@ -131,10 +131,12 @@
             >
               <figure
                 slot="icon"
-                class="h-4 w-4 rounded-full"
+                class="flex h-5 w-5 items-center justify-center rounded-full text-[12px]"
                 style={`background-color: ${project.color}`}
               >
-                <figcaption class="sr-only">Color assigned to project</figcaption>
+                <figcaption class:sr-only={!project.icon}>
+                  {project.icon || "Color assigned to project"}
+                </figcaption>
               </figure>
               {project.name}
             </SubItem>

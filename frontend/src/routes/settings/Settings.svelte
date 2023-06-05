@@ -272,9 +272,9 @@
                   <Link to={`/#/project/${pid}`} class="flex-1">
                     <div class="flex items-center gap-2">
                       <i
-                        class="h-4 w-4 rounded-full"
-                        style="background-color: {project.color};"
-                      />
+                        class="flex h-5 w-5 items-center justify-center rounded-full text-[12px] not-italic"
+                        style="background-color: {project.color};">{project.icon || ""}</i
+                      >
                       {project.name}
                     </div>
                   </Link>

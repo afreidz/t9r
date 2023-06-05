@@ -2,7 +2,6 @@
   import same from "@/lib/same";
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
-  import Tag from "@/core/Tag.svelte";
   import Plan from "@/core/Plan.svelte";
   import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
@@ -14,7 +13,6 @@
   import { getWeeksArray } from "@/lib/dates";
   import { sumTimerHours } from "@/lib/timers";
   import Field from "@/foundation/Field.svelte";
-  import Chart from "@/core/chart/Chart.svelte";
   import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
   import { getSunday, getToday } from "@/lib/dates";
@@ -25,6 +23,7 @@
   import Link from "@/components/foundation/Link.svelte";
   import type { Project } from "@/backend/schema/project";
   import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
+  import Chart from "@/components/core/chart/Chart.svelte";
 
   export let params: { id: string };
 
@@ -98,6 +97,11 @@
       newValues.color3 = null;
     }
   }
+
+  async function fetchEmoji() {
+    const resp = await fetch("https://unpkg.com/emoji.json@14.0.0/emoji.json");
+    return resp.json();
+  }
 </script>
 
 <Layout>
@@ -107,6 +111,23 @@
       {#if newValues}
         <Field label="Project Name">
           <input bind:value={newValues.name} />
+        </Field>
+        <Field label="Icon">
+          {#await fetchEmoji() then emoji}
+            <input
+              min={2}
+              max={30}
+              list="emoji"
+              type="search"
+              class="mb-2 appearance-none"
+              bind:value={newValues.icon}
+            />
+            <datalist id="emoji">
+              {#each emoji as icon}
+                <option value={icon.char}>{icon.name}</option>
+              {/each}
+            </datalist>
+          {/await}
         </Field>
         <Field label="Project Color">
           <div class="w-full overflow-hidden rounded-full">
