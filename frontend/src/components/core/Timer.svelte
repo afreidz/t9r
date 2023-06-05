@@ -4,6 +4,7 @@
 
 <script lang="ts">
   import trpc from "@/lib/trpc";
+  import charAt from "@/lib/charat";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import Copy from "@/foundation/Copy.svelte";
@@ -84,7 +85,7 @@
       <Check checked={!!id && $selectedTimers.includes(id)} on:change />
     {:else}
       <Tag class="!m-0 h-8 w-8 !max-w-none justify-center !p-0 text-2xl font-semibold"
-        >{project?.name.charAt(0) || title?.charAt(0)}</Tag
+        >{project?.name ? charAt(project.name, 0) : title ? charAt(title, 0) : ""}</Tag
       >
     {/if}
   </figure>
