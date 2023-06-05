@@ -130,11 +130,7 @@
 
 <Layout>
   <Header slot="header" main="Settings" sub="Account">
-    <aside slot="right" class="flex flex-col items-center justify-center">
-      <Copy dim variant="pseudomono" as="small">Signed in as:</Copy>
-      <Copy semibold as="strong" variant="gradient" class="uppercase">{$user?.email}</Copy
-      >
-    </aside>
+    <aside slot="right" class="flex flex-col items-center justify-center" />
   </Header>
   <Container>
     <section slot="primary" class="flex-1">
@@ -187,6 +183,11 @@
               class="my-2 w-full text-center text-3xl"
             />
           {/if}
+        </Field>
+        <Field label="Signed in as">
+          <Copy semibold as="strong" variant="gradient" class="my-4 text-center uppercase"
+            >{$user?.email}</Copy
+          >
         </Field>
       </div>
     </section>
@@ -272,7 +273,7 @@
                   <Link to={`/#/project/${pid}`} class="flex-1">
                     <div class="flex items-center gap-2">
                       <i
-                        class="flex h-5 w-5 items-center justify-center rounded-full text-[12px] not-italic"
+                        class="flex h-5 w-5 items-center justify-center rounded-full text-center text-[11px] not-italic"
                         style="background-color: {project.color};">{project.icon || ""}</i
                       >
                       {project.name}

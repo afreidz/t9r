@@ -131,7 +131,7 @@
             >
               <figure
                 slot="icon"
-                class="flex h-5 w-5 items-center justify-center rounded-full text-[12px]"
+                class="flex h-5 w-5 items-center justify-center rounded-full text-[11px]"
                 style={`background-color: ${project.color}`}
               >
                 <figcaption class:sr-only={!project.icon}>
