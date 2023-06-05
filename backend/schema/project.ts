@@ -9,7 +9,7 @@ const ProjectSchema = z.object({
   archived: z.boolean().optional().default(false),
   defaultTitle: z.string().min(2).max(30).optional(),
   defaultUtilized: z.boolean().optional().default(true),
-  icon: z.string().min(0).max(2).optional().nullable().default(null),
+  icon: z.string().min(0).max(4).optional().nullable().default(null),
   color: z
     .string()
     .regex(/^#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})$/)
