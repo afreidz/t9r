@@ -23,6 +23,7 @@
   import ActionNext from "@/core/actions/Next.svelte";
   import ActionPrev from "@/core/actions/Prev.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
+  import Sub from "@/components/core/nav/Sub.svelte";
 
   type DonutChartData = {
     percent: number;
@@ -56,11 +57,7 @@
       });
       trpc.timers.getUtilizationForYear
         .query({ date: startMonth.toString() })
-        .then((result) => {
-          const thisMonth = Temporal.PlainYearMonth.from(getToday());
-          const tmResult = result.find((r) => thisMonth.equals(r.date));
-          report = result.sort((a, b) => (a === tmResult ? -1 : b === tmResult ? 1 : 0));
-        });
+        .then((result) => (report = result));
     });
   }
 
@@ -131,7 +128,7 @@
 
   function pad(days: YearlyUtilizationReport[number]["days"]) {
     const firstOfMonth = Temporal.PlainDate.from(days[0].date);
-    const offset = firstOfMonth.dayOfWeek;
+    const offset = firstOfMonth.dayOfWeek === 7 ? 0 : firstOfMonth.dayOfWeek;
     const pad: typeof days = new Array(offset).fill(null).map((_, i) => ({
       date: firstOfMonth.subtract({ days: i + 1 }).toString(),
       hours: 0,
@@ -151,10 +148,11 @@
     const today = Temporal.Now.plainDateISO();
     const date = Temporal.PlainDate.from(item.date);
     const trackingStart =
-      $settings.trackingStart && Temporal.PlainDate.from($settings.trackingStart);
+      $settings.trackingStart &&
+      Temporal.PlainDate.from($settings.trackingStart).subtract({ days: 1 });
 
-    if (trackingStart && isBeforeDate(date, trackingStart)) return "bg-neutral-700";
     if (item.day === "" && item.hours === 0) return "transparent";
+    if (trackingStart && isBeforeDate(date, trackingStart)) return "bg-neutral-700";
     if (isAfterDate(date, today) || !target) return "bg-neutral-700";
     if (["Sat", "Sun"].includes(item.day) && item.hours) return "bg-cyan-400";
     if (["Sat", "Sun"].includes(item.day) && !item.hours) return "bg-neutral-700";
@@ -199,6 +197,8 @@
     </ActionBar>
   </Header>
   {#if report}
+    {@const thisMonth = Temporal.PlainYearMonth.from(getToday())}
+    {@const tmResult = report.find((r) => thisMonth.equals(r.date))}
     <div class="my-10 flex flex-wrap justify-evenly gap-6">
       <div class="relative flex w-64 flex-col items-center">
         <Copy
@@ -285,8 +285,8 @@
           {/if}
         </figure>
       </div>
-      {#each report as item}
-        <div class="relative w-64">
+      {#each tmResult ? [tmResult, ...report] : report as item, i}
+        <div class="relative w-64" class:sm:hidden={i === 0 && item === tmResult}>
           <Copy
             semibold
             variant="gradient"
@@ -308,7 +308,13 @@
                 highlight={isToday(day.date)}
                 shift={![6, 7].includes(pd.dayOfWeek)}
                 href={`/#/timers/day/${pd.toString()}`}
-                info={isBeforeDate(pd, Temporal.Now.plainDateISO()) && day.day !== ""}
+                info={isBeforeDate(pd, Temporal.Now.plainDateISO()) &&
+                  !!$settings.trackingStart &&
+                  isAfterDate(
+                    pd,
+                    Temporal.PlainDate.from($settings.trackingStart).subtract({ days: 1 })
+                  ) &&
+                  day.day !== ""}
               >
                 <div class="flex justify-between font-light">
                   <span>
