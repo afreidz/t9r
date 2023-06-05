@@ -12,7 +12,11 @@ const errorLink: TRPCLink<AppRouter> = () => {
           observer.next(value);
         },
         error(error) {
-          globalError.set(error.message);
+          if (error.data?.httpStatus === 401) {
+            window.location.href = "/login";
+          } else {
+            globalError.set(error.message);
+          }
           observer.error(error);
         },
         complete() {
@@ -39,17 +43,6 @@ function shimFetch(url: RequestInfo | URL, options?: RequestInit | RequestInitEs
   return fetch(url, {
     ...options,
     credentials: "include",
-  }).then((r) => {
-    if (r.redirected && r.url.includes("/.auth/login")) {
-      const url = new URL(r.url);
-
-      if (url.searchParams.get("post_login_redirect_uri")?.includes("/api")) {
-        url.searchParams.set("post_login_redirect_uri", "/");
-      }
-
-      window.location.href = url.href;
-    }
-    return r;
   });
 }
 
