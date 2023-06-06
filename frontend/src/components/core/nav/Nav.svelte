@@ -95,11 +95,13 @@
                   to={`${query.url}&label=${encodeURI(query.label)}`}
                   on:navigate
                 >
-                  <Icon
-                    slot="icon"
-                    class="text-neutral-light"
-                    icon="ic:baseline-list-alt"
-                  />
+                  <div slot="icon">
+                    {#if query.icon}
+                      <span>{query.icon}</span>
+                    {:else}
+                      <Icon class="text-neutral-light" icon="ic:baseline-list-alt" />
+                    {/if}
+                  </div>
                   {query.label}
                 </SubItem>
               {/each}
