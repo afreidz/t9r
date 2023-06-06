@@ -25,20 +25,22 @@
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
+  import Dialog from "@/core/Dialog.svelte";
   import Copy from "@/foundation/Copy.svelte";
   import HourSum from "@/core/SumChip.svelte";
   import settings from "@/lib/stores/settings";
   import NewTimer from "@/core/NewTimer.svelte";
+  import EmojiPicker from "@/core/Emojis.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerCard from "@/core/TimerCard.svelte";
   import TimerComponent from "@/core/Timer.svelte";
+  import DualAction from "@/core/DualAction.svelte";
   import breakpoints from "@/lib/stores/breakpoints";
   import Filters from "@/core/filters/Filters.svelte";
-  import Dialog from "@/components/core/Dialog.svelte";
+  import { shouldRefresh } from "@/lib/stores/visible";
   import type { TimerQuery } from "@/backend/schema/timer";
+  import type { Settings } from "@/backend/schema/settings";
   import { filterTimers, sumTimerHours } from "@/lib/timers";
-  import DualAction from "@/components/core/DualAction.svelte";
-  import visible, { shouldRefresh } from "@/lib/stores/visible";
   import { location, push, querystring } from "svelte-spa-router";
   import { addToSelected, removeFromSelected } from "@/lib/stores/selected";
   import type { Timer, TimerQueryCombinator } from "@/backend/schema/timer";
@@ -71,7 +73,6 @@
   let viewTimers: Timer[] = [];
   let filters: TimerQuery[] = [];
   let showSaveQueryDialog = false;
-  let saveQueryLabel: string = "";
   let viewChanged: boolean = false;
   let hourIndicators: HTMLElement[] = [];
   let filteredTimers: Timer[] | undefined;
@@ -79,6 +80,10 @@
   let highlightCard: string | undefined = undefined;
   let highlightTimer: string | undefined = undefined;
   let duration: "days" | "months" | "weeks" | "all" = "days";
+  let saveQueryData: Pick<Settings["savedQueries"][number], "label" | "icon"> = {
+    icon: null,
+    label: "",
+  };
   let viewDate: Temporal.PlainDate = params.date
     ? Temporal.PlainDate.from(params.date)
     : getToday();
@@ -262,10 +267,9 @@
     const newQueries = [
       ...($settings.savedQueries ?? []),
       {
+        ...saveQueryData,
         url: window.location.hash.replace("#", ""),
-        label: saveQueryLabel,
         type: "timer",
-        icon: null,
       },
     ];
 
@@ -530,12 +534,10 @@
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
-        <input
-          bind:value={saveQueryLabel}
-          slot="content"
-          placeholder="Query label"
-          class="max-w-[128px] sm:max-w-none"
-        />
+        <div slot="content" class="flex items-center">
+          <input bind:value={saveQueryData.label} class="flex-1" />
+          <EmojiPicker bind:value={saveQueryData.icon} class="flex-none" />
+        </div>
         <Button
           on:click={saveQuery}
           slot="primary"

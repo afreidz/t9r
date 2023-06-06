@@ -18,6 +18,7 @@
   import settings from "@/lib/stores/settings";
   import { sumTimerHours } from "@/lib/timers";
   import projects from "@/lib/stores/projects";
+  import EmojiPicker from "@/core/Emojis.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
   import DualAction from "@/core/DualAction.svelte";
@@ -25,6 +26,7 @@
   import type { Project } from "@/backend/schema/project";
   import type { TimerQuery } from "@/backend/schema/timer";
   import type { Forecast } from "@/backend/schema/forecast";
+  import type { Settings } from "@/backend/schema/settings";
   import { showLeftSidebar, showLoader } from "@/lib/stores/ui";
   import { pop, location, push, querystring } from "svelte-spa-router";
   import { getSunday, type FiscalQuarter, getFiscalYearStartMonth } from "@/lib/dates";
@@ -61,12 +63,15 @@
   let showInfo = false;
   let workplan: WorkplanData;
   let showSaveQueryDialog = false;
-  let saveQueryLabel: string = "";
   let filters: WorkplanFilters[] = [];
   let newPlans: WorkplanData["plans"];
   let thisWeek: Temporal.PlainDate | null;
   let viewDate: Temporal.PlainDate = getToday();
   let scrollPlan: WorkplanData["plans"][number] | undefined = undefined;
+  let saveQueryData: Pick<Settings["savedQueries"][number], "label" | "icon"> = {
+    icon: null,
+    label: "",
+  };
 
   $: dirty = !!newPlans && newPlans.some((w, i) => !same(w, workplan.plans[i]));
   $: if (viewDate) {
@@ -214,10 +219,9 @@
     const newQueries = [
       ...($settings.savedQueries ?? []),
       {
+        ...saveQueryData,
         url: window.location.hash.replace("#", ""),
-        label: saveQueryLabel,
         type: "workplan",
-        icon: null,
       },
     ];
 
@@ -385,12 +389,10 @@
         >
           <Icon icon="teenyicons:x-small-outline" />
         </Button>
-        <input
-          bind:value={saveQueryLabel}
-          slot="content"
-          placeholder="Query label"
-          class="max-w-[128px] sm:max-w-none"
-        />
+        <div slot="content" class="flex items-center">
+          <input bind:value={saveQueryData.label} class="flex-1" />
+          <EmojiPicker bind:value={saveQueryData.icon} class="flex-none" />
+        </div>
         <Button
           on:click={saveQuery}
           slot="primary"
