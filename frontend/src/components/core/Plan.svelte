@@ -16,6 +16,7 @@
   $: if (week) heading = formatForForecastWeek(week);
 
   export let value: Number;
+  export let showInfo = true;
   export let color = "white";
   export let scrollTo = false;
   export let highlight = false;
@@ -45,34 +46,37 @@
       on:change={(e) => dispatch("change", Number(e.currentTarget.value))}
     />
     <div slot="upper-right" class="h-6 min-w-[1.75rem]">
-      {#await actual then actual}
-        {#if actual}
-          <Tag
-            title="Actual hours"
-            background={color}
-            class="!m-0 flex h-full w-full !max-w-none items-center justify-center !py-0 !text-[11px] !leading-3 !shadow-xl"
-            >{actual}</Tag
-          >
-        {/if}
-      {/await}
+      {#if showInfo && actual}
+        {#await actual then actual}
+          {#if actual}
+            <Tag
+              title="Actual hours"
+              background={color}
+              class="!m-0 flex h-full w-full !max-w-none items-center justify-center !py-0 !text-[11px] !leading-3 !shadow-xl"
+              >{actual}</Tag
+            >
+          {/if}
+        {/await}
+      {/if}
     </div>
     <div slot="lower-right" class="h-6 min-w-[1.75rem]">
-      {#await actual then actual}
-        {#if actual && value}
-          {@const percent =
-            Number(value) && Number(actual)
+      {#if showInfo && actual}
+        {#await actual then actual}
+          {#if actual && value}
+            {@const percent = Number(actual)
               ? (Number(actual) / Number(value)) * 100
               : 100}
-          {@const variance = Number((percent - 100).toFixed(0))}
-          <Tag
-            title="Variance"
-            class="!p1 !m-0 flex h-full w-full !max-w-none items-center justify-center !py-0 !text-[11px] !leading-none !shadow-xl {variance >=
-            0
-              ? '!bg-emerald-500'
-              : '!bg-red-500'}">{variance > 0 ? "+" : ""}{variance}%</Tag
-          >
-        {/if}
-      {/await}
+            {@const variance = Number((percent - 100).toFixed(0))}
+            <Tag
+              title="Variance"
+              class="!p1 !m-0 flex h-full w-full !max-w-none items-center justify-center !py-0 !text-[11px] !leading-none !shadow-xl {variance >=
+              0
+                ? '!bg-emerald-500'
+                : '!bg-red-500'}">{variance > 0 ? "+" : ""}{variance}%</Tag
+            >
+          {/if}
+        {/await}
+      {/if}
     </div>
   </Field>
 </div>

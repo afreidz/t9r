@@ -36,6 +36,7 @@
   import ActionClose from "@/core/actions/Close.svelte";
   import ActionFilter from "@/core/actions/Filter.svelte";
   import ActionCurrent from "@/core/actions/Current.svelte";
+  import ActionInfo from "@/components/core/actions/Info.svelte";
 
   type WorkplanData = {
     qtr: FiscalQuarter;
@@ -57,6 +58,7 @@
   };
 
   let dirty = false;
+  let showInfo = false;
   let workplan: WorkplanData;
   let showSaveQueryDialog = false;
   let saveQueryLabel: string = "";
@@ -246,6 +248,9 @@
         disabled={viewDate && isToday(viewDate)}
       />
       <ActionNext on:click={() => (viewDate = viewDate.add({ months: 3 }))} />
+      <div slot="right">
+        <ActionInfo enabled={showInfo} on:click={() => (showInfo = !showInfo)} />
+      </div>
     </ActionBar>
   </Header>
   {#if viewDate && workplan && newPlans}
@@ -269,6 +274,7 @@
         >
           {#each newPlans as plan}
             <Plan
+              {showInfo}
               week={plan.week}
               color={project.color}
               value={plan.forecasts[z].hours}
