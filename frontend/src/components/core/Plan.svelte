@@ -10,7 +10,7 @@
   let elm: HTMLElement;
 
   $: if (elm && scrollTo) {
-    elm.scrollIntoView({ inline: "start", behavior: "smooth" });
+    elm.scrollIntoView({ inline: "center", behavior: "smooth" });
   }
 
   $: if (week) heading = formatForForecastWeek(week);

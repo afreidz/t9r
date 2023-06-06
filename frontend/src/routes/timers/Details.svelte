@@ -20,6 +20,7 @@
   import DualAction from "@/core/DualAction.svelte";
   import selectedTimers from "@/lib/stores/selected";
   import type { Timer } from "@/backend/schema/timer";
+  import ActionEdit from "@/core/actions/Edit.svelte";
   import tags, { updateTags } from "@/lib/stores/tags";
   import Container from "@/foundation/Container.svelte";
   import type { Project } from "@/backend/schema/project";
@@ -31,6 +32,7 @@
   let dirty: boolean = false;
   let picker: HTMLInputElement;
   let timer: Timer | null = null;
+  let editMultipleTimings = false;
   let project: Project | undefined;
   let confirmDelete: boolean = false;
   let timers: Timer[] | undefined = undefined;
@@ -44,8 +46,6 @@
       timers = await trpc.timers.bulkGet.query($selectedTimers);
       if (timers)
         newValues = {
-          start: "09:00:00",
-          end: "17:00:00",
           title:
             timers && timers.every((t) => t.title === timers?.[0].title)
               ? timers?.[0]?.title
@@ -78,6 +78,10 @@
 
   $: if (newValues) dirty = !same(newValues, { ...timer });
   $: multiple = params?.id === "selected";
+  $: if (editMultipleTimings && newValues) {
+    newValues.start = "09:00:00";
+    newValues.end = "17:00:00";
+  }
 
   function reset() {
     newValues = multiple ? { ...emptyTimer } : { ...timer };
@@ -263,29 +267,38 @@
               </div>
             </TimerComponent>
           {/each}
-          <div
-            class="my-3 flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
-          >
-            <Field label="Start Time">
-              {#if newValues.start}
-                <Time bind:value={newValues.start} />
-              {/if}
-            </Field>
-            <Icon icon="material-symbols:arrow-range" class="hidden text-4xl md:block" />
-            <Field label="End Time">
-              {#if newValues.end}
-                <Time bind:value={newValues.end} />
-              {/if}
-            </Field>
+          <div class="flex items-center gap-2">
+            <ActionEdit on:click={() => (editMultipleTimings = true)} class="flex-none" />
+            <span class="flex-1">Update Timing for {timers.length} timers</span>
           </div>
-          {#if timers.some((t) => t.end)}
-            <div class="flex justify-center">
-              <Button
-                on:click={restart}
-                class="h-9 max-w-min bg-gradient-to-br from-violet-600 to-cyan-600 px-8 text-center text-xl text-white"
-                >Restart</Button
-              >
+          {#if editMultipleTimings}
+            <div
+              class="my-3 flex flex-col items-center gap-1 md:flex-row md:justify-evenly"
+            >
+              <Field label="Start Time">
+                {#if newValues.start}
+                  <Time bind:value={newValues.start} />
+                {/if}
+              </Field>
+              <Icon
+                icon="material-symbols:arrow-range"
+                class="hidden text-4xl md:block"
+              />
+              <Field label="End Time">
+                {#if newValues.end}
+                  <Time bind:value={newValues.end} />
+                {/if}
+              </Field>
             </div>
+            {#if timers.some((t) => t.end)}
+              <div class="flex justify-center">
+                <Button
+                  on:click={restart}
+                  class="h-9 max-w-min bg-gradient-to-br from-violet-600 to-cyan-600 px-8 text-center text-xl text-white"
+                  >Restart</Button
+                >
+              </div>
+            {/if}
           {/if}
           <div class="flex flex-1 items-end justify-center">
             <Button

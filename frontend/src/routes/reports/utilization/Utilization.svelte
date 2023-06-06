@@ -215,6 +215,10 @@
                 a 50 50 0 0 1 0 -100"
               fill="none"
               stroke-width="10"
+              on:blur={() => (showYTD = false)}
+              on:focus={() => (showYTD = true)}
+              on:mouseout={() => (showYTD = false)}
+              on:mouseover={() => (showYTD = true)}
             />
             <path
               class={ytd.color}
@@ -237,6 +241,10 @@
                 a 35 35 0 0 1 0 -70"
               fill="none"
               stroke-width="10"
+              on:blur={() => (showQTD = false)}
+              on:focus={() => (showQTD = true)}
+              on:mouseout={() => (showQTD = false)}
+              on:mouseover={() => (showQTD = true)}
             />
             <path
               class={qtd.color}

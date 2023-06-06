@@ -66,6 +66,7 @@
   let newPlans: WorkplanData["plans"];
   let thisWeek: Temporal.PlainDate | null;
   let viewDate: Temporal.PlainDate = getToday();
+  let scrollPlan: WorkplanData["plans"][number] | undefined = undefined;
 
   $: dirty = !!newPlans && newPlans.some((w, i) => !same(w, workplan.plans[i]));
   $: if (viewDate) {
@@ -149,6 +150,10 @@
     }));
 
     newPlans = JSON.parse(JSON.stringify(plans));
+
+    if (!scrollPlan) {
+      scrollPlan = newPlans.find((p) => thisWeek?.equals(p.week));
+    }
 
     workplan = { qtr, fy, plans, projects };
     $showLoader = false;
@@ -277,8 +282,8 @@
               {showInfo}
               week={plan.week}
               color={project.color}
+              scrollTo={scrollPlan === plan}
               value={plan.forecasts[z].hours}
-              scrollTo={thisWeek?.equals(plan.week)}
               highlight={thisWeek?.equals(plan.week)}
               on:change={(e) => (plan.forecasts[z].hours = e.detail)}
               actual={isBeforeDate(plan.week, getToday())

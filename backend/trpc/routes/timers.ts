@@ -13,6 +13,7 @@ import { TRPCError } from "@trpc/server";
 import { getToday } from "../../lib/dates";
 import { filterTimers } from "../../lib/timers";
 import { router, protectedProcedure } from "../lib";
+import { isToday, getSunday } from "../../lib/dates";
 import getFiscalYearStartMonthSS from "../../lib/onlySS";
 import getDBClient, { DBError, ObjectId } from "../../database";
 
@@ -28,16 +29,6 @@ type RegExFilter = {
   $regex: RegExp;
 };
 
-export function getSunday(d: Temporal.PlainDate = Temporal.Now.plainDateISO()) {
-  if (d.dayOfWeek === 7) return d;
-  return d.subtract({ days: d.dayOfWeek });
-}
-
-export function isToday(d: Temporal.PlainDate | string) {
-  const pd = typeof d === "string" ? Temporal.PlainDate.from(d) : d;
-  return pd.equals(Temporal.Now.plainDateISO());
-}
-
 export function sumTimerHours(timers: Timer[] = []) {
   return timers.reduce((hours, timer) => {
     const d = Temporal.PlainDate.from(timer.date);
@@ -51,6 +42,7 @@ export function sumTimerHours(timers: Timer[] = []) {
           roundingMode: "ceil",
         })
       : Temporal.PlainTime.from({ hour: 17, minute: 0 });
+
     const dur = end.since(start, {
       largestUnit: "hour",
       smallestUnit: "minute",

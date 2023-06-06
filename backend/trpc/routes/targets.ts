@@ -24,8 +24,6 @@ const targetsRouter = router({
       const collection = db.collection("targets");
       const query = { year: input.year, owner: userId };
 
-      console.log("ANDY", query);
-
       return collection.findOne<Target>(query);
     }),
   list: protectedProcedure.query(async ({ ctx }) => {
