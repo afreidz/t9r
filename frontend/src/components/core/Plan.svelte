@@ -15,7 +15,7 @@
 
   $: if (week) heading = formatForForecastWeek(week);
 
-  export let value: Number;
+  export let value: number;
   export let showInfo = true;
   export let color = "white";
   export let scrollTo = false;
@@ -62,11 +62,13 @@
     <div slot="lower-right" class="h-6 min-w-[1.75rem]">
       {#if showInfo && actual}
         {#await actual then actual}
-          {#if actual && value}
+          {#if actual}
             {@const percent = Number(actual)
-              ? (Number(actual) / Number(value)) * 100
+              ? value === 0
+                ? 100
+                : (Number(actual) / value) * 100
               : 100}
-            {@const variance = Number((percent - 100).toFixed(0))}
+            {@const variance = value === 0 ? 100 : Number((percent - 100).toFixed(0))}
             <Tag
               title="Variance"
               class="!p1 !m-0 flex h-full w-full !max-w-none items-center justify-center !py-0 !text-[11px] !leading-none !shadow-xl {variance >=
