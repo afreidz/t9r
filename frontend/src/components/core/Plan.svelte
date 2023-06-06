@@ -44,14 +44,32 @@
       readonly={$$props.readonly}
       on:change={(e) => dispatch("change", Number(e.currentTarget.value))}
     />
-    <div slot="upper-right" class="h-7 min-w-[1.75rem]">
+    <div slot="upper-right" class="h-6 min-w-[1.75rem]">
       {#await actual then actual}
         {#if actual}
           <Tag
             title="Actual hours"
             background={color}
-            class="!m-0 flex h-full w-full !max-w-none items-center justify-center !shadow-xl"
+            class="!m-0 flex h-full w-full !max-w-none items-center justify-center !py-0 !text-[11px] !leading-3 !shadow-xl"
             >{actual}</Tag
+          >
+        {/if}
+      {/await}
+    </div>
+    <div slot="lower-right" class="h-6 min-w-[1.75rem]">
+      {#await actual then actual}
+        {#if actual && value}
+          {@const percent =
+            Number(value) && Number(actual)
+              ? (Number(actual) / Number(value)) * 100
+              : 100}
+          {@const variance = Number((percent - 100).toFixed(0))}
+          <Tag
+            title="Variance"
+            class="!p1 !m-0 flex h-full w-full !max-w-none items-center justify-center !py-0 !text-[11px] !leading-none !shadow-xl {variance >=
+            0
+              ? '!bg-emerald-500'
+              : '!bg-red-500'}">{variance > 0 ? "+" : ""}{variance}%</Tag
           >
         {/if}
       {/await}
