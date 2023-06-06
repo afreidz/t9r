@@ -210,6 +210,7 @@
         url: window.location.hash.replace("#", ""),
         label: saveQueryLabel,
         type: "workplan",
+        icon: null,
       },
     ];
 

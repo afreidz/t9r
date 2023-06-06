@@ -4,7 +4,6 @@
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import Months from "./Months.svelte";
-  import { pop } from "svelte-spa-router";
   import { user } from "@/lib/stores/user";
   import Header from "@/core/Header.svelte";
   import Dialog from "@/core/Dialog.svelte";
@@ -13,17 +12,20 @@
   import Time from "@/foundation/Time.svelte";
   import Link from "@/foundation/Link.svelte";
   import { showLoader } from "@/lib/stores/ui";
+  import projects from "@/lib/stores/projects";
+  import { pop, push } from "svelte-spa-router";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
+  import ActionEdit from "@/core/actions/Edit.svelte";
   import tags, { updateTags } from "@/lib/stores/tags";
   import Container from "@/foundation/Container.svelte";
   import ActionClose from "@/core/actions/Close.svelte";
   import ActionReorder from "@/core/actions/Reorder.svelte";
   import type { Settings } from "@/backend/schema/settings";
+  import EmojiPicker from "@/components/core/Emojis.svelte";
   import type { Tag as TagType } from "@/backend/schema/tag";
   import settings, { updateSettings } from "@/lib/stores/settings";
-  import projects from "@/lib/stores/projects";
 
   let dirty = false;
   let tagSearch: string = "";
@@ -31,6 +33,7 @@
   let deletedTag: TagType | undefined;
   let trackStartInput: HTMLInputElement;
   let newValues: Partial<Settings> = $settings;
+  let editSavedQuery: Settings["savedQueries"][number] | undefined = undefined;
 
   updateSettings().then((s) => {
     if (!s) {
@@ -56,7 +59,8 @@
     $showLoader = true;
     await trpc.settings.updateOrCreate.mutate(newValues);
     $showLoader = false;
-    pop();
+    await updateSettings();
+    reset();
   }
 
   function reset() {
@@ -125,6 +129,11 @@
       newOrder.splice(start + 1, 1);
     }
     newValues.projectOrder = newOrder;
+  }
+
+  async function handleEditSavedQuery() {
+    newValues.savedQueries = newValues.savedQueries;
+    editSavedQuery = undefined;
   }
 </script>
 
@@ -214,11 +223,20 @@
                   on:dragstart={(e) => reorder(e, idx)}
                   class="flex items-center justify-between gap-4 border-b border-inherit px-2"
                 >
-                  {#if newValues.savedQueries.length > 1}<ActionReorder />{/if}
-                  <Link to={savedQuery.url} class="flex-1">
-                    {savedQuery.label}
-                  </Link>
-                  <ActionClose on:click={() => deleteSavedQuery(savedQuery)} />
+                  {#if newValues.savedQueries.length > 1}<ActionReorder
+                      class="flex-none"
+                    />{/if}
+                  <div class="flex flex-1 items-center gap-2">
+                    <Link to={savedQuery.url}>
+                      {savedQuery.icon || ""}
+                      {savedQuery.label}
+                    </Link>
+                    <ActionEdit on:click={() => (editSavedQuery = savedQuery)} />
+                  </div>
+                  <ActionClose
+                    class="flex-none"
+                    on:click={() => deleteSavedQuery(savedQuery)}
+                  />
                 </li>
               {/if}
             {/each}
@@ -242,9 +260,13 @@
                   class="flex items-center justify-between gap-4 border-b border-inherit px-2"
                 >
                   {#if newValues.savedQueries.length > 1}<ActionReorder />{/if}
-                  <Link to={savedQuery.url} class="flex-1">
-                    {savedQuery.label}
-                  </Link>
+                  <div class="flex flex-1 items-center gap-2">
+                    <Link to={savedQuery.url}>
+                      {savedQuery.icon || ""}
+                      {savedQuery.label}
+                    </Link>
+                    <ActionEdit on:click={() => (editSavedQuery = savedQuery)} />
+                  </div>
                   <ActionClose on:click={() => deleteSavedQuery(savedQuery)} />
                 </li>
               {/if}
@@ -269,16 +291,20 @@
                   on:drop={(e) => changeProjectOrder(e, idx)}
                   class="flex items-center justify-between gap-4 border-b border-inherit px-2"
                 >
-                  {#if newValues.projectOrder.length > 1}<ActionReorder />{/if}
-                  <Link to={`/#/project/${pid}`} class="flex-1">
-                    <div class="flex items-center gap-2">
-                      <i
-                        class="flex h-5 w-5 items-center justify-center rounded-full text-center text-[11px] not-italic"
-                        style="background-color: {project.color};">{project.icon || ""}</i
-                      >
-                      {project.name}
-                    </div>
-                  </Link>
+                  {#if newValues.projectOrder.length > 1}<ActionReorder
+                      class="flex-none"
+                    />{/if}
+                  <div class="flex flex-1 items-center gap-2">
+                    <i
+                      class="flex h-5 w-5 items-center justify-center rounded-full text-center text-[11px] not-italic"
+                      style="background-color: {project.color};">{project.icon || ""}</i
+                    >
+                    {project.name}
+                    <ActionEdit
+                      class="flex-none"
+                      on:click={() => push(`/project/${pid}`)}
+                    />
+                  </div>
                   <!-- <ActionClose /> -->
                 </li>
               {/if}
@@ -382,6 +408,36 @@
         <span slot="content">Are you sure?</span>
         <Button
           on:click={handleDeleteTag}
+          slot="primary"
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
+        >
+          <Icon icon="material-symbols:fitbit-check-small-sharp" />
+        </Button>
+      </DualAction>
+    </section>
+  </Dialog>
+{/if}
+
+{#if editSavedQuery}
+  <Dialog open={true} title="Edit {editSavedQuery.label}" sub="You are about to...">
+    <Button slot="close" value="cancel" on:click={() => (editSavedQuery = undefined)}>
+      <Icon icon="material-symbols:close" class="h-7 w-7" />
+    </Button>
+    <section class="flex flex-1 flex-col items-center justify-center py-4">
+      <DualAction>
+        <Button
+          slot="secondary"
+          on:click={() => (editSavedQuery = undefined)}
+          class="flex h-10 w-10 items-center justify-center !rounded-full bg-red-500 text-white !ring-offset-white"
+        >
+          <Icon icon="teenyicons:x-small-outline" />
+        </Button>
+        <div slot="content" class="flex items-center">
+          <input bind:value={editSavedQuery.label} class="flex-1" />
+          <EmojiPicker bind:value={editSavedQuery.icon} class="flex-none" />
+        </div>
+        <Button
+          on:click={handleEditSavedQuery}
           slot="primary"
           class="flex h-10 w-10 items-center justify-center !rounded-full bg-green-500 text-white !ring-offset-white"
         >

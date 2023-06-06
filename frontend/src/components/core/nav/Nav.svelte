@@ -234,7 +234,13 @@
                   to={`${query.url}&label=${encodeURI(query.label)}`}
                   on:navigate
                 >
-                  <Icon slot="icon" class="text-neutral-light" icon="carbon:plan" />
+                  <div slot="icon">
+                    {#if query.icon}
+                      <span>{query.icon}</span>
+                    {:else}
+                      <Icon class="text-neutral-light" icon="carbon:plan" />
+                    {/if}
+                  </div>
                   {query.label}
                 </SubItem>
               {/each}

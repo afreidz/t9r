@@ -22,8 +22,8 @@
   import Container from "@/foundation/Container.svelte";
   import Link from "@/components/foundation/Link.svelte";
   import type { Project } from "@/backend/schema/project";
+  import EmojiPicker from "@/components/core/Emojis.svelte";
   import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
-  import Chart from "@/components/core/chart/Chart.svelte";
 
   export let params: { id: string };
 
@@ -97,11 +97,6 @@
       newValues.color3 = null;
     }
   }
-
-  async function fetchEmoji() {
-    const resp = await fetch("https://unpkg.com/emoji.json@14.0.0/emoji.json");
-    return resp.json();
-  }
 </script>
 
 <Layout>
@@ -113,21 +108,7 @@
           <input bind:value={newValues.name} />
         </Field>
         <Field label="Icon">
-          {#await fetchEmoji() then emoji}
-            <input
-              min={2}
-              max={30}
-              list="emoji"
-              type="search"
-              class="mb-2 appearance-none"
-              bind:value={newValues.icon}
-            />
-            <datalist id="emoji">
-              {#each emoji as icon}
-                <option value={icon.char}>{icon.name}</option>
-              {/each}
-            </datalist>
-          {/await}
+          <EmojiPicker bind:value={newValues.icon} />
         </Field>
         <Field label="Project Color">
           <div class="w-full overflow-hidden rounded-full">

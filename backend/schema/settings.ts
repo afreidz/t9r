@@ -23,6 +23,7 @@ const SettingsSchema = z.object({
         label: z.string(),
         url: z.string(),
         type: z.string().default("timer"),
+        icon: z.string().max(4).optional().nullable().default(null),
       })
     )
     .default([]),
