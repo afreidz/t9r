@@ -5,7 +5,6 @@
   import now from "@/lib/stores/now";
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
-  import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
   import Dialog from "@/core/Dialog.svelte";
   import Layout from "@/core/Layout.svelte";
@@ -14,6 +13,7 @@
   import Time from "@/foundation/Time.svelte";
   import { showLoader } from "@/lib/stores/ui";
   import Field from "@/foundation/Field.svelte";
+  import { pop, push } from "svelte-spa-router";
   import Button from "@/foundation/Button.svelte";
   import Switch from "@/foundation/Switch.svelte";
   import TimerComponent from "@/core/Timer.svelte";
@@ -117,7 +117,7 @@
     } else if (timer?._id) {
       await trpc.timers.delete.mutate({ id: timer._id });
     }
-    return pop();
+    return push("/");
   }
 
   function showPicker() {

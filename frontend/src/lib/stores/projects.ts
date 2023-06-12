@@ -19,9 +19,9 @@ export async function updateProjects() {
         (p) => p._id && !settings.projectOrder.includes(p._id)
       ) as Project[];
 
-      const ordered = settings.projectOrder.map((id) =>
-        p.find((p) => p._id === id)
-      ) as Project[];
+      const ordered = settings.projectOrder
+        .map((id) => p.find((p) => p._id === id))
+        .filter(Boolean) as Project[];
 
       projects.update(() => [...ordered, ...others]);
       mostRecentProject.set([...ordered, ...others][0]);

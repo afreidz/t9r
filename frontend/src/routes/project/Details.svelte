@@ -3,7 +3,6 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import Plan from "@/core/Plan.svelte";
-  import { pop } from "svelte-spa-router";
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
@@ -12,6 +11,7 @@
   import Copy from "@/foundation/Copy.svelte";
   import { getWeeksArray } from "@/lib/dates";
   import { sumTimerHours } from "@/lib/timers";
+  import { push, pop } from "svelte-spa-router";
   import Field from "@/foundation/Field.svelte";
   import Switch from "@/foundation/Switch.svelte";
   import Button from "@/foundation/Button.svelte";
@@ -84,7 +84,7 @@
     const result = await trpc.projects.delete.mutate({ id: project._id });
 
     if (result.acknowledged) {
-      pop();
+      push("/");
     }
   }
 

@@ -80,7 +80,12 @@
       : null;
   }
 
-  $: if (viewDate && $projects.length && $querystring) {
+  $: if (
+    viewDate &&
+    $querystring &&
+    $projects.length &&
+    $location.startsWith("/reports/workplan")
+  ) {
     const qs = new URLSearchParams($querystring);
     const f: WorkplanFilters[] = JSON.parse(qs.get("filters") || "");
     const fp = f.find((f) => f.criteria === "project" && f.value.length);
@@ -102,9 +107,15 @@
     );
   }
 
-  $: if ($querystring) {
+  $: if ($querystring && $location.startsWith("/reports/workplan")) {
     const qs = new URLSearchParams($querystring);
-    if (qs.has("filters")) filters = JSON.parse(qs.get("filters") || "");
+    if (qs.has("filters")) {
+      filters = JSON.parse(qs.get("filters") || "");
+    } else {
+      filters = [];
+    }
+  } else if ($location.startsWith("/reports/workplan")) {
+    filters = [];
   }
 
   async function sumProjectTimersByWeek(
@@ -155,10 +166,7 @@
     }));
 
     newPlans = JSON.parse(JSON.stringify(plans));
-
-    if (!scrollPlan) {
-      scrollPlan = newPlans.find((p) => thisWeek?.equals(p.week));
-    }
+    scrollPlan = newPlans.find((p) => thisWeek?.equals(p.week));
 
     workplan = { qtr, fy, plans, projects };
     $showLoader = false;
@@ -230,6 +238,7 @@
     $settings = { ...$settings, savedQueries: newQueries };
     $showLoader = false;
     showSaveQueryDialog = false;
+    saveQueryData = { label: "", icon: "" };
   }
 </script>
 

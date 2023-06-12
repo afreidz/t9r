@@ -35,6 +35,7 @@ const projectsRouter = router({
       const { userId } = ctx.user;
       const db = await getDBClient();
       const timers = db.collection("timers");
+      const settings = db.collection("settings");
       const collection = db.collection("projects");
 
       const result = await collection.deleteOne({
@@ -60,6 +61,19 @@ const projectsRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message: timersResult.message,
           cause: timersResult,
+        });
+      }
+
+      const settingsResult = await settings.updateOne(
+        { owner: userId },
+        { $pull: { projectOrder: input.id } }
+      );
+
+      if (settingsResult instanceof DBError) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: settingsResult.message,
+          cause: settingsResult,
         });
       } else {
         return result;

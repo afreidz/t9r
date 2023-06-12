@@ -12,7 +12,7 @@ const errorLink: TRPCLink<AppRouter> = () => {
           observer.next(value);
         },
         error(error) {
-          if (error.data?.httpStatus === 401) {
+          if (error.data?.httpStatus === 401 || error.message === "UNAUTHORIZED") {
             window.location.href = "/login";
           } else {
             globalError.set(error.message);

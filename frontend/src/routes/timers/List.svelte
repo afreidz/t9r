@@ -99,12 +99,17 @@
   $: if (viewDate) updateTimers();
   $: if (view) loaded = false;
 
-  $: if ($querystring) {
+  $: if ($querystring && $location.startsWith("/timers/all")) {
     const qs = new URLSearchParams($querystring);
     if (qs.has("filters")) {
       filters = JSON.parse(qs.get("filters") || "");
-      updateTimers();
+    } else {
+      filters = [];
     }
+    updateTimers();
+  } else {
+    filters = [];
+    updateTimers();
   }
 
   $: duration = $location.includes("/timers/month")
@@ -182,7 +187,7 @@
         break;
     }
 
-    if (timers && filters) handleFilter(false);
+    if (timers) handleFilter(false);
     $showLoader = false;
   }
 
@@ -233,18 +238,17 @@
   }
 
   async function handleFilter(updateNav = true) {
-    if (filters.some((f) => f.criteria && f.predicate)) {
-      filteredTimers =
-        duration === "all"
-          ? await trpc.timers.getByFilter.query({ filters, combinator })
-          : filterTimers(filters, timers, combinator);
-      viewTimers = filteredTimers;
-      if (updateNav) {
-        const filterQS = JSON.stringify(filters);
-        const existingQS = new URLSearchParams($querystring);
-        existingQS.set("filters", filterQS);
-        push(`${$location}?${existingQS.toString()}`);
-      }
+    filteredTimers =
+      duration === "all"
+        ? await trpc.timers.getByFilter.query({ filters, combinator })
+        : filterTimers(filters, timers, combinator);
+
+    viewTimers = filteredTimers;
+    if (updateNav) {
+      const filterQS = JSON.stringify(filters);
+      const existingQS = new URLSearchParams($querystring);
+      existingQS.set("filters", filterQS);
+      push(`${$location}?${existingQS.toString()}`);
     }
   }
 
@@ -278,6 +282,7 @@
     $settings = { ...$settings, savedQueries: newQueries };
     $showLoader = false;
     showSaveQueryDialog = false;
+    saveQueryData = { icon: "", label: "" };
   }
 </script>
 
@@ -316,7 +321,7 @@
             direction="left"
             enabled={$showLeftSidebar}
             on:click={() => ($showLeftSidebar = !$showLeftSidebar)}
-            class={`from-violet-600 to-cyan-600 ${filteredTimers && "bg-gradient-to-br"}`}
+            class={`from-violet-600 to-cyan-600 ${filters.length && "bg-gradient-to-br"}`}
           />
         {/if}
         {#if duration !== "all"}

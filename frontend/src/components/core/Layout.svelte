@@ -29,13 +29,6 @@
   $: if ($main) observeResize($main, mainResizeObserver);
 </script>
 
-<svelte:window
-  on:unhandledrejection={(e) => {
-    $globalError = e.reason.message;
-    push("/error");
-  }}
-/>
-
 {#if $globalError}
   <Error on:close={() => ($globalError = undefined)}>{$globalError}</Error>
 {/if}

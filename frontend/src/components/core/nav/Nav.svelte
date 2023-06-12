@@ -125,7 +125,7 @@
       />
       {#if $showProjects}
         <SubNav>
-          {#each $projects.filter((p) => !p.archived) as project}
+          {#each $projects.filter((p) => !p?.archived) as project}
             <SubItem
               on:navigate
               to={`/project/${project._id}`}
@@ -143,7 +143,7 @@
               {project.name}
             </SubItem>
           {/each}
-          {#if $projects.some((p) => p.archived)}
+          {#if $projects.some((p) => p?.archived)}
             <SubItem clickable on:click={() => ($showArchived = !$showArchived)}>
               <Icon slot="icon" icon="mdi:eye-off-outline" />
               <span class="flex-1 text-neutral-light">Archived Projects</span>
@@ -158,7 +158,7 @@
           {/if}
           {#if $showArchived}
             <SubNav>
-              {#each $projects.filter((p) => p.archived) as project}
+              {#each $projects.filter((p) => p?.archived) as project}
                 <SubItem
                   on:navigate
                   to={`/project/${project._id}`}

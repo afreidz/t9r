@@ -38,6 +38,7 @@ const tagsRouter = router({
       const { userId } = ctx.user;
       const db = await getDBClient();
       const tags = db.collection("tags");
+      const settings = db.collection("settings");
       const timers = db.collection<Timer>("timers");
 
       if (!ObjectId.isValid(input.id))
@@ -59,16 +60,16 @@ const tagsRouter = router({
           cause: input.id,
         });
 
-      const updateResults = await timers.updateMany(
+      const timerResults = await timers.updateMany(
         { owner: userId, tags: input.id },
         { $set: { "tags.$": tag.value } }
       );
 
-      if (updateResults instanceof DBError) {
+      if (timerResults instanceof DBError) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: updateResults.message,
-          cause: updateResults,
+          message: timerResults.message,
+          cause: timerResults,
         });
       }
 
@@ -79,6 +80,21 @@ const tagsRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message: deleteResult.message,
           cause: deleteResult,
+        });
+      }
+
+      const settingsResult = await settings.updateOne(
+        { owner: userId },
+        {
+          $pull: { hiddenTags: input.id },
+        }
+      );
+
+      if (settingsResult instanceof DBError) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: settingsResult.message,
+          cause: settingsResult,
         });
       } else {
         return deleteResult;
