@@ -21,8 +21,9 @@
   class:outline-none={true}
   class:ring-blue-500={true}
   class:ring-offset-0={true}
-  on:click={() => dispatch("navigate", to)}
+  class:pointer-events-none={disabled}
   use:link={{ disabled: disabled || $location === to }}
+  on:click={() => !disabled && dispatch("navigate", to)}
 >
   <slot />
 </a>

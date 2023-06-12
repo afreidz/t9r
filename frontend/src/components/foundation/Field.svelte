@@ -18,10 +18,10 @@
   <div class="mt-8 flex flex-none items-start">
     <slot name="icon" />
   </div>
-  <div class="absolute top-0 right-0 z-10 translate-x-1/4 -translate-y-1/4">
+  <div class="absolute top-0 right-0 z-10">
     <slot name="upper-right" />
   </div>
-  <div class="absolute bottom-0 right-0 z-10 translate-x-1/4 translate-y-1/4">
+  <div class="absolute bottom-0 right-0 z-10">
     <slot name="lower-right" />
   </div>
 </svelte:element>

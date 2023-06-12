@@ -24,11 +24,11 @@
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import TimerComponent from "@/core/Timer.svelte";
+  import Plan from "@/components/core/Plan.svelte";
   import DualAction from "@/core/DualAction.svelte";
   import { showRightSidebar } from "@/lib/stores/ui";
   import type { Timer } from "@/backend/schema/timer";
   import Container from "@/foundation/Container.svelte";
-  import Link from "@/components/foundation/Link.svelte";
   import type { Project } from "@/backend/schema/project";
   import type { Forecast } from "@/backend/schema/forecast";
   import type { Tag as TagType } from "@/backend/schema/tag";
@@ -62,6 +62,7 @@
   let detailsProject: Project;
   let details: Tasks | undefined;
   let viewDate: Temporal.PlainDate;
+  let scrollDay;
   let detailsDate: Temporal.PlainDate | undefined;
   let detailsEntry: Timesheet[number] | undefined;
   let week = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -84,6 +85,7 @@
           project: project._id || "",
           week: getSunday(viewDate).toString(),
         });
+
         return { project, days, forecast };
       })
     ).then((result: Timesheet) => (timesheet = result));
@@ -168,7 +170,7 @@
           slot="primary"
           class="grid w-full snap-x snap-mandatory auto-rows-min grid-cols-1 overflow-auto"
         >
-          {#each timesheet as entry}
+          {#each timesheet as entry, e}
             {#if entry.days.some((day) => day.timers.length > 0) || entry.forecast}
               {@const hours = sumTimerHours(entry.days.map((d) => d.timers).flat())}
               {@const percent = entry.forecast
@@ -212,29 +214,25 @@
                 class="mb-8 grid grid-cols-[repeat(7,16rem)] gap-4 md:grid-cols-[repeat(7,_minmax(10rem,_16rem))]"
               >
                 {#each entry.days as day, i}
-                  <li class="mb-6 flex snap-center flex-col items-center">
-                    <Link
-                      to={`/timers/day/${day.date.toString()}`}
-                      variant="gradient"
-                      class="flex-none py-2 uppercase"
-                    >
-                      <strong>
-                        {day.date.toLocaleString("en", { weekday: "short" })}
-                        {getSunday(viewDate).add({ days: i }).day}
-                      </strong>
-                    </Link>
-                    <Field as="div" class="relative w-full" label="Hours">
-                      {#key key}
-                        <Copy
-                          as="strong"
-                          variant="gradient"
-                          class="flex flex-none items-center justify-center p-6 text-3xl"
-                          >{sumTimerHours(day.timers)}</Copy
-                        >
-                        <footer class="absolute top-0 right-2">
+                  <li class="mb-6 flex snap-center flex-col">
+                    {#key key}
+                      <Plan
+                        padded
+                        readonly
+                        class="w-full"
+                        value={sumTimerHours(day.timers)}
+                        highlight={day.date.equals(getToday())}
+                        to={`/timers/day/${day.date.toString()}`}
+                        scrollTo={day.date.equals(getToday()) && e === 0}
+                        heading={`${day.date
+                          .toLocaleString("en", { weekday: "short" })
+                          .toUpperCase()} ${getSunday(viewDate).add({ days: i }).day}`}
+                      >
+                        <div slot="upper-right">
                           {#if day.timers.length > 0}
                             <ActionInfo
                               isStatic={true}
+                              class="mr-2"
                               on:click={() => {
                                 $showRightSidebar = true;
                                 details = getTasksAndTagsFromTimers(day.timers);
@@ -244,9 +242,9 @@
                               }}
                             />
                           {/if}
-                        </footer>
-                      {/key}
-                    </Field>
+                        </div>
+                      </Plan>
+                    {/key}
                   </li>
                 {/each}
               </ul>

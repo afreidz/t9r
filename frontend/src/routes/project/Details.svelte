@@ -9,7 +9,6 @@
   import Colors from "@/core/Colors.svelte";
   import Dialog from "@/core/Dialog.svelte";
   import Copy from "@/foundation/Copy.svelte";
-  import { getWeeksArray } from "@/lib/dates";
   import { sumTimerHours } from "@/lib/timers";
   import { push, pop } from "svelte-spa-router";
   import Field from "@/foundation/Field.svelte";
@@ -23,6 +22,7 @@
   import Link from "@/components/foundation/Link.svelte";
   import type { Project } from "@/backend/schema/project";
   import EmojiPicker from "@/components/core/Emojis.svelte";
+  import { formatForForecastWeek, getWeeksArray } from "@/lib/dates";
   import { queryForecast, type ForecastAndActual } from "@/lib/forecast";
 
   export let params: { id: string };
@@ -262,9 +262,10 @@
                   <Plan
                     readonly={true}
                     color={project?.color}
-                    week={forecastWeeks[i]}
                     value={forecast.hours || 0}
                     actual={forecast.actual ?? undefined}
+                    to={`/reports/week/${forecastWeeks[i]}`}
+                    heading={formatForForecastWeek(forecastWeeks[i])}
                     highlight={forecastWeeks[i].equals(getSunday(getToday()))}
                   />
                 {/if}

@@ -5,6 +5,7 @@
     isBeforeDate,
     getWeeksArray,
     getQuarterByDate,
+    formatForForecastWeek,
   } from "@/lib/dates";
   import same from "@/lib/same";
   import trpc from "@/lib/trpc";
@@ -293,11 +294,12 @@
           {#each newPlans as plan}
             <Plan
               {showInfo}
-              week={plan.week}
               color={project.color}
               scrollTo={scrollPlan === plan}
               value={plan.forecasts[z].hours}
+              to={`/reports/week/${plan.week}`}
               highlight={thisWeek?.equals(plan.week)}
+              heading={formatForForecastWeek(plan.week)}
               on:change={(e) => (plan.forecasts[z].hours = e.detail)}
               actual={isBeforeDate(plan.week, getToday())
                 ? sumProjectTimersByWeek(plan.week, project)
