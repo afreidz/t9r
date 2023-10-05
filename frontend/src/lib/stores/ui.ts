@@ -4,6 +4,7 @@ import type { ResizeObserverValue } from "@/lib/resize";
 const gi = localStorage.getItem.bind(localStorage);
 const si = localStorage.setItem.bind(localStorage);
 
+export const dirty = writable(false);
 export const showLoader = writable(true);
 export const isSelecting = writable(false);
 export const main = writable<HTMLElement>();

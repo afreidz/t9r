@@ -12,6 +12,7 @@
   import Icon from "@iconify/svelte";
   import Tag from "@/core/Tag.svelte";
   import Plan from "@/core/Plan.svelte";
+  import { dirty } from "@/lib/stores/ui";
   import Dialog from "@/core/Dialog.svelte";
   import Header from "@/core/Header.svelte";
   import Layout from "@/core/Layout.svelte";
@@ -60,7 +61,6 @@
     value: WorkplanFilterValue;
   };
 
-  let dirty = false;
   let showInfo = false;
   let workplan: WorkplanData;
   let showSaveQueryDialog = false;
@@ -74,7 +74,7 @@
     label: "",
   };
 
-  $: dirty = !!newPlans && newPlans.some((w, i) => !same(w, workplan.plans[i]));
+  $: $dirty = !!newPlans && newPlans.some((w, i) => !same(w, workplan.plans[i]));
   $: if (viewDate) {
     thisWeek = getSunday(getToday()).equals(getSunday(viewDate))
       ? getSunday(viewDate)
@@ -353,7 +353,7 @@
   </div>
 
   <div slot="cta">
-    {#if workplan && dirty}
+    {#if workplan && $dirty}
       <DualAction as="div" label="Do you want to">
         <Button
           slot="secondary"

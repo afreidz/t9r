@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     main,
+    dirty,
     showLoader,
     globalError,
     isSelecting,
@@ -8,6 +9,7 @@
     showRightSidebar,
     mainResizeObserver,
   } from "@/lib/stores/ui";
+  import { onMount } from "svelte";
   import Icon from "@iconify/svelte";
   import Logo from "@/core/Logo.svelte";
   import Error from "@/core/Error.svelte";
@@ -23,6 +25,8 @@
   import breakpoints from "@/lib/stores/breakpoints";
   import MenuTrigger from "@/core/MenuTrigger.svelte";
   import selectedTimers, { clearSelected } from "@/lib/stores/selected";
+
+  onMount(() => ($dirty = false));
 
   let menuOpen = false;
 

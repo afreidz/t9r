@@ -3,6 +3,7 @@
   import trpc from "@/lib/trpc";
   import Icon from "@iconify/svelte";
   import Plan from "@/core/Plan.svelte";
+  import { dirty } from "@/lib/stores/ui";
   import projects from "@/stores/projects";
   import Layout from "@/core/Layout.svelte";
   import Header from "@/core/Header.svelte";
@@ -27,7 +28,6 @@
 
   export let params: { id: string };
 
-  let dirty = false;
   let confirmDelete = false;
   let showGradientStops = false;
   let project: Project | undefined;
@@ -43,10 +43,14 @@
     forecasts = undefined;
     projectTimers = undefined;
     project = $projects.find((p: Project) => p._id === params.id);
+    if (project && !project.icon) project.icon = null;
+    if (project && !project.budget) project.budget = null;
     if (project) newValues = { ...project, budget: project.budget || null };
   }
 
-  $: if (newValues && project) dirty = !same(newValues, project);
+  $: if (newValues && project) {
+    $dirty = !same(newValues, project);
+  }
 
   $: if (forecastWeeks && project && !forecasts) {
     forecasts = Promise.all(
@@ -277,7 +281,7 @@
     </section>
   </Container>
   <div slot="cta">
-    {#if dirty}
+    {#if $dirty}
       <DualAction as="div" label="Update Project?">
         <Button
           on:click={reset}

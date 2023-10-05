@@ -11,12 +11,12 @@
   import Copy from "@/foundation/Copy.svelte";
   import Time from "@/foundation/Time.svelte";
   import Link from "@/foundation/Link.svelte";
-  import { showLoader } from "@/lib/stores/ui";
   import projects from "@/lib/stores/projects";
   import { pop, push } from "svelte-spa-router";
   import Field from "@/foundation/Field.svelte";
   import Button from "@/foundation/Button.svelte";
   import DualAction from "@/core/DualAction.svelte";
+  import { showLoader, dirty } from "@/lib/stores/ui";
   import ActionEdit from "@/core/actions/Edit.svelte";
   import tags, { updateTags } from "@/lib/stores/tags";
   import Container from "@/foundation/Container.svelte";
@@ -27,7 +27,6 @@
   import type { Tag as TagType } from "@/backend/schema/tag";
   import settings, { updateSettings } from "@/lib/stores/settings";
 
-  let dirty = false;
   let tagSearch: string = "";
   let filteredTags: TagType[] = [];
   let deletedTag: TagType | undefined;
@@ -43,7 +42,7 @@
 
   $: if (!Object.keys(newValues).length && $settings)
     newValues = JSON.parse(JSON.stringify($settings));
-  $: if (newValues && $settings) dirty = !same(newValues, $settings);
+  $: if (newValues && $settings) $dirty = !same(newValues, $settings);
 
   $: if (tagSearch.length) {
     filteredTags = $tags.filter((tag) =>
@@ -353,7 +352,7 @@
     </section>
   </Container>
   <div slot="cta">
-    {#if dirty}
+    {#if $dirty}
       <DualAction as="div" label="Do you want to">
         <Button
           slot="secondary"
