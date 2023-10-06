@@ -18,6 +18,7 @@
     showRightSidebar,
   } from "@/lib/stores/ui";
   import trpc from "@/lib/trpc";
+  import { onMount } from "svelte";
   import qs from "@/lib/stores/qs";
   import now from "@/lib/stores/now";
   import Icon from "@iconify/svelte";
@@ -74,6 +75,7 @@
   let filters: TimerQuery[] = [];
   let showSaveQueryDialog = false;
   let viewChanged: boolean = false;
+  let viewDate: Temporal.PlainDate;
   let hourIndicators: HTMLElement[] = [];
   let filteredTimers: Timer[] | undefined;
   let combinator: TimerQueryCombinator = "and";
@@ -84,19 +86,15 @@
     icon: null,
     label: "",
   };
-  let viewDate: Temporal.PlainDate = params.date
-    ? Temporal.PlainDate.from(params.date)
-    : getToday();
 
-  $: if ($shouldRefresh)
-    viewDate = params.date ? Temporal.PlainDate.from(params.date) : getToday();
   $: if ($breakpoints.lg && duration === "days" && !viewChanged) view = "timeline";
+  $: viewDate = params.date ? Temporal.PlainDate.from(params.date) : getToday();
   $: if ($settings?.sod) sod = Temporal.PlainTime.from($settings.sod);
   $: if (filteredTimers) viewTimers = filteredTimers;
   $: if (viewDate && isToday(viewDate)) key = $now;
   $: if ($now) nowText = formatForShortTime($now);
   $: if (!filteredTimers) viewTimers = timers;
-  $: if (viewDate) updateTimers();
+  $: if ($shouldRefresh) viewDate = viewDate;
   $: if (view) loaded = false;
 
   $: if ($querystring && $location.startsWith("/timers/all")) {
@@ -106,9 +104,6 @@
     } else {
       filters = [];
     }
-    updateTimers();
-  } else {
-    filters = [];
     updateTimers();
   }
 
@@ -141,23 +136,32 @@
     }, 300);
   }
 
-  function navigateNext() {
+  onMount(updateTimers);
+
+  async function navigateNext() {
     if (duration === "all") return page++;
-    push(`/timers/${duration}/${viewDate.add({ [duration]: 1 })}`);
+    viewDate = viewDate.add({ [duration]: 1 });
+    await push(`/timers/${duration}/${viewDate}`);
+    await updateTimers();
   }
 
-  function navigatePrev() {
+  async function navigatePrev() {
     if (duration === "all") return page--;
-    push(`/timers/${duration}/${viewDate.subtract({ [duration]: 1 })}`);
+    viewDate = viewDate.subtract({ [duration]: 1 });
+    await push(`/timers/${duration}/${viewDate}`);
+    await updateTimers();
   }
 
-  function navigateCurrent() {
+  async function navigateCurrent() {
     if (duration === "all") return (page = 0);
-    push(`/timers/${duration}/${getToday()}`);
+    viewDate = getToday();
+    await push(`/timers/${duration}/${viewDate}`);
+    await updateTimers();
   }
 
-  function navigateDate(e: CustomEvent) {
-    push(`/timers/${duration}/${e.detail}`);
+  async function navigateDate(e: CustomEvent) {
+    await push(`/timers/${duration}/${e.detail}`);
+    await updateTimers();
   }
 
   async function updateTimers() {
@@ -182,7 +186,7 @@
         break;
       case "days":
         timers = await trpc.timers.getByDate.query({
-          date: params.date ?? getToday().toString(),
+          date: viewDate.toString() ?? getToday().toString(),
         });
         break;
     }
